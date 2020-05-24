@@ -1,5 +1,5 @@
 CC      = gcc
-CFLAGS  = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -std=c99 -Werror -pedantic
+CFLAGS  = -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 .SUFFIXES: .c .o
 
@@ -10,6 +10,9 @@ all: assemble emulate
 assemble: assemble.o
 
 emulate: emulate.o
+
+test:
+	./emulate ~/arm11_testsuite/test_cases/add01
 
 clean:
 	rm -f $(wildcard *.o)
