@@ -6,6 +6,8 @@
 #define MEM_LIMIT 65536
 #define WORD_LEN 4
 
+typedef uint32_t word;
+
 void check_ptr(const void* ptr, char* error_msg) {
 	if (ptr == NULL) {
 		printf("Error: %s\n", error_msg);
@@ -13,9 +15,11 @@ void check_ptr(const void* ptr, char* error_msg) {
 	}
 }
 
-uint32_t* read_arm_to_mem(char* fname) {
+/* Takes in the ARM binary file's name and returns a word pointer to a heap-allocated array
+ * of size MEM_LIMIT bytes. */
+word* read_arm_to_mem(char* fname) {
 
-	uint32_t* memory = (uint32_t*) calloc(MEM_LIMIT, sizeof(uint32_t));
+	word* memory = (word*) calloc(MEM_LIMIT, sizeof(word));
 	check_ptr(memory, "Not enough memory.\n");
 
 	FILE* bin_obj = fopen(fname, "rb");
@@ -27,7 +31,7 @@ uint32_t* read_arm_to_mem(char* fname) {
 
 	assert(file_size < MEM_LIMIT);
 	assert(file_size % WORD_LEN == 0);
-	fread(memory, sizeof(uint32_t), file_size/WORD_LEN, bin_obj);
+	fread(memory, sizeof(word), file_size/WORD_LEN, bin_obj);
 
 	printf("Read %ld words into memory.\n", file_size/WORD_LEN);
 
@@ -41,7 +45,7 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	uint32_t* memory = read_arm_to_mem(argv[1]);
+	word* memory = read_arm_to_mem(argv[1]);
 
 
 
