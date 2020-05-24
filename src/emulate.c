@@ -5,8 +5,16 @@
 
 #define MEM_LIMIT 65536
 #define WORD_LEN 4
+#define REG_COUNT 17
 
 typedef uint32_t word;
+
+struct arm {
+	word*	memory;
+
+	/* 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR */
+	word*	registers;
+};
 
 void check_ptr(const void* ptr, char* error_msg) {
 	if (ptr == NULL) {
@@ -15,11 +23,12 @@ void check_ptr(const void* ptr, char* error_msg) {
 	}
 }
 
-/* Takes in the ARM binary file's name and returns a word pointer to a heap-allocated array
- * of size MEM_LIMIT bytes. */
-word* read_arm_to_mem(char* fname) {
-
-	word* memory = (word*) calloc(MEM_LIMIT, sizeof(word));
+/* Takes in the ARM binary file's name and returns an ARM state pointer with memory and register
+ * pointers on heap, where memory is of size MEM_LIMIT bytes */
+struct arm* init_arm(char* fname) {
+	
+	/* load binary file into memory */
+	word* memory = (word*) calloc(MEM_LIMIT/sizeof(word), sizeof(word));
 	check_ptr(memory, "Not enough memory.\n");
 
 	FILE* bin_obj = fopen(fname, "rb");
@@ -36,7 +45,16 @@ word* read_arm_to_mem(char* fname) {
 	printf("Read %ld words into memory.\n", file_size/WORD_LEN);
 
 	fclose(bin_obj);
-	return memory;
+
+	/* initialise registers */
+	word* registers = (word*) calloc(REG_COUNT, sizeof(word));
+
+	/* construct ARM state */
+	struct arm* arm_state = malloc(sizeof(struct arm));
+	arm_state->memory = memory;
+	arm_state->registers = registers;
+
+	return arm_state;
 }
 
 int main(int argc, char **argv) {
@@ -45,11 +63,11 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	word* memory = read_arm_to_mem(argv[1]);
+	struct arm* arm_state = init_arm(argv[1]);
 
-
-
-	free(memory);
+	free(arm_state->memory);
+	free(arm_state->registers);
+	free(arm_state);
 
 	return EXIT_SUCCESS;
 }
