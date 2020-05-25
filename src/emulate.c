@@ -20,14 +20,14 @@ typedef struct {
   word * registers;
 } arm;
 
-void ptrValidate(const void * pointer, char* error) {
+void ptrValidate(const void * pointer, char * error) {
   if (pointer == NULL) {
     printf("Error: %s\n", error);
     exit(EXIT_FAILURE);
   }
 }
 
-void decode(word instruction) {
+void decode(arm state, word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
   const word multMask = 0x0FC000F0;
@@ -59,7 +59,7 @@ int main(int argc, char ** argv) {
 
 	arm * state;
 
-  // free memory before code termination
+    // free memory before code termination
 	free(state -> memory);
 	free(state -> registers);
 	free(state);
