@@ -12,6 +12,7 @@ typedef uint32_t word;
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
 enum Register {PC = 15, CPSR = 16};
+enum Opcode {AND = 0, EOR = 1, SUB = 2, RSB = 3, ADD = 4, TST = 8, TEQ = 9, CMP = 10, ORR = 12, MOV = 13};
 
 typedef struct {
   // ARM machine memory
@@ -24,6 +25,43 @@ void ptrValidate(const void * pointer, char* error) {
   if (pointer == NULL) {
     printf("Error: %s\n", error);
     exit(EXIT_FAILURE);
+  }
+}
+
+void dpi(word instruction) {
+  const word mask = 0x01E00000;
+  enum Opcode opcode = instruction & mask;
+  switch (opcode) {
+    case AND:
+      // Rn AND operand2
+      break;
+    case EOR:
+      // Rn EOR operand2
+      break;
+    case SUB:
+      // Rn - operand2
+      break;
+    case RSB:
+      // operand2 - Rn
+      break;
+    case ADD:
+      // Rn + operand2
+      break;
+    case TST:
+      // as and, but result not written
+      break;
+    case TEQ:
+      // as eor, but result is not written
+      break;
+    case CMP:
+      // as sub, but result is not written
+      break;
+    case ORR:
+      // Rn OR operand2
+      break;
+    case MOV:
+      // operand2 (Rn is ignored)
+      break;
   }
 }
 
@@ -47,7 +85,7 @@ void instructionSelect(word instruction) {
   } else if (BITS_SET(instruction, multMask, mult)) {
     // function for multiply instructions
   } else if (BITS_SET(instruction, dpMask, dp)) {
-    // function for data processing instructions
+    dpi(instruction);
   }
 }
 
