@@ -5,7 +5,7 @@
 #define MEMORY_CAPACITY 65536
 #define NO_REGISTERS 17
 #define ADDRESS_SIZE 4
-#define BITS_SET(value, mask, bits)((value & mask) == bits)
+#define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
 typedef uint32_t word;
 
@@ -51,17 +51,17 @@ void decode(arm state, word instruction) {
   }
 }
 
-int main(int argc, char ** argv) {
+int main (int argc, char ** argv) {
   if (argc == 1) {
-		printf("Please specify an ARM binary object code file.\n");
-		exit(EXIT_FAILURE);
-	}
+    printf("Please specify an ARM binary object code file.\n");
+    exit(EXIT_FAILURE);
+  }
+  arm * state;
 
-	arm * state;
-
-    // free memory before code termination
-	free(state -> memory);
-	free(state -> registers);
-	free(state);
+  // free memory before code termination
+  free(state -> memory);
+  free(state -> registers);
+  free(state);
   return EXIT_SUCCESS;
+
 }
