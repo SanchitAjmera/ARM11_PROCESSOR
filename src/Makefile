@@ -9,8 +9,10 @@ all: assemble emulate
 
 assemble: assemble.o
 	$(CC) $(CFLAGS) assemble.o -o assemble
+	rm -f assemble.o
 emulate: emulate.o
 	$(CC) $(CFLAGS) emulate.o -o emulate
+	rm -f emulate.o
 assemble.o:
 	$(CC) -c assemble.c
 emulate.o:
