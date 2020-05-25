@@ -13,7 +13,9 @@ typedef uint32_t word;
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
 enum Register {PC = 15, CPSR = 16};
+// opcode mnemonics
 enum Opcode {AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV};
+// condition suffixes
 enum Cond {EQ, NE, GE = 10, LT, GT, LE, AL};
 
 typedef struct {
@@ -31,12 +33,12 @@ void ptrValidate(const void * pointer, char * error) {
 }
 
 bool checkCond(unsigned int cond, arm state) {
-  // CPSR 4 bits
+  // CPSR flag bits
   unsigned int n = state.registers[CPSR] & 8;
   unsigned int z = state.registers[CPSR] & 4;
   unsigned int c = state.registers[CPSR] & 2;
   unsigned int v = state.registers[CPSR] & 1;
-
+  // conditions for instruction
   switch (cond) {
     case EQ:
       return z;
@@ -50,8 +52,10 @@ bool checkCond(unsigned int cond, arm state) {
       return !z && (n == v);
     case LE:
       return z || (n != v);
-    default:
+    case AL:
       return true;
+    default:
+      return false;
   }
 }
 
@@ -59,13 +63,28 @@ void dpi(arm state, word instruction) {
   if (!checkCond(instruction & 0xF0000000, state)) {
     return;
   }
-
+  // parts of the instruction
   unsigned int i = instruction & 0x02000000;
   unsigned int s = instruction & 0x00100000;
   unsigned int rn = instruction & 0x000F0000;
   unsigned int rd = instruction & 0x0000F000;
   unsigned int op2 = instruction & 0x00000FFF;
 
+  // TODO:
+    // If the S bit is 0, the CPSR register is unaffected
+    // If the S bit is set then the CPSR flags should be set as follows:
+      // The V bit will be unaffected.
+      // The C bit in logical operations will be set to the carry out from any shift operation
+        // In arithmetic operations the C bit will be set to the carry out of the bit 31 of the ALU
+        // C is set to 1 if the addition produced a carry
+        // For subtraction (including comparison), the bit C is set to 0 if the subtraction produced a borrow
+      // The Z bit will be set only if the result is all zeros.
+      // The N bit will be set to the logical value of bit 31 of the result.
+
+  // TODO: operand2 is an immediate value
+  // TODO: operand2 is a register
+
+  // execution of instruction
   enum Opcode opcode = instruction & 0x01E00000;
   switch (opcode) {
     case AND:
