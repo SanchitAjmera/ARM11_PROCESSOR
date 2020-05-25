@@ -27,7 +27,7 @@ void ptrValidate(const void * pointer, char* error) {
   }
 }
 
-void instructionSelect(word instruction) {
+void decode(word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
   const word multMask = 0x0FC000F0;
