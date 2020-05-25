@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define MEMORY_CAPACITY 65536
 #define NO_REGISTERS 17
 #define ADDRESS_SIZE 4
-#define BITS_SET(value, mask, bits)((value & mask) == bits)
+#define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
 typedef uint32_t word;
 
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
 enum Register {PC = 15, CPSR = 16};
-enum Opcode {AND = 0, EOR = 1, SUB = 2, RSB = 3, ADD = 4, TST = 8, TEQ = 9, CMP = 10, ORR = 12, MOV = 13};
+enum Opcode {AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV};
+enum Cond {EQ, NE, GE = 10, LT, GT, LE, AL};
 
 typedef struct {
   // ARM machine memory
@@ -21,16 +23,50 @@ typedef struct {
   word * registers;
 } arm;
 
-void ptrValidate(const void * pointer, char* error) {
+void ptrValidate(const void * pointer, char * error) {
   if (pointer == NULL) {
     printf("Error: %s\n", error);
     exit(EXIT_FAILURE);
   }
 }
 
-void dpi(word instruction) {
-  const word mask = 0x01E00000;
-  enum Opcode opcode = instruction & mask;
+bool checkCond(unsigned int cond, arm state) {
+  // CPSR 4 bits
+  unsigned int n = state.registers[CPSR] & 8;
+  unsigned int z = state.registers[CPSR] & 4;
+  unsigned int c = state.registers[CPSR] & 2;
+  unsigned int v = state.registers[CPSR] & 1;
+
+  switch (cond) {
+    case EQ:
+      return z;
+    case NE:
+      return !z;
+    case GE:
+      return n == v;
+    case LT:
+      return n != v;
+    case GT:
+      return !z && (n == v);
+    case LE:
+      return z || (n != v);
+    default:
+      return true;
+  }
+}
+
+void dpi(arm state, word instruction) {
+  if (!checkCond(instruction & 0xF0000000, state)) {
+    return;
+  }
+
+  unsigned int i = instruction & 0x02000000;
+  unsigned int s = instruction & 0x00100000;
+  unsigned int rn = instruction & 0x000F0000;
+  unsigned int rd = instruction & 0x0000F000;
+  unsigned int op2 = instruction & 0x00000FFF;
+
+  enum Opcode opcode = instruction & 0x01E00000;
   switch (opcode) {
     case AND:
       // Rn AND operand2
@@ -65,7 +101,7 @@ void dpi(word instruction) {
   }
 }
 
-void instructionSelect(word instruction) {
+void decode(arm state, word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
   const word multMask = 0x0FC000F0;
@@ -85,7 +121,7 @@ void instructionSelect(word instruction) {
   } else if (BITS_SET(instruction, multMask, mult)) {
     // function for multiply instructions
   } else if (BITS_SET(instruction, dpMask, dp)) {
-    dpi(instruction);
+    dpi(state, instruction);
   }
 }
 
