@@ -10,18 +10,12 @@
 #define ADDRESS_SIZE 4
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
-// Constants for Multiply
-#define MULT_RDEST_MASK 0x000F0000
-#define MULT_REG_S_MASK 0x00000F00
-#define MULT_REG_M_MASK 0x0000000F
-#define MULT_REG_N_MASK 0x0000F000
-#define MULT_REG_S_SHIFT 8
-#define MULT_REG_N_SHIFT 12
-#define MULT_RDEST_SHIFT 16
-#define ACCUMULATE_FLAG (1 << 21)
-#define UPDATE_CPSR (1 << 20)
-#define CPSR_N (1 << 31)
-#define CPSR_Z (1 << 30)
+// Constants for Branch
+#define BRANCH_OFFSET_MASK 0x00FFFFFF
+#define BRANCH_SIGN_BIT (1 << 23)
+#define PIPELINE_SHIFT 2
+#define NEGATIVE_SIGN_EXTEND 0xFC000000
+#define POSITIVE_SIGN_EXTEND 0
 
 typedef uint32_t word;
 
@@ -78,46 +72,19 @@ bool checkCond(arm state, word instruction) {
   }
 }
 
-void multiply(arm state, word instruction) {
-  // no execution if condition code does not match
-  if (!checkCond(state, instruction)) {
-    return;
-  }
-  // Extraction of information from the instruction;
-  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
-  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
-  int regM = instruction & MULT_REG_M_MASK;
-
-  // Initial execution of instruction
-  int result = state.registers[regM] * state.registers[regS];
-
-  // Obtain value from Rn and add to result if Accumulate is set
-  if (instruction & ACCUMULATE_FLAG) {
-    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
-    result += state.registers[regN];
-  }
-  // Update CPSR flags if S (bit 20 in instruction) is set
-  if (instruction & UPDATE_CPSR) {
-    state.registers[CPSR] |= (result & CPSR_N);
-    if (!result)
-      state.registers[CPSR] |= CPSR_Z;
-  }
-
-  // write result to destination register
-  state.registers[destination] = result;
-}
-
 void branch(arm state, word instruction) {
   // no execution if condition code does not match
   if (!checkCond(state, instruction))
     return;
 
   // Extraction of information
-  int offset = instruction & 0x00FFFFFF;
-  int signBit = offset & (1 << 23);
+  int offset = instruction & BRANCH_OFFSET_MASK;
+  int signBit = offset & BRANCH_SIGN_BIT;
 
   // Shift, sign extension and addition of offset onto current address
-  state.registers[PC] += (offset << 2) | (signBit ? 0xFC000000 : 0);
+  state.registers[PC] +=
+      (offset << PIPELINE_SHIFT) |
+      (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
 }
 
 void decode(arm state, word instruction) {
