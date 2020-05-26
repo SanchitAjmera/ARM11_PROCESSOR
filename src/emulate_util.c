@@ -16,7 +16,7 @@ void check_ptr(const void* ptr, const char* error_msg) {
 void init_arm(struct arm* state, const char* fname) {
 	
 	/* load binary file into memory */
-	Byte* memory = (Byte*) calloc(MEM_BYTE_CAPACITY, sizeof(Byte));
+	byte* memory = (byte*) calloc(MEM_BYTE_CAPACITY, sizeof(byte));
 	check_ptr(memory, "Not enough memory.\n");
 
 	FILE* bin_obj = fopen(fname, "rb");
@@ -26,8 +26,7 @@ void init_arm(struct arm* state, const char* fname) {
 	long file_size = ftell(bin_obj);
 	rewind(bin_obj);
 
-	assert(file_size < MEM_BYTE_CAPACITY);
-	assert(file_size % WORD_LEN == 0);
+	/* Asserts that fread read the whole file */
 	assert(fread(memory, 1, file_size, bin_obj)==file_size);
 
 	printf("Read %ld words into memory.\n", file_size/WORD_LEN);
@@ -35,9 +34,17 @@ void init_arm(struct arm* state, const char* fname) {
 	fclose(bin_obj);
 
 	/* initialise registers */
-	Word* registers = (Word*) calloc(REG_COUNT, sizeof(Word));
+	word* registers = (word*) calloc(REG_COUNT, sizeof(word));
 
 	/* construct ARM state */
 	state->memory = memory;
 	state->registers = registers;
+}
+
+word get_word(byte* start_addr) {
+	word w = 0;
+	for(int i = 0; i < WORD_LEN; i++) {
+		w += start_addr[i] << 8*i;
+	}
+	return w;
 }
