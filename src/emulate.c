@@ -32,7 +32,7 @@ void ptrValidate(const void * pointer, char * error) {
   }
 }
 
-bool checkCond(word instruction, arm state) {
+bool checkCond(arm state, word instruction) {
   // CPSR flag bits
   unsigned int n = state.registers[CPSR] & 0x80000000;
   unsigned int z = state.registers[CPSR] & 0x40000000;
@@ -61,7 +61,7 @@ bool checkCond(word instruction, arm state) {
 }
 
 void dpi(arm state, word instruction) {
-  if (!checkCond(instruction, state)) {
+  if (!checkCond(state, instruction)) {
     return;
   }
   // parts of the instruction
