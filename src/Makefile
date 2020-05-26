@@ -11,6 +11,8 @@ assemble: assemble.o
 
 emulate: emulate.o
 
+emulate.o: emulate.h
+
 test:
 	./emulate ~/arm11_testsuite/test_cases/add01
 
