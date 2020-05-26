@@ -92,12 +92,12 @@ void multiply(arm state, word instruction) {
   int result = state.registers[regM] * state.registers[regS];
 
   // Obtain value from Rn and add to result if Accumulate is set
-  if (BITS_SET(instruction, ACCUMULATE_FLAG, ACCUMULATE_FLAG)) {
+  if (instruction & ACCUMULATE_FLAG) {
     int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
     result += state.registers[regN];
   }
   // Update CPSR flags if S (bit 20 in instruction) is set
-  if (BITS_SET(instruction, UPDATE_CPSR, UPDATE_CPSR)) {
+  if (instruction & UPDATE_CPSR) {
     state.registers[CPSR] |= (result & CPSR_N);
     if (!result)
       state.registers[CPSR] |= CPSR_Z;
