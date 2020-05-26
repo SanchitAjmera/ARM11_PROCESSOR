@@ -4,6 +4,12 @@
 
 #include "emulate_util.h"
 
+#define BITS_SET(value, mask, bits) ((value & mask) == bits)
+
+/*registers 0-12 will be used by their value so for reg0 we can just use 0
+but these will make it easier to address in memory*/
+enum Register { PC = 15, CPSR = 16 };
+
 void check_ptr(const void *ptr, const char *error_msg) {
   if (ptr == NULL) {
     printf("Error: %s\n", error_msg);
@@ -48,4 +54,28 @@ word get_word(byte *start_addr) {
     w += start_addr[i] << 8 * i;
   }
   return w;
+}
+
+void decode(arm state, word instruction) {
+  const word dpMask = 0x0C000000;
+  const word dp = 0x00000000;
+  const word multMask = 0x0FC000F0;
+  const word mult = 0x0000090;
+  const word sdtMask = 0x0C600000;
+  const word sdt = 0x04000000;
+  const word branchMask = 0x0F000000;
+  const word branch = 0x0A000000;
+
+  // TODO: determine how to differentiate ...
+  // ... `data processing` from `multiply`
+
+  if (BITS_SET(instruction, branchMask, branch)) {
+    // function for branch instructions
+  } else if (BITS_SET(instruction, sdtMask, sdt)) {
+    // function for single data tranfser instructions
+  } else if (BITS_SET(instruction, multMask, mult)) {
+    // function for multiply instructions
+  } else if (BITS_SET(instruction, dpMask, dp)) {
+    // function for data processing instructions
+  }
 }
