@@ -37,10 +37,10 @@ void ptrValidate(const void *pointer, char *error) {
 
 bool checkCond(arm state, word instruction) {
   // CPSR flag bits
-  uint n = state.registers[CPSR] & 0x80000000;
-  uint z = state.registers[CPSR] & 0x40000000;
-  uint c = state.registers[CPSR] & 0x20000000;
-  uint v = state.registers[CPSR] & 0x10000000;
+  uint n = (state.registers[CPSR] & 0x80000000) >> 31;
+  uint z = (state.registers[CPSR] & 0x40000000) >> 30;
+  uint c = (state.registers[CPSR] & 0x20000000) >> 29;
+  uint v = (state.registers[CPSR] & 0x10000000) >> 28;
   enum Cond cond = instruction >> 28;
   // conditions for instruction
   switch (cond) {
@@ -63,27 +63,27 @@ bool checkCond(arm state, word instruction) {
   }
 }
 
-uint shiftConstant(uint shiftPart) {
+uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
   return shiftPart >> 4;
 }
 
-uint shiftRegister(arm state, uint rs) {
+uint shiftByRegister(arm state, uint rs) {
   // pre: Rs (register) can be any general purpose register except the PC
   // bottom byte of Rs specifies the amount to be shifted
   return state.registers[rs] & 0x0000000F;
 }
 
-uint shiftI(word value, uint shiftBy, enum Shift shiftType) {
+uint shiftI(word value, uint shiftNum, enum Shift shiftType) {
   // TODO: set the CPSR flags (C carry out bit)
   switch (shiftType) {
   case LSL:
-    return value << shiftBy;
+    return value << shiftNum;
   case LSR:
-    return value >> shiftBy;
+    return value >> shiftNum;
   case ASR:
     // TODO: check if this is an arithmetic shift
-    return (signed int)value > shiftBy;
+    return (signed int)value > shiftNum;
   case ROR:
     break;
   }
@@ -96,20 +96,19 @@ int opRegister(arm state, uint op2) {
   uint shiftPart = op2 >> 4;
   // shift type instruction
   enum Shift shiftType = (shiftPart & 0x06) >> 1;
+  // bit to determine what to shift by
+  bool shiftByConst = shiftPart & 0x01;
   // number to shift by
-  uint shiftBy;
-  if (shiftPart & 0x01) {
-    // shift by a constant
-    shiftBy = shiftConstant(shiftPart);
-  } else {
-    // shift specified by a register (optional)
-    shiftBy = shiftRegister(state, shiftPart >> 4);
-  }
-  return shiftI(value, shiftBy, shiftType);
+  uint shiftNum =
+      shiftByConst ? shiftByConstant(shiftPart) : shiftByRegister(state, rs);
+  return shiftI(value, shiftNum, shiftType);
 }
 
 int opImmediate(arm state, uint op2) {
-  // TODO: code me
+  // 8-bit immediate value zero-extended to 32 bits
+  word imm = (op2 & 0x0FF) << 24;
+  // number of rotations
+  uint rotateBy = (op2 & 0xF00) >> 8;
   return 0;
 }
 
@@ -118,11 +117,11 @@ void dpi(arm state, word instruction) {
     return;
   }
   // parts of the instruction
-  uint i = (instruction & 0x02000000) >> 25;
-  uint s = (instruction & 0x00100000) >> 20;
-  uint rn = (instruction & 0x000F0000) >> 16;
-  uint rd = (instruction & 0x0000F000) >> 12;
-  uint op2 = instruction & 0x00000FFF;
+  const uint i = (instruction & 0x02000000) >> 25;
+  const uint s = (instruction & 0x00100000) >> 20;
+  const uint rn = (instruction & 0x000F0000) >> 16;
+  const uint rd = (instruction & 0x0000F000) >> 12;
+  const uint op2 = instruction & 0x00000FFF;
 
   // TODO:
   // If the S bit is 0, the CPSR register is unaffected
@@ -149,45 +148,46 @@ void dpi(arm state, word instruction) {
   }
 
   // execution of instruction
+  // first operand
   word src = state.registers[rn];
-  word dest = state.registers[rd];
-  enum Opcode opcode = instruction & 0x01E00000;
+  // opcode from the instruction
+  enum Opcode opcode = (instruction & 0x01E00000) >> 20;
   switch (opcode) {
   case AND:
     // Rn AND operand2
-    state.registers[rd] = state.registers[rn] & value;
+    state.registers[rd] = src & value;
     break;
   case EOR:
     // Rn EOR operand2
-    state.registers[rd] = state.registers[rn] ^ value;
+    state.registers[rd] = src ^ value;
     break;
   case SUB:
     // Rn - operand2
-    state.registers[rd] = state.registers[rn] - value;
+    state.registers[rd] = src - value;
     break;
   case RSB:
     // operand2 - Rn
-    state.registers[rd] = value - state.registers[rn];
+    state.registers[rd] = value - src;
     break;
   case ADD:
     // Rn + operand2
-    state.registers[rd] = state.registers[rn] + value;
+    state.registers[rd] = src + value;
     break;
   case TST:
     // as and, but result not written
-    state.registers[rn] & value;
+    src &value;
     break;
   case TEQ:
     // as eor, but result is not written
-    state.registers[rd] = state.registers[rn] ^ value;
+    state.registers[rd] = src ^ value;
     break;
   case CMP:
     // as sub, but result is not written
-    state.registers[rd] = state.registers[rn] - value;
+    state.registers[rd] = src - value;
     break;
   case ORR:
     // Rn OR operand2
-    state.registers[rd] = state.registers[rn] | value;
+    state.registers[rd] = src | value;
     break;
   case MOV:
     // operand2 (Rn is ignored)
