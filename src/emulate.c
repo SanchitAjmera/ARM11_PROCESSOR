@@ -107,6 +107,19 @@ void multiply(arm state, word instruction) {
   state.registers[destination] = result;
 }
 
+void branch(arm state, word instruction) {
+  // no execution if condition code does not match
+  if (!checkCond(state, instruction))
+    return;
+
+  // Extraction of information
+  int offset = instruction & 0x00FFFFFF;
+  int signBit = offset & (1 << 23);
+
+  // Shift, sign extension and addition of offset onto current address
+  state.registers[PC] += (offset << 2) | (signBit ? 0xFC000000 : 0);
+}
+
 void decode(arm state, word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
