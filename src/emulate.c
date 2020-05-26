@@ -139,7 +139,7 @@ void dpi(arm state, word instruction) {
   // TODO: operand2 is an immediate value
 
   // op2
-  uint value;
+  word value;
   if (i) {
     // op2 is an immediate value
     value = opImmediate(state, op2);
@@ -147,48 +147,51 @@ void dpi(arm state, word instruction) {
     // op2 is a register value
     value = opRegister(state, op2);
   }
+
   // execution of instruction
+  word src = state.registers[rn];
+  word dest = state.registers[rd];
   enum Opcode opcode = instruction & 0x01E00000;
   switch (opcode) {
   case AND:
     // Rn AND operand2
-    state.registers[rd] = state.registers[rn] & op2;
+    state.registers[rd] = state.registers[rn] & value;
     break;
   case EOR:
     // Rn EOR operand2
-    state.registers[rd] = state.registers[rn] ^ op2;
+    state.registers[rd] = state.registers[rn] ^ value;
     break;
   case SUB:
     // Rn - operand2
-    state.registers[rd] = state.registers[rn] - op2;
+    state.registers[rd] = state.registers[rn] - value;
     break;
   case RSB:
     // operand2 - Rn
-    state.registers[rd] = op2 - state.registers[rn];
+    state.registers[rd] = value - state.registers[rn];
     break;
   case ADD:
     // Rn + operand2
-    state.registers[rd] = state.registers[rn] + op2;
+    state.registers[rd] = state.registers[rn] + value;
     break;
   case TST:
     // as and, but result not written
-    state.registers[rn] & op2;
+    state.registers[rn] & value;
     break;
   case TEQ:
     // as eor, but result is not written
-    state.registers[rd] = state.registers[rn] ^ op2;
+    state.registers[rd] = state.registers[rn] ^ value;
     break;
   case CMP:
     // as sub, but result is not written
-    state.registers[rd] = state.registers[rn] - op2;
+    state.registers[rd] = state.registers[rn] - value;
     break;
   case ORR:
     // Rn OR operand2
-    state.registers[rd] = state.registers[rn] | op2;
+    state.registers[rd] = state.registers[rn] | value;
     break;
   case MOV:
     // operand2 (Rn is ignored)
-    state.registers[rd] = op2;
+    state.registers[rd] = value;
     break;
   }
 }
