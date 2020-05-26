@@ -33,3 +33,9 @@ assemble
 *.nav
 *.toc
 
+#ignore ide files
+**/.idea
+**/cmake-build-debug
+CMakeLists.txt
+
+

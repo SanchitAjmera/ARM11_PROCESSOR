@@ -3,7 +3,7 @@ CFLAGS  = -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 .SUFFIXES: .c .o
 
-.PHONY: all clean
+.PHONY: all clean test
 
 all: assemble emulate testme
 

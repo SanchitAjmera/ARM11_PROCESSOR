@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "emulate_util.h"
 
@@ -17,4 +18,5 @@ int main(int argc, char **argv) {
   free(state);
 
   return EXIT_SUCCESS;
+
 }
