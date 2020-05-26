@@ -27,15 +27,14 @@ void ptrValidate(const void *pointer, char *error) {
   }
 }
 
-// From Alex with a minor update to refactor the mask so the instruction is an
-// input
+// From Alex
 bool checkCond(arm state, word instruction) {
-  unsigned int cond = instruction & 0xF0000000;
   // CPSR flag bits
-  unsigned int n = state.registers[CPSR] & 8;
-  unsigned int z = state.registers[CPSR] & 4;
-  unsigned int c = state.registers[CPSR] & 2;
-  unsigned int v = state.registers[CPSR] & 1;
+  unsigned int n = state.registers[CPSR] & 0x80000000;
+  unsigned int z = state.registers[CPSR] & 0x40000000;
+  unsigned int c = state.registers[CPSR] & 0x20000000;
+  unsigned int v = state.registers[CPSR] & 0x10000000;
+  unsigned int cond = instruction >> 28;
   // conditions for instruction
   switch (cond) {
   case EQ:
@@ -70,15 +69,21 @@ void multiply(arm state, word instruction) {
 
   // Obtain value from Rn and add to result if Accumulate is set
   // need to confirm arguments of BITS_SET with Alex
-  if (BITS_SET(instruction, 0x00200000, 0x00200000)) {
+  if (BITS_SET(instruction, 1 << 21, 1 << 21)) {
     int regN = (instruction & 0x0000F000) >> 12;
     result += state.registers[regN];
   }
+  // Update CPSR flags if S (bit 20 in instruction) is set
+  if (BITS_SET(instruction, 1 << 20, 1 << 20)) {
+    state.registers[CPSR] |= (result & (1 << 31));
+    if (!result)
+      state.registers[CPSR] |= (1 << 30);
+  }
 
+  // write result to destination register
   state.registers[destination] = result;
 
   /*TO DO:
-    - Set CPSR values according to if S bit is set
     - Possibly figure out way of reducing magic number masks
   */
 }
