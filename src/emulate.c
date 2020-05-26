@@ -74,9 +74,9 @@ uint shiftRegister(arm state, uint rs) {
   return state.registers[rs] & 0x0000000F;
 }
 
-uint shiftI(word value, uint shiftBy, uint shiftTypeBits) {
-  // TODO: set the CPSR flags
-  switch (shiftTypeBits) {
+uint shiftI(word value, uint shiftBy, uint shiftType) {
+  // TODO: set the CPSR flags (C carry out bit)
+  switch (shiftType) {
   case LSL:
     return value << shiftBy;
   case LSR:
@@ -90,8 +90,12 @@ uint shiftI(word value, uint shiftBy, uint shiftTypeBits) {
 }
 
 int opRegister(arm state, uint op2) {
+  // value to be shifted
+  word value = state.registers[op2 & 0x00F];
   // bits indicating the shift instruction
   uint shiftPart = op2 >> 4;
+  // shift type instruction
+  uint shiftType = (shiftPart & 0x06) >> 1;
   // number to shift by
   uint shiftBy;
   if (shiftPart & 0x01) {
@@ -101,7 +105,7 @@ int opRegister(arm state, uint op2) {
     // shift specified by a register (optional)
     shiftBy = shiftRegister(state, shiftPart >> 4);
   }
-  return shiftI(state.registers[op2 & 0x00F], shiftBy, (shiftPart & 0x06) >> 1);
+  return shiftI(value, shiftBy, shiftType);
 }
 
 int opImmediate(arm state, uint op2) {
