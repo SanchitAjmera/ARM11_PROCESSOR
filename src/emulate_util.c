@@ -20,7 +20,7 @@ void check_ptr(const void *ptr, const char *error_msg) {
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEM_LIMIT bytes */
-void init_arm(struct arm *state, const char *fname) {
+void init_arm(arm *state, const char *fname) {
 
   /* load binary file into memory */
   byte *memory = (byte *)calloc(MEM_BYTE_CAPACITY, sizeof(byte));

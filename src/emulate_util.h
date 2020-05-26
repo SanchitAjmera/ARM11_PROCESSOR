@@ -6,6 +6,7 @@
 
 typedef uint32_t word;
 typedef uint8_t byte;
+typedef struct arm arm;
 
 static const int MEM_BYTE_CAPACITY = 65536;
 static const int WORD_LEN = 4;
@@ -23,6 +24,8 @@ extern void check_ptr(const void *ptr, const char *error_msg);
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEM_LIMIT bytes */
-extern void init_arm(struct arm *state, const char *fname);
+extern void init_arm(arm *state, const char *fname);
+
+extern void decode(arm state, word instruction);
 
 #endif
