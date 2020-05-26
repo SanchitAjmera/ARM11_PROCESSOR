@@ -1,3 +1,5 @@
+#ifndef
+
 // general constants
 #define MEMORY_CAPACITY 65536
 #define NO_REGISTERS 17
@@ -16,3 +18,5 @@
 #define UPDATE_CPSR (1 << 20)
 #define CPSR_N (1 << 31)
 #define CPSR_Z (1 << 30)
+
+#endif
