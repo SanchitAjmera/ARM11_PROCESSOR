@@ -12,11 +12,11 @@ typedef uint32_t word;
 
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
-enum Register {PC = 15, CPSR = 16};
+enum Register { PC = 15, CPSR = 16 };
 // opcode mnemonics
-enum Opcode {AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV};
+enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 // condition suffixes
-enum Cond {EQ, NE, GE = 10, LT, GT, LE, AL};
+enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 
 typedef struct {
   // ARM machine memory
@@ -25,7 +25,7 @@ typedef struct {
   word * registers;
 } arm;
 
-void ptrValidate(const void * pointer, char * error) {
+void ptrValidate(const void *pointer, char *error) {
   if (pointer == NULL) {
     printf("Error: %s\n", error);
     exit(EXIT_FAILURE);
@@ -57,7 +57,7 @@ bool checkCond(arm state, word instruction) {
       return true;
     default:
       return false;
-  }
+    }
 }
 
 void dpi(arm state, word instruction) {
@@ -65,22 +65,23 @@ void dpi(arm state, word instruction) {
     return;
   }
   // parts of the instruction
-  unsigned int i = instruction & 0x02000000;
-  unsigned int s = instruction & 0x00100000;
-  unsigned int rn = instruction & 0x000F0000;
-  unsigned int rd = instruction & 0x0000F000;
+  unsigned int i = (instruction & 0x02000000) >> 25;
+  unsigned int s = (instruction & 0x00100000) >> 20;
+  unsigned int rn = (instruction & 0x000F0000) >> 16;
+  unsigned int rd = (instruction & 0x0000F000) >> 12;
   unsigned int op2 = instruction & 0x00000FFF;
 
   // TODO:
-    // If the S bit is 0, the CPSR register is unaffected
-    // If the S bit is set then the CPSR flags should be set as follows:
-      // The V bit will be unaffected.
-      // The C bit in logical operations will be set to the carry out from any shift operation
-        // In arithmetic operations the C bit will be set to the carry out of the bit 31 of the ALU
-        // C is set to 1 if the addition produced a carry
-        // For subtraction (including comparison), the bit C is set to 0 if the subtraction produced a borrow
-      // The Z bit will be set only if the result is all zeros.
-      // The N bit will be set to the logical value of bit 31 of the result.
+  // If the S bit is 0, the CPSR register is unaffected
+  // If the S bit is set then the CPSR flags should be set as follows:
+  // The V bit will be unaffected.
+  // The C bit in logical operations will be set to the carry out from any shift
+  // operation In arithmetic operations the C bit will be set to the carry out
+  // of the bit 31 of the ALU C is set to 1 if the addition produced a carry For
+  // subtraction (including comparison), the bit C is set to 0 if the
+  // subtraction produced a borrow
+  // The Z bit will be set only if the result is all zeros.
+  // The N bit will be set to the logical value of bit 31 of the result.
 
   // TODO: operand2 is an immediate value
   // TODO: operand2 is a register
@@ -118,7 +119,7 @@ void dpi(arm state, word instruction) {
     case MOV:
       // operand2 (Rn is ignored)
       break;
-  }
+    }
 }
 
 void decode(arm state, word instruction) {
@@ -145,7 +146,7 @@ void decode(arm state, word instruction) {
   }
 }
 
-int main (int argc, char ** argv) {
+int main(int argc, char ** argv) {
   if (argc == 1) {
     printf("Please specify an ARM binary object code file.\n");
     exit(EXIT_FAILURE);
@@ -153,9 +154,8 @@ int main (int argc, char ** argv) {
   arm * state;
 
   // free memory before code termination
-  free(state -> memory);
-  free(state -> registers);
+  free(state->memory);
+  free(state->registers);
   free(state);
   return EXIT_SUCCESS;
-
 }
