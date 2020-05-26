@@ -68,9 +68,10 @@ uint shiftByConstant(uint shiftPart) {
   return shiftPart >> 4;
 }
 
-uint shiftByRegister(arm state, uint rs) {
-  // pre: Rs (register) can be any general purpose register except the PC
-  // bottom byte of Rs specifies the amount to be shifted
+uint shiftByRegister(arm state, uint shiftPart) {
+  // Rs (register) can be any general purpose register except the PC
+  uint rs = shiftPart >> 4;
+  // bottom byte of value in Rs specifies the amount to be shifted
   return state.registers[rs] & 0x0000000F;
 }
 
@@ -99,8 +100,8 @@ int opRegister(arm state, uint op2) {
   // bit to determine what to shift by
   bool shiftByConst = shiftPart & 0x01;
   // number to shift by
-  uint shiftNum =
-      shiftByConst ? shiftByConstant(shiftPart) : shiftByRegister(state, rs);
+  uint shiftNum = shiftByConst ? shiftByConstant(shiftPart)
+                               : shiftByRegister(state, shiftPart);
   return shiftI(value, shiftNum, shiftType);
 }
 
@@ -109,6 +110,7 @@ int opImmediate(arm state, uint op2) {
   word imm = (op2 & 0x0FF) << 24;
   // number of rotations
   uint rotateBy = (op2 & 0xF00) >> 8;
+  // TODO: rotation function
   return 0;
 }
 
@@ -116,82 +118,67 @@ void dpi(arm state, word instruction) {
   if (!checkCond(state, instruction)) {
     return;
   }
-  // parts of the instruction
+
   const uint i = (instruction & 0x02000000) >> 25;
+  // if s is set then the CPSR flags should be updated
   const uint s = (instruction & 0x00100000) >> 20;
+  // op1 is always the contents of register Rn
   const uint rn = (instruction & 0x000F0000) >> 16;
+  // destination register
   const uint rd = (instruction & 0x0000F000) >> 12;
-  const uint op2 = instruction & 0x00000FFF;
+  uint op2 = instruction & 0x00000FFF;
 
-  // TODO:
-  // If the S bit is 0, the CPSR register is unaffected
-  // If the S bit is set then the CPSR flags should be set as follows:
-  // The V bit will be unaffected.
-  // The C bit in logical operations will be set to the carry out from any shift
-  // operation In arithmetic operations the C bit will be set to the carry out
-  // of the bit 31 of the ALU C is set to 1 if the addition produced a carry For
-  // subtraction (including comparison), the bit C is set to 0 if the
-  // subtraction produced a borrow
-  // The Z bit will be set only if the result is all zeros.
-  // The N bit will be set to the logical value of bit 31 of the result.
-
-  // TODO: operand2 is an immediate value
+  // TODO: CPSR flags
 
   // op2
-  word value;
-  if (i) {
-    // op2 is an immediate value
-    value = opImmediate(state, op2);
-  } else {
-    // op2 is a register value
-    value = opRegister(state, op2);
-  }
+  // If i is set, op2 is an immediate const, otherwise it's a shifted register
+  op2 = i ? opImmediate(state, op2) : opRegister(state, op2);
 
   // execution of instruction
   // first operand
-  word src = state.registers[rn];
+  word op1 = state.registers[rn];
   // opcode from the instruction
   enum Opcode opcode = (instruction & 0x01E00000) >> 20;
   switch (opcode) {
   case AND:
     // Rn AND operand2
-    state.registers[rd] = src & value;
+    state.registers[rd] = op1 & op2;
     break;
   case EOR:
     // Rn EOR operand2
-    state.registers[rd] = src ^ value;
+    state.registers[rd] = op1 ^ op2;
     break;
   case SUB:
     // Rn - operand2
-    state.registers[rd] = src - value;
+    state.registers[rd] = op1 - op2;
     break;
   case RSB:
     // operand2 - Rn
-    state.registers[rd] = value - src;
+    state.registers[rd] = op2 - op1;
     break;
   case ADD:
     // Rn + operand2
-    state.registers[rd] = src + value;
+    state.registers[rd] = op1 + op2;
     break;
   case TST:
     // as and, but result not written
-    src &value;
+    op1 &op2;
     break;
   case TEQ:
     // as eor, but result is not written
-    state.registers[rd] = src ^ value;
+    state.registers[rd] = op1 ^ op2;
     break;
   case CMP:
     // as sub, but result is not written
-    state.registers[rd] = src - value;
+    state.registers[rd] = op1 - op2;
     break;
   case ORR:
     // Rn OR operand2
-    state.registers[rd] = src | value;
+    state.registers[rd] = op1 | op2;
     break;
   case MOV:
     // operand2 (Rn is ignored)
-    state.registers[rd] = value;
+    state.registers[rd] = op2;
     break;
   }
 }
