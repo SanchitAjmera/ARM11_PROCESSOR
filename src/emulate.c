@@ -32,12 +32,13 @@ void ptrValidate(const void * pointer, char * error) {
   }
 }
 
-bool checkCond(unsigned int cond, arm state) {
+bool checkCond(word instruction, arm state) {
   // CPSR flag bits
-  unsigned int n = state.registers[CPSR] & 8;
-  unsigned int z = state.registers[CPSR] & 4;
-  unsigned int c = state.registers[CPSR] & 2;
-  unsigned int v = state.registers[CPSR] & 1;
+  unsigned int n = state.registers[CPSR] & 0x80000000;
+  unsigned int z = state.registers[CPSR] & 0x40000000;
+  unsigned int c = state.registers[CPSR] & 0x20000000;
+  unsigned int v = state.registers[CPSR] & 0x10000000;
+  unsigned int cond = instruction >> 28;
   // conditions for instruction
   switch (cond) {
     case EQ:
@@ -60,7 +61,7 @@ bool checkCond(unsigned int cond, arm state) {
 }
 
 void dpi(arm state, word instruction) {
-  if (!checkCond(instruction & 0xF0000000, state)) {
+  if (!checkCond(instruction, state)) {
     return;
   }
   // parts of the instruction
@@ -144,17 +145,17 @@ void decode(arm state, word instruction) {
   }
 }
 
-int main(int argc, char ** argv) {
+int main (int argc, char ** argv) {
   if (argc == 1) {
-		printf("Please specify an ARM binary object code file.\n");
-		exit(EXIT_FAILURE);
-	}
-
-	arm * state;
+    printf("Please specify an ARM binary object code file.\n");
+    exit(EXIT_FAILURE);
+  }
+  arm * state;
 
   // free memory before code termination
-	free(state -> memory);
-	free(state -> registers);
-	free(state);
+  free(state -> memory);
+  free(state -> registers);
+  free(state);
   return EXIT_SUCCESS;
+
 }
