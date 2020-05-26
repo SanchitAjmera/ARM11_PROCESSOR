@@ -1,67 +1,102 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <math.h>
 
-#define MEMORY_CAPACITY 65536
-#define NO_REGISTERS 17
-#define ADDRESS_SIZE 4
-#define BITS_SET(value, mask, bits) ((value & mask) == bits)
+#define MEMORY_CAPACITY = 65536
+#define NO_REGISTERS = 17
+#define ADDRESS_SIZE = 4
+#define BITS_SET(value, mask, bits) ((values &mask) == bits)
 
+//an unassigned 32 bit int for a word
 typedef uint32_t word;
 
-/*registers 0-12 will be used by their value so for reg0 we can just use 0
-but these will make it easier to address in memory*/
-enum Register {PC = 15, CPSR = 16};
+enum Register {PC =15, CPSR = 16};
 
-typedef struct {
-  // ARM machine memory
-  uint8_t * memory;
-  // 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR
-  word * registers;
-} arm;
+//condition suffixes for their codes
+enum Cond {EQ, NE GE=10, LT, GT, LE, AL};
 
-void ptrValidate(const void * pointer, char * error) {
-  if (pointer == NULL) {
-    printf("Error: %s\n", error);
-    exit(EXIT_FAILURE);
-  }
+typedef struct{
+    //ARM machine memory
+    uint8_t *memory;
+    //0-12 general purpose , 13 SP, 14 LR, 15 PCM 16 CPSR
+    word * registers;
+}arm;
+
+// CHECK IF CORRECTLY ASSIGNED MEMORY
+void ptrValidate(const void * pointer, char * error){
+    if (pointer == null){
+        printf("Error: %s\n", error);
+        exit(EXIT_FAILURE);
+    }
 }
 
-void decode(arm state, word instruction) {
-  const word dpMask = 0x0C000000;
-  const word dp = 0x00000000;
-  const word multMask = 0x0FC000F0;
-  const word mult = 0x0000090;
-  const word sdtMask = 0x0C600000;
-  const word sdt = 0x04000000;
-  const word branchMask = 0x0F000000;
-  const word branch = 0x0A000000;
+// function to check conditions
+//Parameter 1: code for Cond
+//Parameter 2: current state of arm
+bool checkCondition(unsigned int cond, arm state ){
+    //CPSR FLAG BITS - WE USE 1,2,4,8 to extract the 1,2,3,4th bit in the cpsr address
+    unsigned int n = state.registers[CPSR] & 8;
+    unsigned int z = state.registers[CPSR] & 4;
+    unsigned int c = state.registers[CPSR] & 2;
+    unsigned int v = state.registers[CPSR] & 1;
 
-  // TODO: determine how to differentiate ...
-  // ... `data processing` from `multiply`
+    // conditions for instruction
 
-  if (BITS_SET(instruction, branchMask, branch)) {
-    // function for branch instructions
-  } else if (BITS_SET(instruction, sdtMask, sdt)) {
-    // function for single data tranfser instructions
-  } else if (BITS_SET(instruction, multMask, mult)) {
-    // function for multiply instructions
-  } else if (BITS_SET(instruction, dpMask, dp)) {
-    // function for data processing instructions
-  }
+    switch(cond){
+        case EQ:
+            return z;
+        case NE:
+            return !z;
+        case GE:
+            return n ==v;
+        case LT:
+            return n !=v;
+        case GT:
+            return !z && (n==v);
+        case LE:
+            return z || (n != v);;
+        case AL:
+            return true;
+        default:
+            return false;
+    }
 }
 
-int main (int argc, char ** argv) {
-  if (argc == 1) {
-    printf("Please specify an ARM binary object code file.\n");
-    exit(EXIT_FAILURE);
-  }
-  arm * state;
+void sdti(arm state. word instruction) {
+    if (!checkCond(instruction & 0xF0000000, state)){
+        return;
+    }
+    // parts of the instruction
+    unsigned int i = instruction & 0x02000000;
+    unsigned int p = instruction & 0x01000000;
+    unsigned int u = instruction & 0x00800000;
+    unsigned int l = instruction & 0x00100000;
+    unsigned int rn = instruction & 0x000F0000;
+    unsigned int rd = instruction & 0x0000F000;
+    unsigned int offset = instruction & 0x00000FFF;
 
-  // free memory before code termination
-  free(state -> memory);
-  free(state -> registers);
-  free(state);
-  return EXIT_SUCCESS;
-
+    //Immediate Offset
+    if(i){
+        //offset is interpreted as a shifted register
+    } else {
+        // offset is interpreted as an immediate offset
+    }
+    //p doesn't change contents of base register for this exercise
+    if(p){
+        //add/subtract offset to the base register before transferring the data
+    } else{
+        //add/subtract offset to the base register after transferring
+    }
+    if(u){
+        //add offset to base register
+    } else{
+        // subtract offset from base register
+    }
+    if(l){
+        //word is loaded from memory
+    } else {
+        //word is stored in memory
+    }
 }
