@@ -91,33 +91,43 @@ void dpi(arm state, word instruction) {
   switch (opcode) {
     case AND:
       // Rn AND operand2
+      state.memory[rd] = state.memory[rn] & op2;
       break;
     case EOR:
       // Rn EOR operand2
+      state.memory[rd] = state.memory[rn] ^ op2;
       break;
     case SUB:
       // Rn - operand2
+      state.memory[rd] = state.memory[rn] - op2;
       break;
     case RSB:
       // operand2 - Rn
+      state.memory[rd] = op2 - state.memory[rn];
       break;
     case ADD:
       // Rn + operand2
+      state.memory[rd] = state.memory[rn] + op2;
       break;
     case TST:
       // as and, but result not written
+      state.memory[rn] & op2;
       break;
     case TEQ:
       // as eor, but result is not written
+      state.memory[rd] = state.memory[rn] ^ op2;
       break;
     case CMP:
       // as sub, but result is not written
+      state.memory[rd] = state.memory[rn] - op2;
       break;
     case ORR:
       // Rn OR operand2
+      state.memory[rd] = state.memory[rn] | op2;
       break;
     case MOV:
       // operand2 (Rn is ignored)
+      state.memory[rd] = op2;
       break;
     }
 }
