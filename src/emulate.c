@@ -63,19 +63,14 @@ bool checkCond(arm state, word instruction) {
   }
 }
 
-uint shiftByConstant(uint shiftPart) {
-  // integer specified by bits 7-4
-  return shiftPart >> 4;
+word rotateRight(word value, uint rotateBy) {
+  // word temp = 0x00000000;
+  uint start;
+  uint rotateBits = value & rotateBy;
+  return 0;
 }
 
-uint shiftByRegister(arm state, uint shiftPart) {
-  // Rs (register) can be any general purpose register except the PC
-  uint rs = shiftPart >> 4;
-  // bottom byte of value in Rs specifies the amount to be shifted
-  return state.registers[rs] & 0x0000000F;
-}
-
-uint shiftI(word value, uint shiftNum, enum Shift shiftType) {
+word shiftI(word value, uint shiftNum, enum Shift shiftType) {
   // TODO: set the CPSR flags (C carry out bit)
   switch (shiftType) {
   case LSL:
@@ -90,7 +85,19 @@ uint shiftI(word value, uint shiftNum, enum Shift shiftType) {
   }
 }
 
-int opRegister(arm state, uint op2) {
+uint shiftByConstant(uint shiftPart) {
+  // integer specified by bits 7-4
+  return shiftPart >> 4;
+}
+
+uint shiftByRegister(arm state, uint shiftPart) {
+  // Rs (register) can be any general purpose register except the PC
+  uint rs = shiftPart >> 4;
+  // bottom byte of value in Rs specifies the amount to be shifted
+  return state.registers[rs] & 0x0000000F;
+}
+
+word opRegister(arm state, uint op2) {
   // value to be shifted
   word value = state.registers[op2 & 0x00F];
   // bits indicating the shift instruction
@@ -105,79 +112,65 @@ int opRegister(arm state, uint op2) {
   return shiftI(value, shiftNum, shiftType);
 }
 
-int opImmediate(arm state, uint op2) {
+word opImmediate(arm state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = (op2 & 0x0FF) << 24;
   // number of rotations
   uint rotateBy = (op2 & 0xF00) >> 8;
-  // TODO: rotation function
-  return 0;
+  return rotateRight(imm, rotateBy);
 }
 
 void dpi(arm state, word instruction) {
   if (!checkCond(state, instruction)) {
     return;
   }
-
+  // If i is set, op2 is an immediate const, otherwise it's a shifted register
   const uint i = (instruction & 0x02000000) >> 25;
+  // instruction to execute
+  enum Opcode opcode = (instruction & 0x01E00000) >> 20;
   // if s is set then the CPSR flags should be updated
   const uint s = (instruction & 0x00100000) >> 20;
   // op1 is always the contents of register Rn
   const uint rn = (instruction & 0x000F0000) >> 16;
   // destination register
   const uint rd = (instruction & 0x0000F000) >> 12;
-  uint op2 = instruction & 0x00000FFF;
+  // second operand
+  word op2 = instruction & 0x00000FFF;
 
   // TODO: CPSR flags
 
-  // op2
-  // If i is set, op2 is an immediate const, otherwise it's a shifted register
-  op2 = i ? opImmediate(state, op2) : opRegister(state, op2);
-
-  // execution of instruction
-  // first operand
   word op1 = state.registers[rn];
-  // opcode from the instruction
-  enum Opcode opcode = (instruction & 0x01E00000) >> 20;
+  op2 = i ? opImmediate(state, op2) : opRegister(state, op2);
+  // execution of instruction
   switch (opcode) {
   case AND:
-    // Rn AND operand2
     state.registers[rd] = op1 & op2;
     break;
   case EOR:
-    // Rn EOR operand2
     state.registers[rd] = op1 ^ op2;
     break;
   case SUB:
-    // Rn - operand2
     state.registers[rd] = op1 - op2;
     break;
   case RSB:
-    // operand2 - Rn
     state.registers[rd] = op2 - op1;
     break;
   case ADD:
-    // Rn + operand2
     state.registers[rd] = op1 + op2;
     break;
   case TST:
-    // as and, but result not written
     op1 &op2;
     break;
   case TEQ:
-    // as eor, but result is not written
-    state.registers[rd] = op1 ^ op2;
+    op1 ^ op2;
     break;
   case CMP:
-    // as sub, but result is not written
-    state.registers[rd] = op1 - op2;
+    op1 - op2;
     break;
   case ORR:
-    // Rn OR operand2
     state.registers[rd] = op1 | op2;
     break;
   case MOV:
-    // operand2 (Rn is ignored)
     state.registers[rd] = op2;
     break;
   }
