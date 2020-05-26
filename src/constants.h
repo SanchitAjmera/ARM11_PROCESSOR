@@ -15,10 +15,10 @@
 #define SDTI_RD_MASK 0x0000F000
 #define SDTI_OFFSET_MASK 0x00000FFF
 #define SDTI_I_SHIFT 25
-#define MULT_P_SHIFT 24
-#define MULT_U_SHIFT 23
-#define MULT_L_SHIFT 20
-#define MULT_RN_SHIFT 16
-#define MULT_RD_SHIFT 12
+#define SDTI_P_SHIFT 24
+#define SDTI_U_SHIFT 23
+#define SDTI_L_SHIFT 20
+#define SDTI_RN_SHIFT 16
+#define SDTI_RD_SHIFT 12
 
 #endif
