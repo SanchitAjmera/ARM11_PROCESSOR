@@ -41,7 +41,7 @@ bool checkCond(arm state, word instruction) {
   uint z = state.registers[CPSR] & 0x40000000;
   uint c = state.registers[CPSR] & 0x20000000;
   uint v = state.registers[CPSR] & 0x10000000;
-  uint cond = instruction >> 28;
+  enum Cond cond = instruction >> 28;
   // conditions for instruction
   switch (cond) {
   case EQ:
@@ -74,7 +74,7 @@ uint shiftRegister(arm state, uint rs) {
   return state.registers[rs] & 0x0000000F;
 }
 
-uint shiftI(word value, uint shiftBy, uint shiftType) {
+uint shiftI(word value, uint shiftBy, enum Shift shiftType) {
   // TODO: set the CPSR flags (C carry out bit)
   switch (shiftType) {
   case LSL:
@@ -95,7 +95,7 @@ int opRegister(arm state, uint op2) {
   // bits indicating the shift instruction
   uint shiftPart = op2 >> 4;
   // shift type instruction
-  uint shiftType = (shiftPart & 0x06) >> 1;
+  enum Shift shiftType = (shiftPart & 0x06) >> 1;
   // number to shift by
   uint shiftBy;
   if (shiftPart & 0x01) {
