@@ -51,28 +51,14 @@ bool checkCond(arm state, word instruction) {
   }
 }
 
+// dpi ----------------------------------------------------------------------
+
 word rotateRight(word value, uint rotateNum) {
   // the msbs shifted right
   uint first = value & (32 - rotateNum) >> rotateNum;
   // the lsbs to rotate
   uint second = (value & rotateNum) << (32 - rotateNum);
   return first | second;
-}
-
-word shiftI(word value, uint shiftNum, enum Shift shiftType) {
-  // TODO: set the CPSR flags (C carry out bit)
-  switch (shiftType) {
-  case LSL:
-    return value << shiftNum;
-  case LSR:
-    return value >> shiftNum;
-  case ASR:
-    // TODO: check if this is an arithmetic shift
-    return (signed int)value > shiftNum;
-  case ROR:
-    rotateRight(value, shiftNum);
-    break;
-  }
 }
 
 uint shiftByConstant(uint shiftPart) {
@@ -87,19 +73,35 @@ uint shiftByRegister(arm state, uint shiftPart) {
   return state.registers[rs] & 0x0000000F;
 }
 
-word opRegister(arm state, uint op2) {
-  // value to be shifted
-  word value = state.registers[op2 & 0x00F];
-  // bits indicating the shift instruction
-  uint shiftPart = op2 >> 4;
-  // shift type instruction
-  enum Shift shiftType = (shiftPart & 0x06) >> 1;
+word shiftI(word value, uint shiftPart) {
+  // TODO: set the CPSR flags (C carry out bit)
   // bit to determine what to shift by
   bool shiftByConst = shiftPart & 0x01;
   // number to shift by
   uint shiftNum = shiftByConst ? shiftByConstant(shiftPart)
                                : shiftByRegister(state, shiftPart);
-  return shiftI(value, shiftNum, shiftType);
+  enum Shift shiftType = (shiftPart & 0x06) >> 1;
+  switch (shiftType) {
+  case LSL:
+    return value << shiftNum;
+  case LSR:
+    return value >> shiftNum;
+  case ASR:
+    // TODO: CODE ME
+    return 0;
+  case ROR:
+    return rotateRight(value, shiftNum);
+  }
+}
+
+word opRegister(arm state, uint op2) {
+  // register that holds the value to be shifted
+  uint rm = op2 & 0x00F;
+  // value to be shifted
+  word value = state.registers[rm];
+  // bits indicating the shift instruction
+  uint shiftPart = op2 >> 4;
+  return shiftI(value, shiftPart);
 }
 
 word opImmediate(arm state, uint op2) {
@@ -128,6 +130,7 @@ void dpi(arm state, word instruction) {
   word op2 = instruction & 0x00000FFF;
 
   // TODO: CPSR flags
+  // bool
 
   word op1 = state.registers[rn];
   op2 = i ? opImmediate(state, op2) : opRegister(state, op2);
@@ -165,6 +168,8 @@ void dpi(arm state, word instruction) {
     break;
   }
 }
+
+// end of dpi ---------------------------------------------------------------
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
