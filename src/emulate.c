@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
-  arm *state = malloc(sizeof(struct arm));
+  arm *state = malloc(sizeof(arm));
   init_arm(state, argv[1]);
 
   free(state->memory);
