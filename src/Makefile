@@ -1,25 +1,32 @@
 CC      = gcc
-CFLAGS  = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -std=c99 -Werror -pedantic
+CFLAGS  = -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 .SUFFIXES: .c .o
 
 .PHONY: all clean test
 
-all: assemble emulate
+all: assemble emulate testme
 
 assemble: assemble.o
 	$(CC) $(CFLAGS) assemble.o -o assemble
-emulate: emulate.o
-	$(CC) $(CFLAGS) emulate.o -o emulate
-assemble.o:
-	$(CC) -c assemble.c
-emulate.o:
-	$(CC) -c emulate.c
+emulate: emulate.o emulate_util.o
+	$(CC) $(CFLAGS) emulate.o emulate_util.o -o emulate
+testme: testme.o emulate_util.o
+	$(CC) $(CFLAGS) testme.o emulate_util.o -o testme
+
+emulate.o: emulate_util.h
+	$(CC) $(CFLAGS) -c emulate.c
+emulate_util.o: emulate_util.h
+	$(CC) $(CFLAGS) -c emulate_util.c
+testme.o: emulate_util.h
+	$(CC) $(CFLAGS) -c testme.c
 
 test:
-	./emulate ~/arm11_testsuite/test_cases/add01 
+	./emulate ~/arm11_testsuite/test_cases/add01
+	./testme | grep ^T
 
 clean:
 	rm -f $(wildcard *.o)
 	rm -f assemble
 	rm -f emulate
+	rm -f testme
