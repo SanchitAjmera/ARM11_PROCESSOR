@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "constants.h"
 #include "emulate_util.h"
 
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
@@ -56,6 +56,33 @@ word get_word(byte *start_addr) {
   return w;
 }
 
+//execution of the multiply instruction
+void multiply(arm* state, word instruction) {
+  // no execution if condition code does not match
+  if (!checkCond(state, instruction)) {
+    return;
+  }
+  // Extraction of information from the instruction;
+  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
+  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
+  int regM = instruction & MULT_REG_M_MASK;
+
+  // Initial execution of instruction
+  int result = state->registers[regM] * state->registers[regS];
+
+  // Obtain value from Rn and add to result if Accumulate is set
+  if (instruction & ACCUMULATE_FLAG) {
+    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
+    result += state->registers[regN];
+  }
+  // Update CPSR flags if S (bit 20 in instruction) is set
+  if (instruction & UPDATE_CPSR) {
+    state->registers[CPSR] |= (result & CPSR_N);
+    if (!result)
+      state->registers[CPSR] |= CPSR_Z;
+  }
+
+//execution of the branch instruction
 void branch(arm *state, word instruction) {
   // no execution if condition code does not match
   if (!checkCond(state, instruction))
