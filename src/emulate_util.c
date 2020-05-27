@@ -61,6 +61,16 @@ word rotateRight(word value, uint rotateNum) {
   return first | second;
 }
 
+word arithShift(word value, uint shiftNum) {
+  word msb = value & 0x80000000;
+  word temp = msb;
+  for (int i = 0; i < shiftNum; i++) {
+    temp = temp >> 1;
+    temp = temp + msb;
+  }
+  return temp | (value >> shiftNum);
+}
+
 uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
   return shiftPart >> 4;
@@ -70,7 +80,7 @@ uint shiftByRegister(arm state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
   uint rs = shiftPart >> 4;
   // bottom byte of value in Rs specifies the amount to be shifted
-  return state.registers[rs] & 0x0000000F;
+  return state.registers[rs] & 0x000000FF;
 }
 
 word shiftI(arm state, word value, uint shiftPart) {
@@ -81,14 +91,14 @@ word shiftI(arm state, word value, uint shiftPart) {
   uint shiftNum = shiftByConst ? shiftByConstant(shiftPart)
                                : shiftByRegister(state, shiftPart);
   enum Shift shiftType = (shiftPart & 0x06) >> 1;
+  word result;
   switch (shiftType) {
   case LSL:
     return value << shiftNum;
   case LSR:
     return value >> shiftNum;
   case ASR:
-    // TODO: CODE ME
-    return 0;
+    return arithShift(value, shiftNum);
   case ROR:
     return rotateRight(value, shiftNum);
   }
@@ -113,7 +123,7 @@ word opImmediate(arm state, uint op2) {
 }
 
 void setCPSR(arm state, word result) {
-  word new = 0x00000000;
+  // TODO: update C flag
   // set to the logical value of bit 31 of the result
   word n = result & 0x80000000;
   // set only if the result is all zeros
@@ -123,6 +133,8 @@ void setCPSR(arm state, word result) {
   } else {
     z = 0;
   }
+  // carry out
+  word c;
   // unaffected
   uint v = state.registers[CPSR] & 0x10000000;
   // updated flag bits
@@ -134,7 +146,6 @@ void dpi(arm state, word instruction) {
   if (!checkCond(state, instruction)) {
     return;
   }
-  // If i is set, op2 is an immediate const, otherwise it's a shifted register
   const uint i = (instruction & 0x02000000) >> 25;
   // instruction to execute
   enum Opcode opcode = (instruction & 0x01E00000) >> 20;
@@ -148,6 +159,7 @@ void dpi(arm state, word instruction) {
   word op2 = instruction & 0x00000FFF;
 
   word op1 = state.registers[rn];
+  // If i is set, op2 is an immediate const, otherwise it's a shifted register
   op2 = i ? opImmediate(state, op2) : opRegister(state, op2);
   // execution of instruction
   word result;
@@ -193,8 +205,8 @@ void dpi(arm state, word instruction) {
 // end of dpi ---------------------------------------------------------------
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
- * memory and register
- * pointers on heap, where memory is of size MEM_LIMIT bytes */
+   memory and register
+   pointers on heap, where memory is of size MEM_LIMIT bytes */
 void init_arm(arm *state, const char *fname) {
 
   /* load binary file into memory */
