@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// TODO: change name
+// TODO: consider changing name
 typedef struct {
   word result;
   word carryOut;
@@ -88,6 +88,10 @@ uint shiftByRegister(arm state, uint shiftPart) {
   return state.registers[rs] & 0x000000FF;
 }
 
+uint leftCarryOut(word value, uint shiftNum) {
+  return carryOut = (value << (shiftNum - 1))) & 0x80000000;
+}
+
 uint rightCarryOut(word value, uint shiftNum) {
   return (value >> (shiftNum - 1)) & 0x00000001;
 }
@@ -109,9 +113,8 @@ tuple_t *barrelShifter(arm state, word value, uint shiftPart) {
   word temp;
   switch (shiftType) {
   case LSL:
-    temp = value << (shiftNum - 1);
-    carryOut = temp & 0x80000000;
-    result = temp << 1;
+    carryOut = leftCarryOut(value, shiftNum);
+    result = value << shiftNum;
     break;
   case LSR:
     carryOut = rightCarryOut(value, shiftNum);
