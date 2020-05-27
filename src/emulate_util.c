@@ -122,7 +122,7 @@ word opImmediate(arm state, uint op2) {
   return rotateRight(imm, rotateNum);
 }
 
-void setCPSR(arm state, word result) {
+void setCPSR(arm state, word result, bool c_set) {
   // TODO: update C flag
   // set to the logical value of bit 31 of the result
   word n = result & 0x80000000;
@@ -134,11 +134,11 @@ void setCPSR(arm state, word result) {
     z = 0;
   }
   // carry out
-  word c;
+  word c = c_set ? 1 << 28 : 0;
   // unaffected
   uint v = state.registers[CPSR] & 0x10000000;
   // updated flag bits
-  new = n | z | c | v;
+  word new = n | z | c | v;
   state.registers[CPSR] = new;
 }
 
@@ -163,6 +163,7 @@ void dpi(arm state, word instruction) {
   op2 = i ? opImmediate(state, op2) : opRegister(state, op2);
   // execution of instruction
   word result;
+	bool carry_set = 0;
   switch (opcode) {
   case TST:
     result = op1 & op2;
@@ -171,20 +172,24 @@ void dpi(arm state, word instruction) {
     break;
   case TEQ:
     result = op1 ^ op2;
+		break;
   case EOR:
     state.registers[rd] = result;
     break;
-  case CMP:
-    result = op1 - op2;
-  case SUB:
+	case CMP: // CMP and SUB can be done by adding op1 with the 2's complement of op2
+	case SUB:
+		op2 = (~op2) + 1; // Two's complement of op2
+  case ADD:
+		result = op1 + op2;
+		word sign = 1 << 31;
+		// overflow occurs iff the operands have the same sign and the result has the opposite sign
+		if((op1 & sign) == (op2 & sign)) {
+			carry_set = (op1 & sign) != (result & sign);
+		}
     state.registers[rd] = result;
     break;
   case RSB:
     result = op2 - op1;
-    state.registers[rd] = result;
-    break;
-  case ADD:
-    result = op1 + op2;
     state.registers[rd] = result;
     break;
   case ORR:
@@ -198,7 +203,7 @@ void dpi(arm state, word instruction) {
   }
 
   if (s) {
-    setCPSR(state, result);
+    setCPSR(state, result, carry_set);
   }
 }
 
