@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+<<<<<<< HEAD
 // Constants will be moved into a seperate header file
 // general constants
 #define MEMORY_CAPACITY 65536
@@ -111,16 +112,28 @@ void decode(arm state, word instruction) {
   }
 }
 
+=======
+#include "emulate_util.h"
+
+>>>>>>> 3ae83d21e1d3c9d83ae4bb2cd92ba566686f12d8
 int main(int argc, char **argv) {
   if (argc == 1) {
     printf("Please specify an ARM binary object code file.\n");
     exit(EXIT_FAILURE);
   }
+<<<<<<< HEAD
   arm *state;
 
   // free memory before code termination
+=======
+
+  arm *state = malloc(sizeof(struct arm));
+  init_arm(state, argv[1]);
+
+>>>>>>> 3ae83d21e1d3c9d83ae4bb2cd92ba566686f12d8
   free(state->memory);
   free(state->registers);
   free(state);
+
   return EXIT_SUCCESS;
 }
