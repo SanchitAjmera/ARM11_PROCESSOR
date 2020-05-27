@@ -1,6 +1,5 @@
 #include "emulate_util.h"
 #include "constants.h"
-#include "emulate_util.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -29,11 +28,11 @@ void check_ptr(const void *ptr, const char *error_msg) {
   }
 }
 
-bool checkCond(arm state, word instruction) {
+bool checkCond(arm *state, word instruction) {
   // CPSR flag bits
-  uint n = (state.registers[CPSR] & 0x80000000) >> 31;
-  uint z = (state.registers[CPSR] & 0x40000000) >> 30;
-  uint v = (state.registers[CPSR] & 0x10000000) >> 28;
+  uint n = (state->registers[CPSR] & 0x80000000) >> 31;
+  uint z = (state->registers[CPSR] & 0x40000000) >> 30;
+  uint v = (state->registers[CPSR] & 0x10000000) >> 28;
   enum Cond cond = instruction >> 28;
   // conditions for instruction
   switch (cond) {
@@ -68,12 +67,12 @@ word rotateRight(word value, uint rotateNum) {
 word arithShift(word value, uint shiftNum) {
   word msb = value & 0x80000000;
   // TODO: change variable name
-  word temp = msb;
+  word msbs = msb;
   for (int i = 0; i < shiftNum; i++) {
-    temp = temp >> 1;
-    temp = temp + msb;
+    msbs = msbs >> 1;
+    msbs = msbs + msb;
   }
-  return temp | (value >> shiftNum);
+  return msbs | (value >> shiftNum);
 }
 
 uint shiftByConstant(uint shiftPart) {
@@ -81,22 +80,22 @@ uint shiftByConstant(uint shiftPart) {
   return shiftPart >> 4;
 }
 
-uint shiftByRegister(arm state, uint shiftPart) {
+uint shiftByRegister(arm *state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
   uint rs = shiftPart >> 4;
   // bottom byte of value in Rs specifies the amount to be shifted
-  return state.registers[rs] & 0x000000FF;
+  return state->registers[rs] & 0x000000FF;
 }
 
 uint leftCarryOut(word value, uint shiftNum) {
-  return carryOut = (value << (shiftNum - 1))) & 0x80000000;
+  return (value << (shiftNum - 1)) & 0x80000000;
 }
 
 uint rightCarryOut(word value, uint shiftNum) {
   return (value >> (shiftNum - 1)) & 0x00000001;
 }
 
-tuple_t *barrelShifter(arm state, word value, uint shiftPart) {
+tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
   // bit to determine what to shift by
   bool shiftByConst = shiftPart & 0x01;
   // number to shift by
@@ -109,8 +108,6 @@ tuple_t *barrelShifter(arm state, word value, uint shiftPart) {
   check_ptr(output, "Not enough memory!");
   word result;
   word carryOut;
-  // TODO: change variable name
-  word temp;
   switch (shiftType) {
   case LSL:
     carryOut = leftCarryOut(value, shiftNum);
@@ -138,17 +135,17 @@ tuple_t *barrelShifter(arm state, word value, uint shiftPart) {
   return output;
 }
 
-tuple_t *opRegister(arm state, uint op2) {
+tuple_t *opRegister(arm *state, uint op2) {
   // register that holds the value to be shifted
   uint rm = op2 & 0x00F;
   // value to be shifted
-  word value = state.registers[rm];
+  word value = state->registers[rm];
   // bits indicating the shift instruction
   uint shiftPart = op2 >> 4;
   return barrelShifter(state, value, shiftPart);
 }
 
-tuple_t *opImmediate(arm state, uint op2) {
+tuple_t *opImmediate(arm *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = op2 & 0x0FF;
   // number to rotate by
@@ -163,7 +160,7 @@ tuple_t *opImmediate(arm state, uint op2) {
   return output;
 }
 
-void setCPSR(arm state, word result, uint carryOut) {
+void setCPSR(arm *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & 0x80000000;
   // set only if the result is all zeros
@@ -175,16 +172,16 @@ void setCPSR(arm state, word result, uint carryOut) {
   }
   word c = carryOut << 31;
   // unaffected
-  uint v = state.registers[CPSR] & 0x10000000;
+  uint v = state->registers[CPSR] & 0x10000000;
   // updated flag bits
-  state.registers[CPSR] = n | z | c | v;
+  state->registers[CPSR] = n | z | c | v;
 }
 
-void dpi(arm state, word instruction) {
-  // decode
+void dpi(arm *state, word instruction) {
+  // extraction of code
   const uint i = (instruction & 0x02000000) >> 25;
   // instruction to execute
-  enum Opcode opcode = (instruction & 0x01E00000) >> 20;
+  enum Opcode opcode = (instruction & 0x01E00000) >> 21;
   const uint s = (instruction & 0x00100000) >> 20;
   // op1 is always the contents of register Rn
   const uint rn = (instruction & 0x000F0000) >> 16;
@@ -193,7 +190,7 @@ void dpi(arm state, word instruction) {
   // second operand
   word op2 = instruction & 0x00000FFF;
   // first operand
-  word op1 = state.registers[rn];
+  word op1 = state->registers[rn];
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
   tuple_t *output = i ? opImmediate(state, op2) : opRegister(state, op2);
   op2 = output->result;
@@ -203,23 +200,23 @@ void dpi(arm state, word instruction) {
   switch (opcode) {
   case AND:
     result = op1 & op2;
-    state.registers[rd] = result;
+    state->registers[rd] = result;
     break;
   case EOR:
     result = op1 ^ op2;
-    state.registers[rd] = result;
+    state->registers[rd] = result;
     break;
   case SUB:
     result = op1 - op2;
-    state.registers[rd] = result;
+    state->registers[rd] = result;
     break;
   case RSB:
     result = op2 - op1;
-    state.registers[rd] = result;
+    state->registers[rd] = result;
     break;
   case ADD:
     result = op1 + op2;
-    state.registers[rd] = result;
+    state->registers[rd] = result;
     break;
   case TST:
     result = op1 & op2;
@@ -232,10 +229,10 @@ void dpi(arm state, word instruction) {
     break;
   case ORR:
     result = op1 | op2;
-    state.registers[rd] = op1 | op2;
+    state->registers[rd] = op1 | op2;
     break;
   case MOV:
-    state.registers[rd] = op2;
+    state->registers[rd] = op2;
     break;
   }
 
@@ -322,7 +319,7 @@ word get_word(byte *start_addr) {
   return w;
 }
 
-void decode(arm state, word instruction) {
+void decode(arm *state, word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
   const word multMask = 0x0FC000F0;
