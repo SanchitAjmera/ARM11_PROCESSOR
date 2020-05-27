@@ -73,7 +73,7 @@ uint shiftByRegister(arm state, uint shiftPart) {
   return state.registers[rs] & 0x0000000F;
 }
 
-word shiftI(word value, uint shiftPart) {
+word shiftI(arm state, word value, uint shiftPart) {
   // TODO: set the CPSR flags (C carry out bit)
   // bit to determine what to shift by
   bool shiftByConst = shiftPart & 0x01;
@@ -101,7 +101,7 @@ word opRegister(arm state, uint op2) {
   word value = state.registers[rm];
   // bits indicating the shift instruction
   uint shiftPart = op2 >> 4;
-  return shiftI(value, shiftPart);
+  return shiftI(state, value, shiftPart);
 }
 
 word opImmediate(arm state, uint op2) {
@@ -110,6 +110,24 @@ word opImmediate(arm state, uint op2) {
   // number to rotate by
   uint rotateNum = (op2 & 0xF00) >> 8;
   return rotateRight(imm, rotateNum);
+}
+
+void setCPSR(arm state, word result) {
+  word new = 0x00000000;
+  // set to the logical value of bit 31 of the result
+  word n = result & 0x80000000;
+  // set only if the result is all zeros
+  word z;
+  if (!result) {
+    z = 1 << 29;
+  } else {
+    z = 0;
+  }
+  // unaffected
+  uint v = state.registers[CPSR] & 0x10000000;
+  // updated flag bits
+  new = n | z | c | v;
+  state.registers[CPSR] = new;
 }
 
 void dpi(arm state, word instruction) {
@@ -129,43 +147,46 @@ void dpi(arm state, word instruction) {
   // second operand
   word op2 = instruction & 0x00000FFF;
 
-  // TODO: CPSR flags
-  // bool
-
   word op1 = state.registers[rn];
   op2 = i ? opImmediate(state, op2) : opRegister(state, op2);
   // execution of instruction
+  word result;
   switch (opcode) {
-  case AND:
-    state.registers[rd] = op1 & op2;
-    break;
-  case EOR:
-    state.registers[rd] = op1 ^ op2;
-    break;
-  case SUB:
-    state.registers[rd] = op1 - op2;
-    break;
-  case RSB:
-    state.registers[rd] = op2 - op1;
-    break;
-  case ADD:
-    state.registers[rd] = op1 + op2;
-    break;
   case TST:
-    op1 &op2;
+    result = op1 & op2;
+  case AND:
+    state.registers[rd] = result;
     break;
   case TEQ:
-    op1 ^ op2;
+    result = op1 ^ op2;
+  case EOR:
+    state.registers[rd] = result;
     break;
   case CMP:
-    op1 - op2;
+    result = op1 - op2;
+  case SUB:
+    state.registers[rd] = result;
+    break;
+  case RSB:
+    result = op2 - op1;
+    state.registers[rd] = result;
+    break;
+  case ADD:
+    result = op1 + op2;
+    state.registers[rd] = result;
     break;
   case ORR:
-    state.registers[rd] = op1 | op2;
+    result = op1 | op2;
+    state.registers[rd] = result;
     break;
   case MOV:
-    state.registers[rd] = op2;
+    result = op2;
+    state.registers[rd] = result;
     break;
+  }
+
+  if (s) {
+    setCPSR(state, result);
   }
 }
 
