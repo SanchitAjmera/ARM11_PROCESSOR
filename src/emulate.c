@@ -1,9 +1,8 @@
+#include "emulate_util.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "emulate_util.h"
 
 int main(int argc, char **argv) {
   if (argc == 1) {
