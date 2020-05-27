@@ -146,11 +146,12 @@ tuple_t *opImmediate(arm state, uint op2) {
   word imm = op2 & 0x0FF;
   // number to rotate by
   uint rotateNum = (op2 >> 8) * 2;
-  // pointer to output
+  // tuple for the result and the carry out bit
   tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
   check_ptr(output, "Not enough memory!");
+  // result of the rotation operation
   output->result = rotateRight(imm, rotateNum);
-  // carry out for CSPR
+  // carry out for CSPR flag
   output->carryOut = rightCarryOut(imm, rotateNum);
   return output;
 }
@@ -194,30 +195,36 @@ void dpi(arm state, word instruction) {
   word result;
   switch (opcode) {
   case AND:
-    state.registers[rd] = op1 & op2;
+    result = op1 & op2;
+    state.registers[rd] = result;
     break;
   case EOR:
-    state.registers[rd] = op1 ^ op2;
+    result = op1 ^ op2;
+    state.registers[rd] = result;
     break;
   case SUB:
-    state.registers[rd] = op1 - op2;
+    result = op1 - op2;
+    state.registers[rd] = result;
     break;
   case RSB:
-    state.registers[rd] = op2 - op1;
+    result = op2 - op1;
+    state.registers[rd] = result;
     break;
   case ADD:
-    state.registers[rd] = op1 + op2;
+    result = op1 + op2;
+    state.registers[rd] = result;
     break;
   case TST:
-    op1 &op2;
+    result = op1 & op2;
     break;
   case TEQ:
-    op1 ^ op2;
+    result = op1 ^ op2;
     break;
   case CMP:
-    op1 - op2;
+    result = op1 - op2;
     break;
   case ORR:
+    result = op1 | op2;
     state.registers[rd] = op1 | op2;
     break;
   case MOV:
