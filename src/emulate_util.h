@@ -31,6 +31,6 @@ extern void multiply(arm* state, word instruction);
 //execution of a branch instruction 
 extern void branch(arm *state, word instruction);
 
-extern void decode(arm state, word instruction);
+extern void decode(arm *state, word instruction);
 
 #endif
