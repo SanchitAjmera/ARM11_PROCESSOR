@@ -6,8 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BITS_SET(value, mask, bits) ((value & mask) == bits)
-
+// TODO: change name
 typedef struct {
   word result;
   word carryOut;
@@ -62,15 +61,13 @@ bool checkCond(arm state, word instruction) {
 // dpi ----------------------------------------------------------------------
 
 word rotateRight(word value, uint rotateNum) {
-  // the msbs shifted right
-  uint first = value & (32 - rotateNum) >> rotateNum;
-  // the lsbs to rotate
-  uint second = (value & rotateNum) << (32 - rotateNum);
-  return first | second;
+  uint lsbs = value & ((1 << rotateNum) - 1);
+  return (value >> rotateNum) | (lsbs << (32 - rotateNum));
 }
 
 word arithShift(word value, uint shiftNum) {
   word msb = value & 0x80000000;
+  // TODO: change variable name
   word temp = msb;
   for (int i = 0; i < shiftNum; i++) {
     temp = temp >> 1;
@@ -103,6 +100,7 @@ tuple_t *barrelShifter(arm state, word value, uint shiftPart) {
                                : shiftByRegister(state, shiftPart);
   // bits that specify the shift operation
   enum Shift shiftType = (shiftPart & 0x06) >> 1;
+  // tuple for the result and the carry out bit
   tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
   check_ptr(output, "Not enough memory!");
   word result;
@@ -145,9 +143,9 @@ tuple_t *opRegister(arm state, uint op2) {
 
 tuple_t *opImmediate(arm state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
-  word imm = (op2 & 0x0FF) << 24;
+  word imm = op2 & 0x0FF;
   // number to rotate by
-  uint rotateNum = (op2 & 0xF00) >> 8;
+  uint rotateNum = (op2 >> 8) * 2;
   // pointer to output
   tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
   check_ptr(output, "Not enough memory!");
@@ -195,36 +193,35 @@ void dpi(arm state, word instruction) {
   // execution
   word result;
   switch (opcode) {
-  case TST:
-    result = op1 & op2;
   case AND:
-    state.registers[rd] = result;
+    state.registers[rd] = op1 & op2;
     break;
-  case TEQ:
-    result = op1 ^ op2;
   case EOR:
-    state.registers[rd] = result;
+    state.registers[rd] = op1 ^ op2;
     break;
-  case CMP:
-    result = op1 - op2;
   case SUB:
-    state.registers[rd] = result;
+    state.registers[rd] = op1 - op2;
     break;
   case RSB:
-    result = op2 - op1;
-    state.registers[rd] = result;
+    state.registers[rd] = op2 - op1;
     break;
   case ADD:
-    result = op1 + op2;
-    state.registers[rd] = result;
+    state.registers[rd] = op1 + op2;
+    break;
+  case TST:
+    op1 &op2;
+    break;
+  case TEQ:
+    op1 ^ op2;
+    break;
+  case CMP:
+    op1 - op2;
     break;
   case ORR:
-    result = op1 | op2;
-    state.registers[rd] = result;
+    state.registers[rd] = op1 | op2;
     break;
   case MOV:
-    result = op2;
-    state.registers[rd] = result;
+    state.registers[rd] = op2;
     break;
   }
 
@@ -237,9 +234,44 @@ void dpi(arm state, word instruction) {
 
 // end of dpi ---------------------------------------------------------------
 
+// execution of the multiply instruction
+void multiply(arm *state, word instruction) {
+  // extraction of information from the instruction;
+  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
+  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
+  int regM = instruction & MULT_REG_M_MASK;
+
+  // Initial execution of instruction
+  int result = state->registers[regM] * state->registers[regS];
+
+  // obtain value from Rn and add to result if Accumulate is set
+  if (instruction & ACCUMULATE_FLAG) {
+    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
+    result += state->registers[regN];
+  }
+  // update CPSR flags if S (bit 20 in instruction) is set
+  if (instruction & UPDATE_CPSR) {
+    state->registers[CPSR] |= (result & CPSR_N);
+    if (!result)
+      state->registers[CPSR] |= CPSR_Z;
+  }
+}
+
+// execution of the branch instruction
+void branch(arm *state, word instruction) {
+  // extraction of information
+  int offset = instruction & BRANCH_OFFSET_MASK;
+  int signBit = offset & BRANCH_SIGN_BIT;
+
+  // shift, sign extension and addition of offset onto current address
+  state->registers[PC] +=
+      (offset << CURRENT_INSTRUCTION_SHIFT) |
+      (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
+}
+
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
-   memory and register
-   pointers on heap, where memory is of size MEM_LIMIT bytes */
+memory and register
+pointers on heap, where memory is of size MEM_LIMIT bytes */
 void init_arm(arm *state, const char *fname) {
 
   /* load binary file into memory */
@@ -276,72 +308,30 @@ word get_word(byte *start_addr) {
   return w;
 }
 
-// execution of the multiply instruction
-void multiply(arm *state, word instruction) {
-  // no execution if condition code does not match
+void decode(arm state, word instruction) {
+  const word dpMask = 0x0C000000;
+  const word dp = 0x00000000;
+  const word multMask = 0x0FC000F0;
+  const word mult = 0x0000090;
+  const word sdtMask = 0x0C600000;
+  const word sdt = 0x04000000;
+  const word branchMask = 0x0F000000;
+  const word branch = 0x0A000000;
+
   if (!checkCond(state, instruction)) {
     return;
   }
-  // Extraction of information from the instruction;
-  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
-  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
-  int regM = instruction & MULT_REG_M_MASK;
 
-  // Initial execution of instruction
-  int result = state->registers[regM] * state->registers[regS];
+  // TODO: determine how to differentiate ...
+  // ... `data processing` from `multiply`
 
-  // Obtain value from Rn and add to result if Accumulate is set
-  if (instruction & ACCUMULATE_FLAG) {
-    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
-    result += state->registers[regN];
+  if (BITS_SET(instruction, branchMask, branch)) {
+    // function for branch instructions
+  } else if (BITS_SET(instruction, sdtMask, sdt)) {
+    // function for single data tranfser instructions
+  } else if (BITS_SET(instruction, multMask, mult)) {
+    // function for multiply instructions
+  } else if (BITS_SET(instruction, dpMask, dp)) {
+    dpi(state, instruction);
   }
-  // Update CPSR flags if S (bit 20 in instruction) is set
-  if (instruction & UPDATE_CPSR) {
-    state->registers[CPSR] |= (result & CPSR_N);
-    if (!result)
-      state->registers[CPSR] |= CPSR_Z;
-  }
-
-  // execution of the branch instruction
-  void branch(arm * state, word instruction) {
-    // no execution if condition code does not match
-    if (!checkCond(state, instruction))
-      return;
-
-    // Extraction of information
-    int offset = instruction & BRANCH_OFFSET_MASK;
-    int signBit = offset & BRANCH_SIGN_BIT;
-
-    // Shift, sign extension and addition of offset onto current address
-    state->registers[PC] +=
-        (offset << CURRENT_INSTRUCTION_SHIFT) |
-        (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
-  }
-
-  void decode(arm state, word instruction) {
-    const word dpMask = 0x0C000000;
-    const word dp = 0x00000000;
-    const word multMask = 0x0FC000F0;
-    const word mult = 0x0000090;
-    const word sdtMask = 0x0C600000;
-    const word sdt = 0x04000000;
-    const word branchMask = 0x0F000000;
-    const word branch = 0x0A000000;
-
-    if (!checkCond(state, instruction)) {
-      return;
-    }
-
-    // TODO: determine how to differentiate ...
-    // ... `data processing` from `multiply`
-
-    if (BITS_SET(instruction, branchMask, branch)) {
-      // function for branch instructions
-    } else if (BITS_SET(instruction, sdtMask, sdt)) {
-      // function for single data tranfser instructions
-    } else if (BITS_SET(instruction, multMask, mult)) {
-      // function for multiply instructions
-    } else if (BITS_SET(instruction, dpMask, dp)) {
-      dpi(state, instruction);
-    }
-  }
+}
