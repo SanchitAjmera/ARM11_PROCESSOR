@@ -1,4 +1,5 @@
-#ifndef
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 // General constants
 #define MEMORY_CAPACITY 65536
