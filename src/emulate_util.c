@@ -52,9 +52,11 @@ bool checkCond(arm state, word instruction) {
 }
 
 word rotateRight(word value, uint rotateNum) {
-  // uint start;
-  // uint rotateBits = value & rotateNum;
-  return 0;
+  // the msbs shifted right
+  uint first = value & (32 - rotateNum) >> rotateNum;
+  // the lsbs to rotate
+  uint second = (value & rotateNum) << (32 - rotateNum);
+  return first | second;
 }
 
 word shiftI(word value, uint shiftNum, enum Shift shiftType) {
@@ -68,7 +70,7 @@ word shiftI(word value, uint shiftNum, enum Shift shiftType) {
     // TODO: check if this is an arithmetic shift
     return (signed int)value > shiftNum;
   case ROR:
-    // TODO: code me
+    rotateRight(value, shiftNum);
     break;
   }
 }
