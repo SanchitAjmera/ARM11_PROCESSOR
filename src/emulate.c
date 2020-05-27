@@ -88,7 +88,7 @@ bool checkCond(word instruction, arm state ){
 
 void sdti(arm state, word instruction) {
     if (!checkCond(instruction & 0xF0000000, state)){
-        return;
+      return;
     }
     // parts of the instruction
     unsigned int i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
@@ -101,25 +101,34 @@ void sdti(arm state, word instruction) {
 
     //Immediate Offset
     if(i){
-        //offset is interpreted as a shifted register
+      //offset is interpreted as a shifted register
     } else {
-        // offset is interpreted as an immediate offset
+      // offset is interpreted as an immediate offset
     }
     //p doesn't change contents of base register for this exercise
     if(p){
-        //add/subtract offset to the base register before transferring the data
+      // if flag is set then (pre-Indexing) and simply transfer data
+
     } else{
-        //add/subtract offset to the base register after transferring
-    }
-    if(u){
-        //add offset to base register
-    } else{
+
+      if(u){
+        //offset is added to base register if u is set
+        rn += offset;
+
+      } else {
         // subtract offset from base register
+        rn -= offset;
+      }
+      //trasfer data
     }
+
     if(l){
-        //word is loaded from memory
+      //word is loaded from memory
+      // word ldr is the word stored within the source register rd
+      //TODO: find way to load word from source register into variable ldr
     } else {
-        //word is stored in memory
+      //word str is the word from the updated base register rn
+      // this word is stored within the destination/source register rd
     }
 }
 
