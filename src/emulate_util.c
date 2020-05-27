@@ -77,6 +77,8 @@ void multiply(arm* state, word instruction) {
     if (!result)
       state->registers[CPSR] |= CPSR_Z;
   }
+  state->registers[destination] = result;
+}
 
 //execution of the branch instruction
 void branch(arm *state, word instruction) {
