@@ -22,7 +22,7 @@
 // Constants for Branch instruction
 #define BRANCH_OFFSET_MASK 0x00FFFFFF
 #define BRANCH_SIGN_BIT (1 << 23)
-#define PIPELINE_SHIFT 2
+#define CURRENT_INSTRUCTION_SHIFT 2
 #define NEGATIVE_SIGN_EXTEND 0xFC000000
 #define POSITIVE_SIGN_EXTEND 0
 
