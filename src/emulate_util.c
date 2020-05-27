@@ -112,15 +112,19 @@ tuple_t *barrelShifter(arm state, word value, uint shiftPart) {
     temp = value << (shiftNum - 1);
     carryOut = temp & 0x80000000;
     result = temp << 1;
+    break;
   case LSR:
     carryOut = rightCarryOut(value, shiftNum);
     result = value >> shiftNum;
+    break;
   case ASR:
     carryOut = rightCarryOut(value, shiftNum);
     result = arithShift(value, shiftNum);
+    break;
   case ROR:
     carryOut = rightCarryOut(value, shiftNum);
     result = rotateRight(value, shiftNum);
+    break;
   default:
     // no other shift instruction
     // should never happen
