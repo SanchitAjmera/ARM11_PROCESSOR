@@ -247,7 +247,7 @@ void dpi(arm *state, word instruction) {
 
 // execution of the multiply instruction
 void multiply(arm *state, word instruction) {
-  // extraction of information from the instruction;
+  // Extraction of information from the instruction;
   int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
   int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
   int regM = instruction & MULT_REG_M_MASK;
@@ -266,6 +266,7 @@ void multiply(arm *state, word instruction) {
     if (!result)
       state->registers[CPSR] |= CPSR_Z;
   }
+  state->registers[destination] = result;
 }
 
 // execution of the branch instruction
@@ -337,11 +338,11 @@ void decode(arm *state, word instruction) {
   // ... `data processing` from `multiply`
 
   if (BITS_SET(instruction, branchMask, branch)) {
-    // function for branch instructions
+    branch(state, instruction);
   } else if (BITS_SET(instruction, sdtMask, sdt)) {
     // function for single data tranfser instructions
   } else if (BITS_SET(instruction, multMask, mult)) {
-    // function for multiply instructions
+    multiply(state, instruction);
   } else if (BITS_SET(instruction, dpMask, dp)) {
     dpi(state, instruction);
   }
