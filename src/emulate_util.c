@@ -58,10 +58,6 @@ word get_word(byte *start_addr) {
 
 //execution of the multiply instruction
 void multiply(arm* state, word instruction) {
-  // no execution if condition code does not match
-  if (!checkCond(state, instruction)) {
-    return;
-  }
   // Extraction of information from the instruction;
   int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
   int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
@@ -84,10 +80,6 @@ void multiply(arm* state, word instruction) {
 
 //execution of the branch instruction
 void branch(arm *state, word instruction) {
-  // no execution if condition code does not match
-  if (!checkCond(state, instruction))
-    return;
-
   // Extraction of information
   int offset = instruction & BRANCH_OFFSET_MASK;
   int signBit = offset & BRANCH_SIGN_BIT;
@@ -108,16 +100,20 @@ void decode(arm state, word instruction) {
   const word branchMask = 0x0F000000;
   const word branch = 0x0A000000;
 
+  if (!checkCond(state, instruction)) {
+    return;
+  }
+
   // TODO: determine how to differentiate ...
   // ... `data processing` from `multiply`
 
   if (BITS_SET(instruction, branchMask, branch)) {
-    // function for branch instructions
+    branch(state, instruction);
   } else if (BITS_SET(instruction, sdtMask, sdt)) {
     // function for single data tranfser instructions
   } else if (BITS_SET(instruction, multMask, mult)) {
-    // function for multiply instructions
+    multiply(state, instruction);
   } else if (BITS_SET(instruction, dpMask, dp)) {
-    // function for data processing instructions
+    // dpi(state, instruction);
   }
 }
