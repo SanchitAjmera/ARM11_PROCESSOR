@@ -1,10 +1,8 @@
+#include "emulate_util.h"
+#include "constants.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "constants.h"
-#include "emulate_util.h"
-
-#define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
@@ -29,7 +27,7 @@ void init_arm(arm *state, const char *fname) {
   FILE *bin_obj = fopen(fname, "rb");
   check_ptr(bin_obj, "File could not be opened\n");
 
-  fseek(bin_obj, 0, SEEK_END);
+  fseek(bin_obj, SEEK_SET, SEEK_END);
   long file_size = ftell(bin_obj);
   rewind(bin_obj);
 
@@ -56,8 +54,7 @@ word get_word(byte *start_addr) {
   return w;
 }
 
-//execution of the multiply instruction
-void multiply(arm* state, word instruction) {
+void executeMultiply(arm *state, word instruction) {
   // Extraction of information from the instruction;
   int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
   int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
@@ -80,8 +77,7 @@ void multiply(arm* state, word instruction) {
   state->registers[destination] = result;
 }
 
-//execution of the branch instruction
-void branch(arm *state, word instruction) {
+void executeBranch(arm *state, word instruction) {
   // Extraction of information
   int offset = instruction & BRANCH_OFFSET_MASK;
   int signBit = offset & BRANCH_SIGN_BIT;
@@ -92,16 +88,36 @@ void branch(arm *state, word instruction) {
       (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
 }
 
-void decode(arm *state, word instruction) {
-  const word dpMask = 0x0C000000;
-  const word dp = 0x00000000;
-  const word multMask = 0x0FC000F0;
-  const word mult = 0x0000090;
-  const word sdtMask = 0x0C600000;
-  const word sdt = 0x04000000;
-  const word branchMask = 0x0F000000;
-  const word branchBits = 0x0A000000;
+bool checkCond(arm *state, word instruction) {
+  // CPSR flag bits
+  uint n = GET_CPSR_N(state->registers[CPSR]);
+  uint z = GET_CPSR_Z(state->registers[CPSR]);
+  uint v = GET_CPSR_V(state->registers[CPSR]);
+  enum Cond cond = GET_CPSR_FLAGS(state->registers[CPSR]);
+  // conditions for instruction
+  switch (cond) {
+  case EQ:
+    return z;
+  case NE:
+    return !z;
+  case GE:
+    return n == v;
+  case LT:
+    return n != v;
+  case GT:
+    return !z && (n == v);
+  case LE:
+    return z || (n != v);
+  case AL:
+    return true;
+  default:
+    // no other instruction
+    // should never happen
+    assert(false);
+  }
+}
 
+void decode(arm *state, word instruction) {
   if (!checkCond(state, instruction)) {
     return;
   }
@@ -109,13 +125,13 @@ void decode(arm *state, word instruction) {
   // TODO: determine how to differentiate ...
   // ... `data processing` from `multiply`
 
-  if (BITS_SET(instruction, branchMask, branchBits)) {
-    branch(state, instruction);
-  } else if (BITS_SET(instruction, sdtMask, sdt)) {
+  if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
+    executeBranch(state, instruction);
+  } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
     // function for single data tranfser instructions
-  } else if (BITS_SET(instruction, multMask, mult)) {
-    multiply(state, instruction);
-  } else if (BITS_SET(instruction, dpMask, dp)) {
+  } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
+    executeMultiply(state, instruction);
+  } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
     dpi(state, instruction);
   }
 }
