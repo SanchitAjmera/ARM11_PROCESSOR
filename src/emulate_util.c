@@ -77,18 +77,19 @@ word arithShift(word value, uint shiftNum) {
 
 uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
-  return shiftPart >> 4;
+  // #define GET_SHIFT_CONSTANT_SHIFT 3
+  return shiftPart >> 3;
 }
 
 uint shiftByRegister(arm *state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
-  uint rs = shiftPart >> 4;
+  uint rs = shiftPart >> GET_RS_SHIFT;
   // bottom byte of value in Rs specifies the amount to be shifted
   return state->registers[rs] & LEAST_BYTE;
 }
 
 uint leftCarryOut(word value, uint shiftNum) {
-  return (value << (shiftNum - 1)) >> 31;
+  return (value << (shiftNum - 1)) >> (WORD_SIZE - 1);
 }
 
 uint rightCarryOut(word value, uint shiftNum) {
@@ -97,32 +98,29 @@ uint rightCarryOut(word value, uint shiftNum) {
 
 tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
   // bit to determine what to shift by
-  bool shiftByConst = shiftPart & LSB_MASK;
+  bool shiftByReg = shiftPart & LSB_MASK;
   // number to shift by
-  uint shiftNum = shiftByConst ? shiftByConstant(shiftPart)
-                               : shiftByRegister(state, shiftPart);
+  uint shiftNum = shiftByReg ? shiftByRegister(state, shiftPart)
+                             : shiftByConstant(shiftPart);
   // bits that specify the shift operation
-  enum Shift shiftType = (shiftPart & 0x06) >> 1;
+  enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE_SHIFT;
   // tuple for the result and the carry out bit
   tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
   check_ptr(output, "Not enough memory!");
   word result;
-  word carryOut;
+  word carryOut = rightCarryOut(value, shiftNum);
   switch (shiftType) {
   case LSL:
     carryOut = leftCarryOut(value, shiftNum);
     result = value << shiftNum;
     break;
   case LSR:
-    carryOut = rightCarryOut(value, shiftNum);
     result = value >> shiftNum;
     break;
   case ASR:
-    carryOut = rightCarryOut(value, shiftNum);
     result = arithShift(value, shiftNum);
     break;
   case ROR:
-    carryOut = rightCarryOut(value, shiftNum);
     result = rotateRight(value, shiftNum);
     break;
   default:
@@ -137,11 +135,11 @@ tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
 
 tuple_t *opRegister(arm *state, uint op2) {
   // register that holds the value to be shifted
-  uint rm = op2 & 0x00F;
+  uint rm = op2 & LSN_MASK;
   // value to be shifted
   word value = state->registers[rm];
-  // bits indicating the shift instruction
-  uint shiftPart = op2 >> 4;
+  // bits indicating the shift instruction (bits 11-4)
+  uint shiftPart = op2 >> GET_SHIFT_INSTRUCTION_SHIFT;
   return barrelShifter(state, value, shiftPart);
 }
 
@@ -149,7 +147,7 @@ tuple_t *opImmediate(arm *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = op2 & LEAST_BYTE;
   // number to rotate by
-  uint rotateNum = (op2 >> 8) * 2;
+  uint rotateNum = (op2 >> GET_ROTATE_SHIFT) * ROTATION_FACTOR;
   // tuple for the result and the carry out bit
   tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
   check_ptr(output, "Not enough memory!");
@@ -162,9 +160,9 @@ tuple_t *opImmediate(arm *state, uint op2) {
 
 uint getCarryOut(word op1, word op2, word result) {
   uint carryOut = 0;
-  word signBit = 1 << 31;
+  word signBit = MSB_MASK;
   // overflow occurs iff the operands have the same sign and the result has ...
-  // ... the opposite signBit
+  // ... the opposite sign
   if ((op1 & signBit) == (op2 & signBit)) {
     carryOut = (op1 & signBit) != (result & signBit);
   }
@@ -175,11 +173,11 @@ void setCPSR(arm *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & MSB_MASK;
   // set only if the result is all zeros
-  word z = result ? 0 : 1 << 29;
+  word z = result ? 0 : CPSR_Z;
   // carry out from the instruction
-  word c = carryOut ? 1 << 28 : 0;
+  word c = carryOut ? SET_CPSR_C : 0;
   // unaffected
-  uint v = state->registers[CPSR] & 0x10000000;
+  uint v = state->registers[CPSR] & CPSR_V_MASK;
   // updated flag bits
   state->registers[CPSR] = n | z | c | v;
 }
@@ -204,7 +202,6 @@ void dpi(arm *state, word instruction) {
   word carryOut = output->carryOut;
   // execution
   word result;
-  // CMP and SUB can be done by adding op1 with the 2's complement of op2
   switch (opcode) {
   case AND:
     result = op1 & op2;
@@ -215,13 +212,13 @@ void dpi(arm *state, word instruction) {
     state->registers[rd] = result;
     break;
   case SUB:
-    result = op1 + (~op2) + 1;
-    carryOut = getCarryOut(op1, (~op2) + 1, result);
+    result = op1 + TWOS_COMPLEMENT(op2);
+    carryOut = getCarryOut(op1, TWOS_COMPLEMENT(op2), result);
     state->registers[rd] = result;
     break;
   case RSB:
-    result = op2 + (~op1) + 1;
-    carryOut = getCarryOut((~op1) + 1, op2, result);
+    result = op2 + TWOS_COMPLEMENT(op1);
+    carryOut = getCarryOut(TWOS_COMPLEMENT(~op1), op2, result);
     state->registers[rd] = result;
     break;
   case ADD:
@@ -236,8 +233,8 @@ void dpi(arm *state, word instruction) {
     result = op1 ^ op2;
     break;
   case CMP:
-    result = op1 + (~op2) + 1;
-    carryOut = getCarryOut(op1, (~op2) + 1, result);
+    result = op1 + TWOS_COMPLEMENT(op2);
+    carryOut = getCarryOut(op1, TWOS_COMPLEMENT(op2), result);
     break;
   case ORR:
     result = op1 | op2;

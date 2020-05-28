@@ -6,7 +6,7 @@
 #define NO_REGISTERS 17
 #define ADDRESS_SIZE 4
 #define WORD_SIZE 32
-#define MSB_MASK 0x80000000
+#define MSB_MASK 1 << 31
 #define LSB_MASK 0x1
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
@@ -31,6 +31,9 @@
 #define POSITIVE_SIGN_EXTEND 0
 
 // constants for Data Processing instruction
+#define TWOS_COMPLEMENT(value) ((~value) + 1)
+#define CPSR_V_MASK 0x1000000
+#define SET_CPSR_C (1 << 28)
 #define DPI_I_MASK 0x02000000
 #define DPI_OPCODE_MASK 0x01E00000
 #define DPI_S_MASK 0x00100000
@@ -43,4 +46,11 @@
 #define DPI_RN_SHIFT 16
 #define DPI_RD_SHIFT 12
 #define LEAST_BYTE 0xFF
+#define GET_ROTATE_SHIFT 8
+#define ROTATION_FACTOR 2
+#define GET_RS_SHIFT 4
+#define SHIFT_TYPE_MASK 0x06
+#define GET_SHIFT_TYPE_SHIFT 1
+#define LSN_MASK 0xF
+#define GET_SHIFT_INSTRUCTION_SHIFT 4
 #endif
