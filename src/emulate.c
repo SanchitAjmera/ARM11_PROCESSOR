@@ -85,6 +85,7 @@ bool checkCond(word instruction, arm state ){
     }
 }
 
+//-Single Data Tranfer Instructions function ----------------------------------
 
 void sdti(arm state, word instruction) {
     if (!checkCond(instruction & 0xF0000000, state)){
@@ -97,14 +98,12 @@ void sdti(arm state, word instruction) {
     unsigned int l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
     unsigned int rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
     unsigned int rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
-    unsigned int offset = (instruction & SDTI_OFFSET_MASK);
+    word offset = (instruction & SDTI_OFFSET_MASK);
 
     //Immediate Offset
-    if(i){
-      //offset is interpreted as a shifted register
-    } else {
-      // offset is interpreted as an immediate offset
-    }
+    
+    offset = i ? opRegister(state, offset) :  opImmediate(state, offset);
+    
     //p doesn't change contents of base register for this exercise
     if(p){
       // if flag is set then (pre-Indexing) and simply transfer data
