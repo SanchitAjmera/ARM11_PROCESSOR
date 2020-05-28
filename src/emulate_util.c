@@ -88,7 +88,7 @@ uint shiftByRegister(arm *state, uint shiftPart) {
 }
 
 uint leftCarryOut(word value, uint shiftNum) {
-  return (value << (shiftNum - 1)) & >> 31;
+  return (value << (shiftNum - 1)) >> 31;
 }
 
 uint rightCarryOut(word value, uint shiftNum) {
@@ -160,6 +160,17 @@ tuple_t *opImmediate(arm *state, uint op2) {
   return output;
 }
 
+uint getCarryOut(word op1, word op2, word result) {
+  uint carryOut = 0;
+  word signBit = 1 << 31;
+  // overflow occurs iff the operands have the same sign and the result has ...
+  // ... the opposite signBit
+  if ((op1 & signBit) == (op2 & signBit)) {
+    carryOut = (op1 & signBit) != (result & signBit);
+  }
+  return carryOut;
+}
+
 void setCPSR(arm *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & 0x80000000;
@@ -171,7 +182,7 @@ void setCPSR(arm *state, word result, uint carryOut) {
     z = 0;
   }
   // carry out
-  word c = c_set ? 1 << 28 : 0;
+  word c = carryOut ? 1 << 28 : 0;
   // unaffected
   uint v = state->registers[CPSR] & 0x10000000;
   // updated flag bits
@@ -198,7 +209,7 @@ void dpi(arm *state, word instruction) {
   word carryOut = output->carryOut;
   // execution
   word result;
-  bool carry_set = 0;
+  // CMP and SUB can be done by adding op1 with the 2's complement of op2
   switch (opcode) {
   case AND:
     result = op1 & op2;
@@ -208,27 +219,19 @@ void dpi(arm *state, word instruction) {
     result = op1 ^ op2;
     state->registers[rd] = result;
     break;
-  case CMP:
-    // CMP and SUB can be done by adding op1 with the 2's complement of op2
   case SUB:
-    // Two's complement of op2
-    op2 = (~op2) + 1;
-  case ADD:
-    result = op1 + op2;
-    word sign = 1 << 31;
-    // overflow occurs iff the operands have the same sign and the result has
-    // the opposite sign
-    if ((op1 & sign) == (op2 & sign)) {
-      carry_set = (op1 & sign) != (result & sign);
-    }
-    state.registers[rd] = result;
+    result = op1 - op2;
+    carryOut = getCarryOut(op1, (~op2) + 1, result);
+    state->registers[rd] = result;
     break;
   case RSB:
     result = op2 - op1;
+    carryOut = getCarryOut((~op1) + 1, op2, result);
     state->registers[rd] = result;
     break;
   case ADD:
     result = op1 + op2;
+    carryOut = getCarryOut(op1, op2, result);
     state->registers[rd] = result;
     break;
   case TST:
@@ -239,6 +242,7 @@ void dpi(arm *state, word instruction) {
     break;
   case CMP:
     result = op1 - op2;
+    carryOut = getCarryOut(op1, (~op2) + 1, result);
     break;
   case ORR:
     result = op1 | op2;
@@ -330,7 +334,7 @@ void branch(arm *state, word instruction) {
       (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
 }
 
-void decode(arm state, word instruction) {
+void decode(arm *state, word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
   const word multMask = 0x0FC000F0;
@@ -338,7 +342,7 @@ void decode(arm state, word instruction) {
   const word sdtMask = 0x0C600000;
   const word sdt = 0x04000000;
   const word branchMask = 0x0F000000;
-  const word branch = 0x0A000000;
+  const word branchBits = 0x0A000000;
 
   if (!checkCond(state, instruction)) {
     return;
@@ -347,7 +351,7 @@ void decode(arm state, word instruction) {
   // TODO: determine how to differentiate ...
   // ... `data processing` from `multiply`
 
-  if (BITS_SET(instruction, branchMask, branch)) {
+  if (BITS_SET(instruction, branchMask, branchBits)) {
     branch(state, instruction);
   } else if (BITS_SET(instruction, sdtMask, sdt)) {
     // function for single data tranfser instructions
