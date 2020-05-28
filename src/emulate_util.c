@@ -77,8 +77,7 @@ word arithShift(word value, uint shiftNum) {
 
 uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
-  // #define GET_SHIFT_CONSTANT_SHIFT 3
-  return shiftPart >> 3;
+  return shiftPart >> GET_SHIFT_CONSTANT_SHIFT;
 }
 
 uint shiftByRegister(arm *state, uint shiftPart) {
