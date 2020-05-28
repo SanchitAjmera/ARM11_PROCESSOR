@@ -170,7 +170,8 @@ void setCPSR(arm *state, word result, uint carryOut) {
   } else {
     z = 0;
   }
-  word c = carryOut << 31;
+  // carry out
+  word c = c_set ? 1 << 28 : 0;
   // unaffected
   uint v = state->registers[CPSR] & 0x10000000;
   // updated flag bits
@@ -197,6 +198,7 @@ void dpi(arm *state, word instruction) {
   word carryOut = output->carryOut;
   // execution
   word result;
+	bool carry_set = 0;
   switch (opcode) {
   case AND:
     result = op1 & op2;
@@ -206,9 +208,17 @@ void dpi(arm *state, word instruction) {
     result = op1 ^ op2;
     state->registers[rd] = result;
     break;
-  case SUB:
-    result = op1 - op2;
-    state->registers[rd] = result;
+	case CMP: // CMP and SUB can be done by adding op1 with the 2's complement of op2
+	case SUB:
+		op2 = (~op2) + 1; // Two's complement of op2
+  case ADD:
+		result = op1 + op2;
+		word sign = 1 << 31;
+		// overflow occurs iff the operands have the same sign and the result has the opposite sign
+		if((op1 & sign) == (op2 & sign)) {
+			carry_set = (op1 & sign) != (result & sign);
+		}
+    state.registers[rd] = result;
     break;
   case RSB:
     result = op2 - op1;
