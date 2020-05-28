@@ -92,7 +92,7 @@ void branch(arm *state, word instruction) {
       (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
 }
 
-void decode(arm state, word instruction) {
+void decode(arm *state, word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
   const word multMask = 0x0FC000F0;
