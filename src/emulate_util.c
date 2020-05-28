@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// TODO: consider changing name
+// TODO: consider changing name (and type of carryOut)
 typedef struct {
   word result;
   word carryOut;
@@ -25,35 +25,6 @@ void check_ptr(const void *ptr, const char *error_msg) {
   if (ptr == NULL) {
     printf("Error: %s\n", error_msg);
     exit(EXIT_FAILURE);
-  }
-}
-
-bool checkCond(arm *state, word instruction) {
-  // CPSR flag bits
-  uint n = (state->registers[CPSR] & 0x80000000) >> 31;
-  uint z = (state->registers[CPSR] & 0x40000000) >> 30;
-  uint v = (state->registers[CPSR] & 0x10000000) >> 28;
-  enum Cond cond = instruction >> 28;
-  // conditions for instruction
-  switch (cond) {
-  case EQ:
-    return z;
-  case NE:
-    return !z;
-  case GE:
-    return n == v;
-  case LT:
-    return n != v;
-  case GT:
-    return !z && (n == v);
-  case LE:
-    return z || (n != v);
-  case AL:
-    return true;
-  default:
-    // no other instruction
-    // should never happen
-    assert(false);
   }
 }
 
@@ -157,7 +128,7 @@ tuple_t *opImmediate(arm *state, uint op2) {
   return output;
 }
 
-uint getCarryOut(word op1, word op2, word result) {
+word getCarryOut(word op1, word op2, word result) {
   uint carryOut = 0;
   word signBit = MSB_MASK;
   // overflow occurs iff the operands have the same sign and the result has ...
@@ -168,15 +139,17 @@ uint getCarryOut(word op1, word op2, word result) {
   return carryOut;
 }
 
-void setCPSR(arm *state, word result, uint carryOut) {
+void setCPSR(arm *state, word result, word carryOut) {
   // set to the logical value of bit 31 of the result
-  word n = result & MSB_MASK;
+  word n = result & CPSR_N;
   // set only if the result is all zeros
   word z = result ? 0 : CPSR_Z;
   // carry out from the instruction
   word c = carryOut ? SET_CPSR_C : 0;
+  // v is unaffected
+  word v = state->registers[CPSR] & CPSR_V_MASK;
   // updated flag bits
-  state->registers[CPSR] |= n | z | c;
+  state->registers[CPSR] = n | z | c | v;
 }
 
 void dpi(arm *state, word instruction) {
@@ -326,6 +299,35 @@ void branch(arm *state, word instruction) {
   state->registers[PC] +=
       (offset << CURRENT_INSTRUCTION_SHIFT) |
       (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
+}
+
+bool checkCond(arm *state, word instruction) {
+  // CPSR flag bits
+  uint n = (state->registers[CPSR] & 0x80000000) >> 31;
+  uint z = (state->registers[CPSR] & 0x40000000) >> 30;
+  uint v = (state->registers[CPSR] & 0x10000000) >> 28;
+  enum Cond cond = instruction >> 28;
+  // conditions for instruction
+  switch (cond) {
+  case EQ:
+    return z;
+  case NE:
+    return !z;
+  case GE:
+    return n == v;
+  case LT:
+    return n != v;
+  case GT:
+    return !z && (n == v);
+  case LE:
+    return z || (n != v);
+  case AL:
+    return true;
+  default:
+    // no other instruction
+    // should never happen
+    assert(false);
+  }
 }
 
 void decode(arm *state, word instruction) {

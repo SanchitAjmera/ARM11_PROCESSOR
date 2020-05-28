@@ -32,8 +32,8 @@
 
 // constants for Data Processing instruction
 #define TWOS_COMPLEMENT(value) ((~value) + 1)
-#define CPSR_V_MASK 0x1000000
-#define SET_CPSR_C (1 << 28)
+#define CPSR_V_MASK 0x10000000
+#define SET_CPSR_C (1 << 29)
 #define DPI_I_MASK 0x02000000
 #define DPI_OPCODE_MASK 0x01E00000
 #define DPI_S_MASK 0x00100000
