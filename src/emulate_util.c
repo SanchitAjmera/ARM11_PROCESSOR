@@ -175,10 +175,8 @@ void setCPSR(arm *state, word result, uint carryOut) {
   word z = result ? 0 : CPSR_Z;
   // carry out from the instruction
   word c = carryOut ? SET_CPSR_C : 0;
-  // unaffected
-  uint v = state->registers[CPSR] & CPSR_V_MASK;
   // updated flag bits
-  state->registers[CPSR] = n | z | c | v;
+  state->registers[CPSR] |= n | z | c;
 }
 
 void dpi(arm *state, word instruction) {
