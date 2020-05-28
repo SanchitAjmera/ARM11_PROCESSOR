@@ -245,45 +245,6 @@ void dpi(arm *state, word instruction) {
 
 // end of dpi ---------------------------------------------------------------
 
-// execution of the multiply instruction
-void multiply(arm *state, word instruction) {
-  // Extraction of information from the instruction;
-  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
-  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
-  int regM = instruction & MULT_REG_M_MASK;
-
-  // Initial execution of instruction
-  int result = state->registers[regM] * state->registers[regS];
-
-  // obtain value from Rn and add to result if Accumulate is set
-  if (instruction & ACCUMULATE_FLAG) {
-    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
-    result += state->registers[regN];
-  }
-  // update CPSR flags if S (bit 20 in instruction) is set
-  if (instruction & UPDATE_CPSR) {
-    state->registers[CPSR] |= (result & CPSR_N);
-    if (!result)
-      state->registers[CPSR] |= CPSR_Z;
-  }
-  state->registers[destination] = result;
-}
-
-// execution of the branch instruction
-void branch(arm *state, word instruction) {
-  // extraction of information
-  int offset = instruction & BRANCH_OFFSET_MASK;
-  int signBit = offset & BRANCH_SIGN_BIT;
-
-  // shift, sign extension and addition of offset onto current address
-  state->registers[PC] +=
-      (offset << CURRENT_INSTRUCTION_SHIFT) |
-      (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
-}
-
-/* Takes in the ARM binary file's name and returns an ARM state pointer with
-memory and register
-pointers on heap, where memory is of size MEM_LIMIT bytes */
 void init_arm(arm *state, const char *fname) {
 
   /* load binary file into memory */
@@ -320,7 +281,43 @@ word get_word(byte *start_addr) {
   return w;
 }
 
-void decode(arm *state, word instruction) {
+// execution of the multiply instruction
+void multiply(arm *state, word instruction) {
+  // Extraction of information from the instruction;
+  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
+  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
+  int regM = instruction & MULT_REG_M_MASK;
+
+  // Initial execution of instruction
+  int result = state->registers[regM] * state->registers[regS];
+
+  // Obtain value from Rn and add to result if Accumulate is set
+  if (instruction & ACCUMULATE_FLAG) {
+    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
+    result += state->registers[regN];
+  }
+  // Update CPSR flags if S (bit 20 in instruction) is set
+  if (instruction & UPDATE_CPSR) {
+    state->registers[CPSR] |= (result & CPSR_N);
+    if (!result)
+      state->registers[CPSR] |= CPSR_Z;
+  }
+  state->registers[destination] = result;
+}
+
+// execution of the branch instruction
+void branch(arm *state, word instruction) {
+  // Extraction of information
+  int offset = instruction & BRANCH_OFFSET_MASK;
+  int signBit = offset & BRANCH_SIGN_BIT;
+
+  // Shift, sign extension and addition of offset onto current address
+  state->registers[PC] +=
+      (offset << CURRENT_INSTRUCTION_SHIFT) |
+      (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
+}
+
+void decode(arm state, word instruction) {
   const word dpMask = 0x0C000000;
   const word dp = 0x00000000;
   const word multMask = 0x0FC000F0;
