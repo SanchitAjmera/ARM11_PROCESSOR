@@ -100,7 +100,7 @@ void decode(arm *state, word instruction) {
   const word sdtMask = 0x0C600000;
   const word sdt = 0x04000000;
   const word branchMask = 0x0F000000;
-  const word branch = 0x0A000000;
+  const word branchBits = 0x0A000000;
 
   if (!checkCond(state, instruction)) {
     return;
@@ -109,13 +109,13 @@ void decode(arm *state, word instruction) {
   // TODO: determine how to differentiate ...
   // ... `data processing` from `multiply`
 
-  if (BITS_SET(instruction, branchMask, branch)) {
+  if (BITS_SET(instruction, branchMask, branchBits)) {
     branch(state, instruction);
   } else if (BITS_SET(instruction, sdtMask, sdt)) {
     // function for single data tranfser instructions
   } else if (BITS_SET(instruction, multMask, mult)) {
     multiply(state, instruction);
   } else if (BITS_SET(instruction, dpMask, dp)) {
-    // dpi(state, instruction);
+    dpi(state, instruction);
   }
 }
