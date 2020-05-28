@@ -61,11 +61,11 @@ bool checkCond(arm *state, word instruction) {
 
 word rotateRight(word value, uint rotateNum) {
   uint lsbs = value & ((1 << rotateNum) - 1);
-  return (value >> rotateNum) | (lsbs << (32 - rotateNum));
+  return (value >> rotateNum) | (lsbs << (WORD_SIZE - rotateNum));
 }
 
 word arithShift(word value, uint shiftNum) {
-  word msb = value & 0x80000000;
+  word msb = value & MSB_MASK;
   // TODO: change variable name
   word msbs = msb;
   for (int i = 0; i < shiftNum; i++) {
@@ -84,7 +84,7 @@ uint shiftByRegister(arm *state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
   uint rs = shiftPart >> 4;
   // bottom byte of value in Rs specifies the amount to be shifted
-  return state->registers[rs] & 0x000000FF;
+  return state->registers[rs] & LEAST_BYTE;
 }
 
 uint leftCarryOut(word value, uint shiftNum) {
@@ -92,12 +92,12 @@ uint leftCarryOut(word value, uint shiftNum) {
 }
 
 uint rightCarryOut(word value, uint shiftNum) {
-  return (value >> (shiftNum - 1)) & 0x00000001;
+  return (value >> (shiftNum - 1)) & LSB_MASK;
 }
 
 tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
   // bit to determine what to shift by
-  bool shiftByConst = shiftPart & 0x01;
+  bool shiftByConst = shiftPart & LSB_MASK;
   // number to shift by
   uint shiftNum = shiftByConst ? shiftByConstant(shiftPart)
                                : shiftByRegister(state, shiftPart);
@@ -147,7 +147,7 @@ tuple_t *opRegister(arm *state, uint op2) {
 
 tuple_t *opImmediate(arm *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
-  word imm = op2 & 0x0FF;
+  word imm = op2 & LEAST_BYTE;
   // number to rotate by
   uint rotateNum = (op2 >> 8) * 2;
   // tuple for the result and the carry out bit
@@ -173,15 +173,10 @@ uint getCarryOut(word op1, word op2, word result) {
 
 void setCPSR(arm *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
-  word n = result & 0x80000000;
+  word n = result & MSB_MASK;
   // set only if the result is all zeros
-  word z;
-  if (!result) {
-    z = 1 << 29;
-  } else {
-    z = 0;
-  }
-  // carry out
+  word z = result ? 0 : 1 << 29;
+  // carry out from the instruction
   word c = carryOut ? 1 << 28 : 0;
   // unaffected
   uint v = state->registers[CPSR] & 0x10000000;
@@ -191,16 +186,16 @@ void setCPSR(arm *state, word result, uint carryOut) {
 
 void dpi(arm *state, word instruction) {
   // extraction of code
-  const uint i = (instruction & 0x02000000) >> 25;
+  const uint i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
   // instruction to execute
-  enum Opcode opcode = (instruction & 0x01E00000) >> 21;
-  const uint s = (instruction & 0x00100000) >> 20;
+  enum Opcode opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
+  const uint s = (instruction & DPI_S_MASK) >> DPI_S_SHIFT;
   // op1 is always the contents of register Rn
-  const uint rn = (instruction & 0x000F0000) >> 16;
+  const uint rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
   // destination register
-  const uint rd = (instruction & 0x0000F000) >> 12;
+  const uint rd = (instruction & DPI_RD_MASK) >> DPI_RD_SHIFT;
   // second operand
-  word op2 = instruction & 0x00000FFF;
+  word op2 = instruction & DPI_OP2_MASK;
   // first operand
   word op1 = state->registers[rn];
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
@@ -220,12 +215,12 @@ void dpi(arm *state, word instruction) {
     state->registers[rd] = result;
     break;
   case SUB:
-    result = op1 - op2;
+    result = op1 + (~op2) + 1;
     carryOut = getCarryOut(op1, (~op2) + 1, result);
     state->registers[rd] = result;
     break;
   case RSB:
-    result = op2 - op1;
+    result = op2 + (~op1) + 1;
     carryOut = getCarryOut((~op1) + 1, op2, result);
     state->registers[rd] = result;
     break;
@@ -241,16 +236,21 @@ void dpi(arm *state, word instruction) {
     result = op1 ^ op2;
     break;
   case CMP:
-    result = op1 - op2;
+    result = op1 + (~op2) + 1;
     carryOut = getCarryOut(op1, (~op2) + 1, result);
     break;
   case ORR:
     result = op1 | op2;
-    state->registers[rd] = op1 | op2;
+    state->registers[rd] = result;
     break;
   case MOV:
-    state->registers[rd] = op2;
+    result = op2;
+    state->registers[rd] = result;
     break;
+  default:
+    // no other instructions
+    // should never happen
+    assert(false);
   }
 
   // if s is set then the CPSR flags should be updated
