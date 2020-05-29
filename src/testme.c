@@ -90,7 +90,7 @@ void test_CPSR() {
 	test_bool(carryOut == 0, "0x0FFFFFFF-0xFFFFFFFF, carry = 0");
 	printf("result = %x %i %d\n", result, result, result);
 
-	// TODO: add testing for the other CPSR flags? N Z C V
+	// TODO: add testing for the other CPSR flags? N Z C V 
 }
 
 int main(void) {

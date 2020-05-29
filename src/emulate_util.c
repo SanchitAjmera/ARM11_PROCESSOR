@@ -180,7 +180,7 @@ void dpi(arm *state, word instruction) {
 		carryOut = op2 < op1 ? 0 : 1;
     state->registers[rd] = result;
     break;
-  case ADD:
+  case ADD: //
     result = op1 + op2;
 		carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
     state->registers[rd] = result;
