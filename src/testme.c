@@ -10,7 +10,7 @@ void test_bool(bool cond, char *test_name) {
 
 /* Loads a binary file fname into state memory and returns strcmp() between
    memory contents and the expected file dump fdump */
-int test_file_load(struct arm *state, const char *fname, const char *fdump) {
+int test_file_load(arm *state, const char *fname, const char *fdump) {
   init_arm(state, fname);
 
   /* read state->memory contents into string */
@@ -32,10 +32,12 @@ int test_file_load(struct arm *state, const char *fname, const char *fdump) {
   return strcmp(mem_contents, fdump);
 }
 
-/* Tests whether binary object files are loaded into memory 1) correctly,
-         2) in their entirety, and 3) in the correct byte order. */
+/* Tests whether binary object files are loaded into memory
+  1) correctly,
+  2) in their entirety
+  3) in the correct byte order. */
 void test_init_arm() {
-  struct arm *state = malloc(sizeof(struct arm));
+  arm *state = malloc(sizeof(arm));
 
   /* hex dump of binary object files used in this test */
   char *add01_dump = "0110a0e3022081e2";
