@@ -25,7 +25,7 @@ void print_arm_state(arm *state) {
   printf("Non-zero memory:\n");
   for (int i = 0; i < MEMORY_CAPACITY; i += 4) {
     if (state->memory[i] != 0)
-      printf("0x%08x: %08x\n", i, get_word(state->memory + i));
+      printf("0x%08x: 0x%08x\n", i, get_word(state->memory + i));
   }
 }
 
