@@ -23,7 +23,7 @@ enum Shift { LSL, LSR, ASR, ROR };
 
 void check_ptr(const void *ptr, const char *error_msg) {
   if (ptr == NULL) {
-    printf("Error: %s\n", error_msg);
+    fprintf(stderr, "Error: %s\n", error_msg);
     exit(EXIT_FAILURE);
   }
 }
@@ -171,7 +171,7 @@ void dpi(arm *state, word instruction) {
     state->registers[rd] = result;
     break;
   case SUB:
-    result = op1 - op2;
+    result = op1 + ~op2 + 1;
     carryOut = op1 < op2 ? 0 : 1;
     state->registers[rd] = result;
     break;
@@ -180,7 +180,7 @@ void dpi(arm *state, word instruction) {
     carryOut = op2 < op1 ? 0 : 1;
     state->registers[rd] = result;
     break;
-  case ADD: //
+  case ADD:
     result = op1 + op2;
     carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
     state->registers[rd] = result;
@@ -221,7 +221,7 @@ void dpi(arm *state, word instruction) {
 void init_arm(arm *state, const char *fname) {
 
   /* load binary file into memory */
-  byte *memory = (byte *)calloc(MEM_BYTE_CAPACITY, sizeof(byte));
+  byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
   check_ptr(memory, "Not enough memory.\n");
 
   FILE *bin_obj = fopen(fname, "rb");
@@ -234,12 +234,12 @@ void init_arm(arm *state, const char *fname) {
   /* Asserts that fread read the whole file */
   assert(fread(memory, 1, file_size, bin_obj) == file_size);
 
-  printf("Read %ld words into memory.\n", file_size / WORD_LEN);
+  printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
 
   fclose(bin_obj);
 
   /* initialise registers */
-  word *registers = (word *)calloc(REG_COUNT, sizeof(word));
+  word *registers = (word *)calloc(NO_REGISTERS, sizeof(word));
 
   /* construct ARM state */
   state->memory = memory;
@@ -248,7 +248,7 @@ void init_arm(arm *state, const char *fname) {
 
 word get_word(byte *start_addr) {
   word w = 0;
-  for (int i = 0; i < WORD_LEN; i++) {
+  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
     w += start_addr[i] << 8 * i;
   }
   return w;

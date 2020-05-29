@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv) {
   if (argc == 1) {
-    printf("Please specify an ARM binary object code file.\n");
+    fprintf(stderr, "Please specify an ARM binary object code file.\n");
     exit(EXIT_FAILURE);
   }
 
