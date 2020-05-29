@@ -372,6 +372,7 @@ void decode(arm state, word instruction) {
   }
 }
 
+/*
 int main(int argc, char **argv) {
   if (argc == 1) {
     printf("Please specify an ARM binary object code file.\n");
@@ -384,4 +385,34 @@ int main(int argc, char **argv) {
   free(state->registers);
   free(state);
   return EXIT_SUCCESS;
+}
+*/
+
+void printBits(uint32_t x) {
+  uint32_t mask = 1 << 31;
+  for (int i = 0; i < 32; i++) {
+    printf("%i", (x & mask) != 0);
+    x <<= 1;
+  }
+
+  printf("\n");
+}
+
+int main(int argc, char **argv) {
+  arm state;
+  state.memory = (byte *)calloc(65536, sizeof(byte));
+  state.registers = (word *)calloc(17, sizeof(word));
+
+  state.registers[0] = 0xFDCE0873;
+  state.registers[1] = 0x0000000F;
+  state.registers[2] = 0X00000001;
+  state.registers[CPSR] = 0x90000000;
+  // ACTUAL ANSWER
+  state.registers[4] = 0xFDCE0873 & (0x0000000F << 3);
+
+  for (int i = 0; i < 5; i++) {
+    printf("Register %d: ", i);
+    printBits(state.registers[i]);
+  }
+  return 0;
 }
