@@ -39,7 +39,8 @@
 #define MULT_REG_N_SHIFT 12
 #define MULT_RDEST_SHIFT 16
 #define ACCUMULATE_FLAG (1 << 21)
-#define UPDATE_CPSR (1 << 20)
+#define INSTRUCTION_S_MASK (1 << 20)
+#define UPDATE_CPSR(instruction) (instruction & INSTRUCTION_S_MASK)
 
 // constants for Branch instruction
 #define BRANCH_OFFSET_MASK 0x00FFFFFF
