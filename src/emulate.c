@@ -100,8 +100,8 @@ void transfer(arm *state, unsigned int sourceReg, unsigned int destReg) {
   checkValidAddress(address) ? (state->registers[destReg] = address)
                              : printf("address is not valid");
 }
-  
-//-Single Data Tranfer Instructions function ----------------------------------
+
+//-Single Data Tranfer Instructions function ---------------------------------
 
 void sdti(arm state, word instruction) {
   if (!checkCond(instruction & 0xF0000000, state)) {
@@ -130,30 +130,15 @@ void sdti(arm state, word instruction) {
   // PRE-INDEXING is set
   if (p) {
     // For this exercise PRE-INDEXING doesn't alter the base register Rn
-    // Transfer Data
+    // Transfer Data according to Load/Store bit
+    l ? transfer(state, rn, rd) : transfer(state, rd, rn);
 
-    // if flag is set then (pre-Indexing) and simply transfer data
-
+    // POST-INDEXING is set
   } else {
-
-    if (u) {
-      // offset is added to base register if u is set
-      rn += offset;
-
-    } else {
-      // subtract offset from base register
-      rn -= offset;
-    }
+    // indexing base regsiter Rn according to Up bit
+    u ? (rn += offset) : (rn -= offset);
     // trasfer data
-  }
-
-  if (l) {
-    // word is loaded from memory
-    // word ldr is the word stored within the source register rd
-    // TODO: find way to load word from source register into variable ldr
-  } else {
-    // word str is the word from the updated base register rn
-    // this word is stored within the destination/source register rd
+    l ? transfer(state, rn, rd) : transfer(state, rd, rn);
   }
 }
 
