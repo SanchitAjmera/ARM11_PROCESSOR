@@ -12,7 +12,7 @@
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
 // constants for masks
-// Constants for Multiply
+// Constants for Single Data Transfer
 #define SDTI_I_MASK 0x02000000
 #define SDTI_P_MASK 0x01000000
 #define SDTI_U_MASK 0x00800000
@@ -56,10 +56,10 @@ void ptrValidate(const void *pointer, char *error) {
 bool checkCond(word instruction, arm state) {
   // CPSR FLAG BITS - WE USE 1,2,4,8 to extract the 1,2,3,4th bit in the cpsr
   // address
-  unsigned int n = (state.registers[CPSR] & 0x80000000) >> 31;
-  unsigned int z = (state.registers[CPSR] & 0x40000000) >> 30;
-  unsigned int c = (state.registers[CPSR] & 0x20000000) >> 29;
-  unsigned int v = (state.registers[CPSR] & 0x10000000) >> 28;
+  unsigned int n = (state->registers[CPSR] & 0x80000000) >> 31;
+  unsigned int z = (state->registers[CPSR] & 0x40000000) >> 30;
+  unsigned int c = (state->registers[CPSR] & 0x20000000) >> 29;
+  unsigned int v = (state->registers[CPSR] & 0x10000000) >> 28;
   unsigned int cond = instruction >> 28;
   // conditions for instruction
 
@@ -84,28 +84,39 @@ bool checkCond(word instruction, arm state) {
   }
 }
 
-
+// function for checking if word is within MEMORY_CAPACITY
+bool checkWordSize(word address) { return address <= 65536; }
 //-Single Data Tranfer Instructions function ----------------------------------
 
 void sdti(arm state, word instruction) {
   if (!checkCond(instruction & 0xF0000000, state)) {
     return;
   }
-  // parts of the instruction
+  // Components of the instruction
+  // Immediate Offset
   unsigned int i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
+  // Pre/Post indexing bit
   unsigned int p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
+  // Up bit
   unsigned int u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
+  // Load/Store bit
   unsigned int l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
+  // Base Register
   unsigned int rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
+  // Source/Destination register
   unsigned int rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
+  // Offset
   word offset = (instruction & SDTI_OFFSET_MASK);
 
   // Immediate Offset
+  tuple_t *output = i ? opRegister(state, offset) : opImmediate(state, offset);
+  offset = output->result;
 
-  offset = i ? opRegister(state, offset) : opImmediate(state, offset);
-
-  // p doesn't change contents of base register for this exercise
+  // PRE-INDEXING is set
   if (p) {
+    // For this exercise PRE-INDEXING doesn't alter the base register Rn
+    // Transfer Data
+
     // if flag is set then (pre-Indexing) and simply transfer data
 
   } else {
