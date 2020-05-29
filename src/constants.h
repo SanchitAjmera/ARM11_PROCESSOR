@@ -30,6 +30,21 @@
 #define DECODE_BRANCH_MASK 0x0F000000
 #define DECODE_BRANCH_EXPECTED 0x0A000000
 
+// constants for single data transfer
+#define SDTI_I_MASK 0x02000000
+#define SDTI_P_MASK 0x01000000
+#define SDTI_U_MASK 0x00800000
+#define SDTI_L_MASK 0x00100000
+#define SDTI_RN_MASK 0x000F0000
+#define SDTI_RD_MASK 0x0000F000
+#define SDTI_OFFSET_MASK 0x00000FFF
+#define SDTI_I_SHIFT 25
+#define SDTI_P_SHIFT 24
+#define SDTI_U_SHIFT 23
+#define SDTI_L_SHIFT 20
+#define SDTI_RN_SHIFT 16
+#define SDTI_RD_SHIFT 12
+
 // constants for Multiply instruction
 #define MULT_RDEST_MASK 0x000F0000
 #define MULT_REG_S_MASK 0x00000F00

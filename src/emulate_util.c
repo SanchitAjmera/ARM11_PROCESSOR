@@ -58,6 +58,55 @@ word get_word(byte *start_addr) {
   return w;
 }
 
+// function for checking if word is within MEMORY_CAPACITY
+// ADDRESS_SIZE is taken away from MEMORY_CAPACITY as address must be
+// ADDRESS_SIZE less than MEMORY_CAPACITY in order for word to be read
+bool checkValidAddress(word address) {
+  return (address <= MEMORY_CAPACITY - ADDRESS_SIZE);
+}
+
+// function which transfers data from one register to another
+void transfer(arm *state, unsigned int sourceReg, unsigned int destReg) {
+  // getting address from source register
+  word address = state->registers[sourceReg];
+  // checking if address is valide
+  // if valid then transferring address to destination register
+  checkValidAddress(address) ? (state->registers[destReg] = address)
+                             : printf("address is not valid");
+}
+
+//-Single Data Tranfer Instructions function ---------------------------------
+
+void sdti(arm *state, word instruction) {
+  // Components of the instruction
+  // Immediate Offset
+  unsigned int i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
+  // Pre/Post indexing bit
+  unsigned int p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
+  // Up bit
+  unsigned int u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
+  // Load/Store bit
+  unsigned int l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
+  // Base Register
+  unsigned int rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
+  // Source/Destination register
+  unsigned int rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
+  // Offset
+  word offset = (instruction & SDTI_OFFSET_MASK);
+
+  // Immediate Offset
+  tuple_t *output = i ? opRegister(state, offset) : opImmediate(state, offset);
+  offset = output->result;
+
+  // PRE-INDEXING is set
+  if (!p) {
+    // indexing base regsiter Rn according to Up bit
+    u ? (rn += offset) : (rn -= offset);
+  }
+  // transfer Data
+  l ? transfer(state, rn, rd) : transfer(state, rd, rn);
+}
+
 void executeMultiply(arm *state, word instruction) {
   // Extraction of information from the instruction;
   int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
