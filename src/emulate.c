@@ -84,6 +84,16 @@ bool checkCond(word instruction, arm state) {
   }
 }
 
+// function which transfers data from one register to another
+void transfer(unsigned int sourceReg, unsigned in destReg) {
+  // getting address from source register
+  word address = state->registers[sourceReg];
+  // checking if address is valide
+  // if valid then transferring address to destination register
+  checkValidAddress(address) ? (state->registers[destReg] = address)
+                             : printf("address is not valid");
+}
+
 // function for checking if word is within MEMORY_CAPACITY
 // ADDRESS_SIZE is taken away from MEMORY_CAPACITY as address must be 
 // ADDRESS_SIZE less than MEMORY_CAPACITY in order for word to be read
