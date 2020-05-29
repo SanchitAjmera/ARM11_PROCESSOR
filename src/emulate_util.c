@@ -1,12 +1,15 @@
 #include "emulate_util.h"
 #include "constants.h"
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
 enum Register { PC = 15, CPSR = 16 };
+// condition suffixes
+enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 
 void check_ptr(const void *ptr, const char *error_msg) {
   if (ptr == NULL) {
@@ -46,6 +49,7 @@ void init_arm(arm *state, const char *fname) {
   state->registers = registers;
 }
 
+// TODO: consider const byte *start_addr
 word get_word(byte *start_addr) {
   word w = 0;
   for (int i = 0; i < WORD_LEN; i++) {
@@ -69,10 +73,10 @@ void executeMultiply(arm *state, word instruction) {
     result += state->registers[regN];
   }
   // Update CPSR flags if S (bit 20 in instruction) is set
-  if (instruction & UPDATE_CPSR) {
-    state->registers[CPSR] |= (result & CPSR_N);
+  if (UPDATE_CPSR(instruction)) {
+    state->registers[CPSR] |= (result & CPSR_N_MASK);
     if (!result)
-      state->registers[CPSR] |= CPSR_Z;
+      state->registers[CPSR] |= CPSR_Z_MASK;
   }
   state->registers[destination] = result;
 }
@@ -90,10 +94,11 @@ void executeBranch(arm *state, word instruction) {
 
 bool checkCond(arm *state, word instruction) {
   // CPSR flag bits
-  uint n = GET_CPSR_N(state->registers[CPSR]);
-  uint z = GET_CPSR_Z(state->registers[CPSR]);
-  uint v = GET_CPSR_V(state->registers[CPSR]);
-  enum Cond cond = GET_CPSR_FLAGS(state->registers[CPSR]);
+  word cpsr = state->registers[CPSR];
+  uint n = GET_CPSR_N(cpsr);
+  uint z = GET_CPSR_Z(cpsr);
+  uint v = GET_CPSR_V(cpsr);
+  enum Cond cond = GET_CPSR_FLAGS(cpsr);
   // conditions for instruction
   switch (cond) {
   case EQ:
@@ -128,10 +133,10 @@ void decode(arm *state, word instruction) {
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
     executeBranch(state, instruction);
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
-    // function for single data tranfser instructions
+    // executestdi(state, instruction)
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
     executeMultiply(state, instruction);
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
-    dpi(state, instruction);
+    // executedpi(state, instruction);
   }
 }
