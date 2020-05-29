@@ -49,8 +49,7 @@ void init_arm(arm *state, const char *fname) {
   state->registers = registers;
 }
 
-// TODO: consider const byte *start_addr
-word get_word(byte *start_addr) {
+word get_word(const byte *start_addr) {
   word w = 0;
   for (int i = 0; i < WORD_LEN; i++) {
     w += start_addr[i] << 8 * i;
@@ -75,9 +74,7 @@ void transfer(arm *state, unsigned int sourceReg, unsigned int destReg) {
                              : printf("address is not valid");
 }
 
-//-Single Data Tranfer Instructions function ---------------------------------
-
-void sdti(arm *state, word instruction) {
+void executesdti(arm *state, word instruction) {
   // Components of the instruction
   // Immediate Offset
   unsigned int i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
@@ -182,7 +179,7 @@ void decode(arm *state, word instruction) {
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
     executeBranch(state, instruction);
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
-    // executestdi(state, instruction)
+    executestdi(state, instruction)
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
     executeMultiply(state, instruction);
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {

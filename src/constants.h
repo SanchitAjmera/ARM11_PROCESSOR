@@ -17,7 +17,7 @@
 #define GET_CPSR_Z(cpsr) ((cpsr & CPSR_Z_MASK) >> CPSR_Z_SHIFT)
 #define GET_CPSR_C(cpsr) ((cpsr & CPSR_C_MASK) >> CPSR_C_SHIFT)
 #define GET_CPSR_V(cpsr) ((cpsr & CPSR_V_MASK) >> CPSR_V_SHIFT)
-#define GET_CPSR_FLAGS(cpsr) (cpsr >> 28)
+#define GET_CPSR_FLAGS(cpsr) (cpsr >> CPSR_V_MASK)
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
 // constants for decode function
