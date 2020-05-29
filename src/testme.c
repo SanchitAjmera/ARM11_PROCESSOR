@@ -64,7 +64,40 @@ void test_init_arm() {
   free(state);
 }
 
+void test_CPSR() {
+	word op1, op2, result, expected, carryOut;
+	
+	/* Test addition */
+	op1 = 0xAFFFFFFF;
+	op2 = 0x6FFFFFFF;
+	result = op1 + op2;
+	expected = 0x1FFFFFFE;
+	carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
+	test_bool(carryOut == 1, "0xAFFFFFFF+0x6FFFFFFF (unsigned overflow), carry = 1");
+	test_bool(result == expected, "0xAFFFFFFF+0x6FFFFFFF, result = 0x1FFFFFFE");
+
+	op1 = 0x000003E8;
+	op2 = 0x000AE200;
+	result = op1+op2;
+	carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
+	test_bool(carryOut == 0, "0x000003E8+0x000AE200, carry = 0");
+
+	/* Test subtraction */
+	op1 = 0x0FFFFFFF;
+	op2 = 0xFFFFFFFF;
+	result = op1 - op2;
+	carryOut = op1 < op2 ? 0 : 1;
+	test_bool(carryOut == 0, "0x0FFFFFFF-0xFFFFFFFF, carry = 0");
+	printf("result = %x %i %d\n", result, result, result);
+
+	// TODO: add testing for the other CPSR flags? N Z C V
+}
+
 int main(void) {
+	printf("----Testing init_arm----\n");
   test_init_arm();
+
+	printf("----Testing CPSR flags----\n");
+	test_CPSR();
   return 0;
 }
