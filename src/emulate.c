@@ -1,6 +1,7 @@
-#include <stdint.h>
-#include <stdlib.h>
 #include "emulate_util.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char **argv) {
   if (argc == 1) {
@@ -9,9 +10,8 @@ int main(int argc, char **argv) {
   }
 
   // free memory before code termination
-  arm *state = malloc(sizeof(struct arm));
+  arm *state = malloc(sizeof(arm));
   init_arm(state, argv[1]);
-
 
   free(state->memory);
   free(state->registers);
