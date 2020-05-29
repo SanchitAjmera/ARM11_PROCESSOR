@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "emulate_util.h"
+#include "constants.h"
 
 void test_bool(bool cond, char *test_name) {
   printf("T: %s : %s\n", test_name, cond ? "OK" : "FAIL");
@@ -21,7 +22,7 @@ int test_file_load(arm *state, const char *fname, const char *fdump) {
   printf("expected: %s, memory: %s\n", fdump, mem_contents);
 
   int non_zero_count = 0;
-  for (int i = strlen(fdump); i < MEM_BYTE_CAPACITY; i++) {
+  for (int i = strlen(fdump); i < MEMORY_CAPACITY; i++) {
     non_zero_count += state->memory[i] == 0 ? 0 : 1;
   }
   test_bool(non_zero_count == 0, "all other memory locations 0");
@@ -64,7 +65,51 @@ void test_init_arm() {
   free(state);
 }
 
+void test_CPSR() {
+  word op1, op2, result, expected, carryOut;
+
+  /* Test addition */
+  op1 = 0xAFFFFFFF;
+  op2 = 0x6FFFFFFF;
+  result = op1 + op2;
+  expected = 0x1FFFFFFE;
+  carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
+  test_bool(carryOut == 1, "0xAFFFFFFF+0x6FFFFFFF (unsigned overflow), carry = 1");
+  test_bool(result == expected, "0xAFFFFFFF+0x6FFFFFFF, result = 0x1FFFFFFE");
+
+  op1 = 0x000003E8;
+  op2 = 0x000AE200;
+  result = op1+op2;
+  carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
+  test_bool(carryOut == 0, "0x000003E8+0x000AE200, carry = 0");
+
+  /* Test subtraction */
+  op1 = 0x0FFFFFFF;
+  op2 = 0xFFFFFFFF;
+  result = op1 - op2;
+  carryOut = op1 < op2 ? 0 : 1;
+  test_bool(carryOut == 0, "0x0FFFFFFF-0xFFFFFFFF, carry = 0");
+
+  op1 = 20;
+  op2 = 50;
+  result = op1-op2;
+  carryOut = op1 < op2 ? 0 : 1;
+  test_bool(carryOut == 0, "20 - 50, carry = 0");
+
+  op1 = 50;
+  op2 = 20;
+  result = op1-op2;
+  carryOut = op1 < op2 ? 0 : 1;
+  test_bool(carryOut == 1, "50 - 20, carry = 1");
+
+  // TODO: add testing for the other CPSR flags? N Z C V
+}
+
 int main(void) {
+  printf("----Testing init_arm----\n");
   test_init_arm();
+
+  printf("----Testing CPSR flags----\n");
+  test_CPSR();
   return 0;
 }

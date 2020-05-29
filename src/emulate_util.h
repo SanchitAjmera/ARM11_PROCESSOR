@@ -8,10 +8,6 @@ typedef uint32_t word;
 typedef uint8_t byte;
 typedef unsigned int uint;
 
-static const int MEM_BYTE_CAPACITY = 65536;
-static const int WORD_LEN = 4;
-static const int REG_COUNT = 17;
-
 typedef struct {
   byte *memory;
   /* 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR */
@@ -31,6 +27,8 @@ extern void multiply(arm *state, word instruction);
 // execution of a branch instruction
 extern void branch(arm *state, word instruction);
 
+extern word get_word(byte *start_addr);
+extern word fetch(arm *state);
 extern void decode(arm *state, word instruction);
 
 #endif

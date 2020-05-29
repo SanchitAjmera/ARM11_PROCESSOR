@@ -23,7 +23,7 @@ enum Shift { LSL, LSR, ASR, ROR };
 
 void check_ptr(const void *ptr, const char *error_msg) {
   if (ptr == NULL) {
-    printf("Error: %s\n", error_msg);
+    fprintf(stderr, "Error: %s\n", error_msg);
     exit(EXIT_FAILURE);
   }
 }
@@ -128,17 +128,6 @@ tuple_t *opImmediate(arm *state, uint op2) {
   return output;
 }
 
-word getCarryOut(word op1, word op2, word result) {
-  uint carryOut = 0;
-  word signBit = MSB_MASK;
-  // overflow occurs iff the operands have the same sign and the result has ...
-  // ... the opposite sign
-  if ((op1 & signBit) == (op2 & signBit)) {
-    carryOut = (op1 & signBit) != (result & signBit);
-  }
-  return carryOut;
-}
-
 void setCPSR(arm *state, word result, word carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & CPSR_N;
@@ -182,18 +171,18 @@ void dpi(arm *state, word instruction) {
     state->registers[rd] = result;
     break;
   case SUB:
-    result = op1 + TWOS_COMPLEMENT(op2);
-    carryOut = getCarryOut(op1, TWOS_COMPLEMENT(op2), result);
+    result = op1 + ~op2 + 1;
+    carryOut = op1 < op2 ? 0 : 1;
     state->registers[rd] = result;
     break;
   case RSB:
-    result = op2 + TWOS_COMPLEMENT(op1);
-    carryOut = getCarryOut(TWOS_COMPLEMENT(~op1), op2, result);
+    result = op2 - op1;
+    carryOut = op2 < op1 ? 0 : 1;
     state->registers[rd] = result;
     break;
   case ADD:
     result = op1 + op2;
-    carryOut = getCarryOut(op1, op2, result);
+    carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
     state->registers[rd] = result;
     break;
   case TST:
@@ -203,8 +192,8 @@ void dpi(arm *state, word instruction) {
     result = op1 ^ op2;
     break;
   case CMP:
-    result = op1 + TWOS_COMPLEMENT(op2);
-    carryOut = getCarryOut(op1, TWOS_COMPLEMENT(op2), result);
+    result = op1 - op2;
+    carryOut = op1 < op2 ? 0 : 1;
     break;
   case ORR:
     result = op1 | op2;
@@ -228,42 +217,6 @@ void dpi(arm *state, word instruction) {
 }
 
 // end of dpi ---------------------------------------------------------------
-
-void init_arm(arm *state, const char *fname) {
-
-  /* load binary file into memory */
-  byte *memory = (byte *)calloc(MEM_BYTE_CAPACITY, sizeof(byte));
-  check_ptr(memory, "Not enough memory.\n");
-
-  FILE *bin_obj = fopen(fname, "rb");
-  check_ptr(bin_obj, "File could not be opened\n");
-
-  fseek(bin_obj, 0, SEEK_END);
-  long file_size = ftell(bin_obj);
-  rewind(bin_obj);
-
-  /* Asserts that fread read the whole file */
-  assert(fread(memory, 1, file_size, bin_obj) == file_size);
-
-  printf("Read %ld words into memory.\n", file_size / WORD_LEN);
-
-  fclose(bin_obj);
-
-  /* initialise registers */
-  word *registers = (word *)calloc(REG_COUNT, sizeof(word));
-
-  /* construct ARM state */
-  state->memory = memory;
-  state->registers = registers;
-}
-
-word get_word(byte *start_addr) {
-  word w = 0;
-  for (int i = 0; i < WORD_LEN; i++) {
-    w += start_addr[i] << 8 * i;
-  }
-  return w;
-}
 
 // execution of the multiply instruction
 void multiply(arm *state, word instruction) {
@@ -328,6 +281,48 @@ bool checkCond(arm *state, word instruction) {
     // should never happen
     assert(false);
   }
+}
+
+void init_arm(arm *state, const char *fname) {
+
+  /* load binary file into memory */
+  byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
+  check_ptr(memory, "Not enough memory.\n");
+
+  FILE *bin_obj = fopen(fname, "rb");
+  check_ptr(bin_obj, "File could not be opened\n");
+
+  fseek(bin_obj, 0, SEEK_END);
+  long file_size = ftell(bin_obj);
+  rewind(bin_obj);
+
+  /* Asserts that fread read the whole file */
+  assert(fread(memory, 1, file_size, bin_obj) == file_size);
+
+  printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
+
+  fclose(bin_obj);
+
+  /* initialise registers */
+  word *registers = (word *)calloc(NO_REGISTERS, sizeof(word));
+
+  /* construct ARM state */
+  state->memory = memory;
+  state->registers = registers;
+}
+
+word get_word(byte *start_addr) {
+  word w = 0;
+  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
+    w += start_addr[i] << 8 * (WORD_SIZE_BYTES-1-i);
+  }
+  return w;
+}
+
+word fetch(arm *state) {
+  word memory_offset = state->registers[PC];
+  state->registers[PC] += WORD_SIZE_BYTES;
+  return get_word(state->memory + memory_offset);
 }
 
 void decode(arm *state, word instruction) {
