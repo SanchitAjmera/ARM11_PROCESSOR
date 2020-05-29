@@ -87,7 +87,7 @@ bool checkCond(word instruction, arm state) {
 // function for checking if word is within MEMORY_CAPACITY
 // ADDRESS_SIZE is taken away from MEMORY_CAPACITY as address must be 
 // ADDRESS_SIZE less than MEMORY_CAPACITY in order for word to be read
-bool checkWordSize(word address) { 
+bool checkValidAddress(word address) { 
   return (address <= MEMORY_CAPACITY - ADDRESS_SIZE);
 }
   
