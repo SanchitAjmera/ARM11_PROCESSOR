@@ -128,18 +128,12 @@ void sdti(arm state, word instruction) {
   offset = output->result;
 
   // PRE-INDEXING is set
-  if (p) {
-    // For this exercise PRE-INDEXING doesn't alter the base register Rn
-    // Transfer Data according to Load/Store bit
-    l ? transfer(state, rn, rd) : transfer(state, rd, rn);
-
-    // POST-INDEXING is set
-  } else {
-    // indexing base regsiter Rn according to Up bit
-    u ? (rn += offset) : (rn -= offset);
-    // trasfer data
-    l ? transfer(state, rn, rd) : transfer(state, rd, rn);
+  if (!p) {
+  // indexing base regsiter Rn according to Up bit
+  u ? (rn += offset) : (rn -= offset);
   }
+  // transfer Data
+  l ? transfer(state, rn, rd) : transfer(state, rd, rn);
 }
 
 void decode(arm state, word instruction) {
