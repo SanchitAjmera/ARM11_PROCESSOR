@@ -218,42 +218,6 @@ void dpi(arm *state, word instruction) {
 
 // end of dpi ---------------------------------------------------------------
 
-void init_arm(arm *state, const char *fname) {
-
-  /* load binary file into memory */
-  byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
-  check_ptr(memory, "Not enough memory.\n");
-
-  FILE *bin_obj = fopen(fname, "rb");
-  check_ptr(bin_obj, "File could not be opened\n");
-
-  fseek(bin_obj, 0, SEEK_END);
-  long file_size = ftell(bin_obj);
-  rewind(bin_obj);
-
-  /* Asserts that fread read the whole file */
-  assert(fread(memory, 1, file_size, bin_obj) == file_size);
-
-  printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
-
-  fclose(bin_obj);
-
-  /* initialise registers */
-  word *registers = (word *)calloc(NO_REGISTERS, sizeof(word));
-
-  /* construct ARM state */
-  state->memory = memory;
-  state->registers = registers;
-}
-
-word get_word(byte *start_addr) {
-  word w = 0;
-  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    w += start_addr[i] << 8 * i;
-  }
-  return w;
-}
-
 // execution of the multiply instruction
 void multiply(arm *state, word instruction) {
   // Extraction of information from the instruction;
@@ -317,6 +281,48 @@ bool checkCond(arm *state, word instruction) {
     // should never happen
     assert(false);
   }
+}
+
+void init_arm(arm *state, const char *fname) {
+
+  /* load binary file into memory */
+  byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
+  check_ptr(memory, "Not enough memory.\n");
+
+  FILE *bin_obj = fopen(fname, "rb");
+  check_ptr(bin_obj, "File could not be opened\n");
+
+  fseek(bin_obj, 0, SEEK_END);
+  long file_size = ftell(bin_obj);
+  rewind(bin_obj);
+
+  /* Asserts that fread read the whole file */
+  assert(fread(memory, 1, file_size, bin_obj) == file_size);
+
+  printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
+
+  fclose(bin_obj);
+
+  /* initialise registers */
+  word *registers = (word *)calloc(NO_REGISTERS, sizeof(word));
+
+  /* construct ARM state */
+  state->memory = memory;
+  state->registers = registers;
+}
+
+word get_word(byte *start_addr) {
+  word w = 0;
+  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
+    w += start_addr[i] << 8 * (WORD_SIZE_BYTES-1-i);
+  }
+  return w;
+}
+
+word fetch(arm *state) {
+  word memory_offset = state->registers[PC];
+  state->registers[PC] += WORD_SIZE_BYTES;
+  return get_word(state->memory + memory_offset);
 }
 
 void decode(arm *state, word instruction) {

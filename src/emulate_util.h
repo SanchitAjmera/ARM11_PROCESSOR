@@ -27,6 +27,8 @@ extern void multiply(arm *state, word instruction);
 // execution of a branch instruction
 extern void branch(arm *state, word instruction);
 
+extern word get_word(byte *start_addr);
+extern word fetch(arm *state);
 extern void decode(arm *state, word instruction);
 
 #endif
