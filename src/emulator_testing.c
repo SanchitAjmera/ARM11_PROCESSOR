@@ -306,6 +306,7 @@ void setCPSR(arm *state, word result, word carryOut) {
 
 void sdti(arm *state, word instruction) {
   if (!checkCond(instruction & 0xF0000000, state)) {
+    printf("cond failed");
     return;
   }
   // parts of the instruction
@@ -321,11 +322,43 @@ void sdti(arm *state, word instruction) {
   tuple_t *output = i ? opRegister(state, offset) : opImmediate(state, offset);
   offset = output->result;
 
+  // see if i need to load or store Data
+
+  if (l) {
+  }
+
   // p doesn't change contents of base register for this exercise
   if (p) {
-    // if flag is set then (pre-Indexing) and simply transfer data
+    if (u) {
+      // offset is added to base register if u is set
+      rn += offset;
 
-  } else {
+    } else {
+      // subtract offset from base register
+      rn -= offset;
+    }
+
+    if (l) {
+      // check if address is out of bounds (MAX == 64KB)
+      // laod data from address from rn into rd
+      word ldr = state->registers[rn];
+      state->registers[rd] = ldr;
+    } else {
+      word str = state->registers[rd];
+      state->registers[rn] = str;
+    }
+
+  } else { // if post=indexing
+
+    if (l) {
+      // check if address is out of bounds (MAX == 64KB)
+      // laod data from address from rn into rd
+      word ldr = state->registers[rn];
+      state->registers[rd] = ldr;
+    } else {
+      word str = state->registers[rd];
+      state->registers[rn] = str;
+    }
 
     if (u) {
       // offset is added to base register if u is set
@@ -335,16 +368,6 @@ void sdti(arm *state, word instruction) {
       // subtract offset from base register
       rn -= offset;
     }
-    // trasfer data
-  }
-
-  if (l) {
-    // word is loaded from memory
-    // word ldr is the word stored within the source register rd
-    // TODO: find way to load word from source register into variable ldr
-  } else {
-    // word str is the word from the updated base register rn
-    // this word is stored within the destination/source register rd
   }
 }
 
@@ -372,22 +395,6 @@ void decode(arm state, word instruction) {
   }
 }
 
-/*
-int main(int argc, char **argv) {
-  if (argc == 1) {
-    printf("Please specify an ARM binary object code file.\n");
-    exit(EXIT_FAILURE);
-  }
-  arm *state;
-
-  // free memory before code termination
-  free(state->memory);
-  free(state->registers);
-  free(state);
-  return EXIT_SUCCESS;
-}
-*/
-
 void printBits(uint32_t x) {
   uint32_t mask = 1 << 31;
   for (int i = 0; i < 32; i++) {
@@ -403,16 +410,46 @@ int main(int argc, char **argv) {
   state.memory = (byte *)calloc(65536, sizeof(byte));
   state.registers = (word *)calloc(17, sizeof(word));
 
+  // STRUCTURE
+  // COND - 01 - I - P - U - 00 - L - Rn - Rd - Offset
+  // 1110 01 1 0 1 00 1 - 0000 - 0100 - 000000000000
+  word instr = 0b11100110100100000100000000000000;
+
   state.registers[0] = 0xFDCE0873;
   state.registers[1] = 0x0000000F;
   state.registers[2] = 0X00000001;
   state.registers[CPSR] = 0x90000000;
   // ACTUAL ANSWER
   state.registers[4] = 0xFDCE0873 & (0x0000000F << 3);
-
+  printf("state before: \n");
   for (int i = 0; i < 5; i++) {
     printf("Register %d: ", i);
     printBits(state.registers[i]);
   }
+  printf("\n");
+
+  sdti(&state, instr);
+  printf("state after: \n");
+  for (int i = 0; i < 5; i++) {
+    printf("Register %d: ", i);
+    printBits(state.registers[i]);
+  }
+
   return 0;
 }
+
+/*
+int main(int argc, char **argv) {
+  if (argc == 1) {
+    printf("Please specify an ARM binary object code file.\n");
+    exit(EXIT_FAILURE);
+  }
+  arm *state;
+
+  // free memory before code termination
+  free(state->memory);
+  free(state->registers);
+  free(state);
+  return EXIT_SUCCESS;
+}
+*/
