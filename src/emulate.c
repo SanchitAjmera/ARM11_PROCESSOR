@@ -85,7 +85,7 @@ bool checkCond(word instruction, arm state) {
 }
 
 // function for checking if word is within MEMORY_CAPACITY
-bool checkWordSize(word address) { return address <= 65536; }
+bool checkWordSize(word address) { return address <= MEMORY_CAPACITY; }
 //-Single Data Tranfer Instructions function ----------------------------------
 
 void sdti(arm state, word instruction) {
