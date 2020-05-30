@@ -138,9 +138,9 @@ word getCarryOut(word op1, word op2, bool isAddition) {
 
 void setCPSR(arm *state, word result, word carryOut) {
   // set to the logical value of bit 31 of the result
-  word n = result & CPSR_N;
+  word n = result & CPSR_N_MASK;
   // set only if the result is all zeros
-  word z = result ? 0 : CPSR_Z;
+  word z = result ? 0 : CPSR_ZMASK;
   // carry out from the instruction
   word c = carryOut ? SET_CPSR_C : 0;
   // v is unaffected
@@ -154,7 +154,6 @@ void dpi(arm *state, word instruction) {
   const uint i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
   // instruction to execute
   enum Opcode opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
-  const uint s = (instruction & DPI_S_MASK) >> DPI_S_SHIFT;
   // op1 is always the contents of register Rn
   const uint rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
   // destination register
@@ -221,8 +220,8 @@ void dpi(arm *state, word instruction) {
     assert(false);
   }
 
-  // if s is set then the CPSR flags should be updated
-  if (s) {
+  // if s (bit 20) is set then the CPSR flags should be updated
+  if (UPDATE_CPSR(instruction)) {
     setCPSR(state, result, carryOut);
   }
   free(output);
