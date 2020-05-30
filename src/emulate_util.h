@@ -10,7 +10,7 @@ typedef uint8_t byte;
 typedef unsigned int uint;
 
 // ARM instruction set
-typedef enum { DPI = 0, MULT = 1, BR = 2, SDTI = 3, ERR = 4 } InstructionSet;
+typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionSet;
 
 // tuple for instruction and instructionSet enum
 typedef struct {
