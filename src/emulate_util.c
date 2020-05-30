@@ -262,14 +262,16 @@ void executesdti(arm *state, word instruction) {
   // Immediate Offset
   tuple_t *output = i ? opRegister(state, offset) : opImmediate(state, offset);
   offset = output->result;
-
-  // PRE-INDEXING is set
+  
+  // Because PRE-INDEXING doesn't change the value of the base register rn
+  // the data will always be transferred regardless of the indexing bit p.
+  // transfering Data:
+  l ? transfer(state, rn, rd) : transfer(state, rd, rn);
+  // POST-INDEXING is set
   if (!p) {
     // indexing base regsiter Rn according to Up bit
     u ? (rn += offset) : (rn -= offset);
   }
-  // transfer Data
-  l ? transfer(state, rn, rd) : transfer(state, rd, rn);
 }
 
 void executeMultiply(arm *state, word instruction) {
