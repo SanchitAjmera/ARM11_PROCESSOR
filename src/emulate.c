@@ -1,5 +1,5 @@
-#include "emulate_util.h"
 #include "constants.h"
+#include "emulate_util.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +9,8 @@ void print_arm_state(arm *state) {
   printf("Registers:\n");
   char reg_name[5];
   for (int i = 0; i < NO_REGISTERS; i++) {
-    if (i == 13 || i == 14) continue; // Not used in this exercise
+    if (i == 13 || i == 14)
+      continue; // Not used in this exercise
 
     if (i == 15) {
       strcpy(reg_name, "PC");
@@ -19,7 +20,8 @@ void print_arm_state(arm *state) {
       sprintf(reg_name, "%%%i", i);
     }
 
-    printf("%-4s:%10i (0x%08x)\n",reg_name, state->registers[i], state->registers[i]);
+    printf("%-4s:%10i (0x%08x)\n", reg_name, state->registers[i],
+           state->registers[i]);
   }
 
   printf("Non-zero memory:\n");
