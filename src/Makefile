@@ -14,11 +14,11 @@ emulate: emulate.o emulate_util.o
 testme: testme.o emulate_util.o
 	$(CC) $(CFLAGS) testme.o emulate_util.o -o testme
 
-emulate.o: emulate_util.h
+emulate.o: emulate_util.h emulate.c
 	$(CC) $(CFLAGS) -c emulate.c
-emulate_util.o: emulate_util.h
+emulate_util.o: emulate_util.h emulate_util.c
 	$(CC) $(CFLAGS) -c emulate_util.c
-testme.o: emulate_util.h
+testme.o: emulate_util.h testme.c
 	$(CC) $(CFLAGS) -c testme.c
 
 test:

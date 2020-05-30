@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "constants.h"
 #include "emulate_util.h"
 #include "constants.h"
 
@@ -76,12 +77,13 @@ void test_CPSR() {
   result = op1 + op2;
   expected = 0x1FFFFFFE;
   carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
-  test_bool(carryOut == 1, "0xAFFFFFFF+0x6FFFFFFF (unsigned overflow), carry = 1");
+  test_bool(carryOut == 1,
+            "0xAFFFFFFF+0x6FFFFFFF (unsigned overflow), carry = 1");
   test_bool(result == expected, "0xAFFFFFFF+0x6FFFFFFF, result = 0x1FFFFFFE");
 
   op1 = 0x000003E8;
   op2 = 0x000AE200;
-  result = op1+op2;
+  result = op1 + op2;
   carryOut = op1 <= UINT32_MAX - op2 ? 0 : 1;
   test_bool(carryOut == 0, "0x000003E8+0x000AE200, carry = 0");
 
@@ -94,13 +96,13 @@ void test_CPSR() {
 
   op1 = 20;
   op2 = 50;
-  result = op1-op2;
+  result = op1 - op2;
   carryOut = op1 < op2 ? 0 : 1;
   test_bool(carryOut == 0, "20 - 50, carry = 0");
 
   op1 = 50;
   op2 = 20;
-  result = op1-op2;
+  result = op1 - op2;
   carryOut = op1 < op2 ? 0 : 1;
   test_bool(carryOut == 1, "50 - 20, carry = 1");
 
