@@ -139,7 +139,7 @@ void setCPSR(arm *state, word result, word carryOut) {
   state->registers[CPSR] = n | z | c | v;
 }
 
-void executedpi(arm *state, word instruction) {
+void executeDPI(arm *state, word instruction) {
   // extraction of code
   const uint i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
   // instruction to execute
@@ -247,7 +247,7 @@ void load(arm *state, word destReg, word sourceAddr) {
   }
 }
 
-void executesdti(arm *state, word instruction) {
+void executeSTDI(arm *state, word instruction) {
   // Components of the instruction
   // Immediate Offset
   uint i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
@@ -308,12 +308,14 @@ void executeMultiply(arm *state, word instruction) {
   state->registers[destination] = result;
 }
 
-void executeBranch(arm *state, word instruction) {
-  // flush pipeline
+void flushPipeline(arm *state) {
   state->fetched = 0;
-  state->decoded.is_set = false;
   state->decoded.instr = 0;
+  state->decoded.is_set = false;
+}
 
+void executeBranch(arm *state, word instruction) {
+  flushPipeline(state);
   // extraction of information
   int offset = instruction & BRANCH_OFFSET_MASK;
   int signBit = offset & BRANCH_SIGN_BIT;
@@ -322,66 +324,6 @@ void executeBranch(arm *state, word instruction) {
   state->registers[PC] +=
       ((offset << CURRENT_INSTRUCTION_SHIFT) |
        (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND));
-}
-
-bool checkCond(arm *state, word instruction) {
-  // CPSR flag bits
-  word cpsr = state->registers[CPSR];
-  uint n = GET_CPSR_N(cpsr);
-  uint z = GET_CPSR_Z(cpsr);
-  uint v = GET_CPSR_V(cpsr);
-  enum Cond cond = GET_CPSR_FLAGS(instruction);
-  // conditions for instruction
-  switch (cond) {
-  case EQ:
-    return z;
-  case NE:
-    return !z;
-  case GE:
-    return n == v;
-  case LT:
-    return n != v;
-  case GT:
-    return !z && (n == v);
-  case LE:
-    return z || (n != v);
-  case AL:
-    return true;
-  default:
-    // no other instruction
-    // should never happen
-    assert(false);
-  }
-}
-
-bool checkCond(arm *state, word instruction) {
-  // CPSR flag bits
-  word cpsr = state->registers[CPSR];
-  uint n = GET_CPSR_N(cpsr);
-  uint z = GET_CPSR_Z(cpsr);
-  uint v = GET_CPSR_V(cpsr);
-  enum Cond cond = GET_CPSR_FLAGS(instruction);
-  // conditions for instruction
-  switch (cond) {
-  case EQ:
-    return z;
-  case NE:
-    return !z;
-  case GE:
-    return n == v;
-  case LT:
-    return n != v;
-  case GT:
-    return !z && (n == v);
-  case LE:
-    return z || (n != v);
-  case AL:
-    return true;
-  default:
-    // no other instruction
-    // should never happen
-    assert(false);
-  }
 }
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
@@ -406,8 +348,7 @@ void init_arm(arm *state, const char *fname) {
   /* construct ARM state */
   state->memory = memory;
   state->registers = registers;
-  state->fetched = 0;
-  state->decoded.is_set = false;
+  flushPipeline(state);
 }
 
 word get_word(byte *start_addr) {
@@ -451,32 +392,64 @@ void decode(arm *state) {
   state->decoded.is_set = true;
 }
 
+// checks the instruction condition with the CPSR flags
+bool checkCond(arm *state, word instruction) {
+  // CPSR flag bits
+  word cpsr = state->registers[CPSR];
+  uint n = GET_CPSR_N(cpsr);
+  uint z = GET_CPSR_Z(cpsr);
+  uint v = GET_CPSR_V(cpsr);
+  enum Cond cond = GET_CPSR_FLAGS(instruction);
+  // conditions for instruction
+  switch (cond) {
+  case EQ:
+    return z;
+  case NE:
+    return !z;
+  case GE:
+    return n == v;
+  case LT:
+    return n != v;
+  case GT:
+    return !z && (n == v);
+  case LE:
+    return z || (n != v);
+  case AL:
+    return true;
+  default:
+    // no other instruction
+    // should never happen
+    assert(false);
+  }
+}
+
 void execute(arm *state) {
   if (state->decoded.is_set == false) {
-    // printf("null exec\n");
     return;
   }
-  tuple_instruction instructionTuple = state->decoded;
-  InstructionSet instructionSet = instructionTuple.instrSet;
-  word instruction = instructionTuple.instr;
-
+  instructionState currInstructionState = state->decoded;
+  InstructionSet instructionSet = currInstructionState.instrSet;
+  word instruction = currInstructionState.instr;
   if (checkCond(state, instruction)) {
     switch (instructionSet) {
     case BR:
       executeBranch(state, instruction);
       break;
     case DPI:
-      executedpi(state, instruction);
+      executeDPI(state, instruction);
       break;
     case SDTI:
-      executesdti(state, instruction);
+      executeSTDI(state, instruction);
       break;
     case MULT:
       executeMultiply(state, instruction);
       break;
     case IGNR:
+      // the instruction is ignored
       break;
     default:
+      // no other instructions
+      // should never happen
       assert(false);
     }
   }
