@@ -1,7 +1,6 @@
 #ifndef EMULATE_UTIL_H
 #define EMULATE_UTIL_H
 
-#include "emulate_util.h"
 #include <stdint.h>
 #include <stdlib.h>
 
