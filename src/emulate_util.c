@@ -128,15 +128,12 @@ tuple_t *opImmediate(arm *state, uint op2) {
   return output;
 }
 
-word getCarryOut(word op1, word op2, word result) {
-  uint carryOut = 0;
-  word signBit = MSB_MASK;
-  // overflow occurs iff the operands have the same sign and the result has ...
-  // ... the opposite sign
-  if ((op1 & signBit) == (op2 & signBit)) {
-    carryOut = (op1 & signBit) != (result & signBit);
+word getCarryOut(word op1, word op2, bool isAddition) {
+  if (isAddition) {
+    return (op1 <= UINT32_MAX - op2) ? 0 : 1;
   }
-  return carryOut;
+  // pre: op1 - op2
+  return op1 < op2 ? 0 : 1;
 }
 
 void setCPSR(arm *state, word result, word carryOut) {
@@ -182,18 +179,21 @@ void dpi(arm *state, word instruction) {
     state->registers[rd] = result;
     break;
   case SUB:
-    result = op1 + TWOS_COMPLEMENT(op2);
-    carryOut = getCarryOut(op1, TWOS_COMPLEMENT(op2), result);
+    result = op1 - op2;
+    // subtraction, so isAddition is false
+    carryOut = getCarryOut(op1, op2, false);
     state->registers[rd] = result;
     break;
   case RSB:
-    result = op2 + TWOS_COMPLEMENT(op1);
-    carryOut = getCarryOut(TWOS_COMPLEMENT(~op1), op2, result);
+    result = op2 - op1;
+    // subtraction, so isAddition is false
+    carryOut = getCarryOut(op2, op1, false);
     state->registers[rd] = result;
     break;
   case ADD:
     result = op1 + op2;
-    carryOut = getCarryOut(op1, op2, result);
+    // addition, so isAddition is true
+    carryOut = getCarryOut(op1, op2, true);
     state->registers[rd] = result;
     break;
   case TST:
@@ -203,8 +203,9 @@ void dpi(arm *state, word instruction) {
     result = op1 ^ op2;
     break;
   case CMP:
-    result = op1 + TWOS_COMPLEMENT(op2);
-    carryOut = getCarryOut(op1, TWOS_COMPLEMENT(op2), result);
+    result = op1 - op2;
+    // subtraction, so isAddition is false
+    carryOut = getCarryOut(op1, op2, false);
     break;
   case ORR:
     result = op1 | op2;
