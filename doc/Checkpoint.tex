@@ -2,6 +2,8 @@
 
 \usepackage{fullpage}
 
+\setlength{\parindent}{0pt}
+
 \begin{document}
 
 \title{ARM-11 CHECKPOINT}
@@ -15,8 +17,8 @@
 \section*{Introduction}
 Our first course of action for this project was to decide which technologies we will use to manage our tasks
 and keep track of our progress. After trialling a few different options, including the Microsoft Teams Planner,
-we decided to use the ‘Issues’ feature within GitLab. Issues allowed us to keep track of both our tasks and code
-progress in one place, which made the delegation and completion of tasks more streamlined. Being wellcoordinated was a priority in our plan for this project as it meant we could effectively carry out our tasks and
+we decided to use the \textsl{‘Issues’} feature within GitLab. \textsl{Issues} allowed us to keep track of both our tasks and code
+progress in one place, which made the delegation and completion of tasks more streamlined. Being well coordinated was a priority in our plan for this project as it meant we could effectively carry out our tasks and
 successfully build up the project. We also had regular meetings, via Discord, to discuss each member’s plans
 for the project, what they had completed and what they intended to complete by the end of each day. 
 
@@ -26,14 +28,21 @@ We collectively decided to begin creating our own implementations of the foundat
 included how the registers and memory were to be defined within our code. Upon completion of this initial
 task, we had a meeting on which features from each member’s code we will use in the project. After
 confirming our memory and register design, we created a list of tasks which were then split among the group.
-These tasks were naturally divided into three types: Fetch, Decode and Execute.
-The ‘Fetch’ task was to generate several functions which handled the loading of the binary file and initialised
-the state of our emulator. Morkus add a sentence or two here for Fetch and that memory stuff you did. The
-loading of the binary file into memory is handled by *****init arm.
-The ‘Decode’ task…Need to finish this
-The ‘Execute’ task was split further into four types based on each of the four instructions that were to be
-implemented. We decided to have one member working solely on the Data Processing Instruction and another
-for the Single Data Transfer Instructions as they required more time to complete. The Multiply and Branch
+These tasks were naturally divided into three types: \textsl{Fetch, Decode} and \textsl{Execute}.
+
+
+The \textsl{'Fetch'} task was to generate several functions which handled the loading of the binary file and initialised
+the state of our emulator. 
+Morkus add a sentence or two here for Fetch and that memory stuff you did. 
+The loading of the binary file into memory is handled by the function {\tt init\_arm}.
+
+
+The \textsl{‘Decode’} task…Need to finish this
+
+
+The \textsl{‘Execute’} task was split further into four types based on each of the four instructions that were to be
+implemented. We decided to have one member working solely on the \textsl{Data Processing Instruction} and another
+for the \textsl{Single Data Transfer Instructions} as they required more time to complete. The \textsl{Multiply} and \textsl{Branch}
 instructions were relatively shorter and only needed one member to implement both functions.
 Are we meant to write the names of the members i.e. This person did this task etc…?
 
@@ -41,7 +50,9 @@ Are we meant to write the names of the members i.e. This person did this task et
 As a team, we feel that we have worked well together so far. Any conflicts on plans for a feature were solved
 quickly, and we have not had any issues with the work ethic of any member. Our team have been using Git to
 constantly commit changes with useful messages, create branches to prevent problems in the Master and
-updating the Git issues, which all translates to a well-structured process in tackling this project.
+updating the Git \textsl{issues}, which all translates to a well-structured process in tackling this project.
+
+
 The cohesive nature of our group is supported by the extensive internal code reviews we conduct for our
 fellow members’ tasks. To ensure that we remove logical errors within our programs and improve the
 definitions of some functions, we decided to work on reviewing and testing each other’s code. These code
@@ -49,6 +60,8 @@ reviews were especially helpful as minor errors are easily missed when working o
 Although the reviews took many hours on some occasions, each member of the group was happy to help
 another. This meant that our overall implementation improved immensely. The reviews are an aspect of our
 group working that we are proud of and hope to maintain throughout this project.
+
+
 During the first few days, we had a small problem with the times each of us had started and ended their work
 for the day, mainly due to different sleeping patterns. This staggered timing meant it was harder for us to
 communicate effectively and work on the project together. However, after a constructive meeting, we solved
