@@ -1,4 +1,5 @@
 #include "constants.h"
+#include "emulate_util.c"
 #include "emulate_util.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -52,6 +53,7 @@ int main(int argc, char **argv) {
   // re-intialise instruction
   instruction = fetch(state);
 
+  // PIPELINE
   do {
     execute(state, decoded);
     decoded = decode(state, instruction);
