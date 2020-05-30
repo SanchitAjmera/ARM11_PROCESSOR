@@ -5,16 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*registers 0-12 will be used by their value so for reg0 we can just use 0
-but these will make it easier to address in memory*/
-enum Register { PC = 15, CPSR = 16 };
-// opcode mnemonics
-enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
-// condition suffixes
-enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
-// shift types
-enum Shift { LSL, LSR, ASR, ROR };
-
 void check_ptr(const void *ptr, const char *error_msg) {
   if (ptr == NULL) {
     printf("Error: %s\n", error_msg);
@@ -22,9 +12,16 @@ void check_ptr(const void *ptr, const char *error_msg) {
   }
 }
 
-word rotateRight(word value, uint rotateNum) {
-  uint lsbs = value & ((1 << rotateNum) - 1);
-  return (value >> rotateNum) | (lsbs << (WORD_SIZE - rotateNum));
+uint shiftByConstant(uint shiftPart) {
+  // integer specified by bits 7-4
+  return shiftPart >> GET_SHIFT_CONSTANT_SHIFT;
+}
+
+uint shiftByRegister(arm *state, uint shiftPart) {
+  // Rs (register) can be any general purpose register except the PC
+  uint rs = shiftPart >> GET_RS_SHIFT;
+  // bottom byte of value in Rs specifies the amount to be shifted
+  return state->registers[rs] & LEAST_BYTE_MASK;
 }
 
 word arithShift(word value, uint shiftNum) {
@@ -37,28 +34,21 @@ word arithShift(word value, uint shiftNum) {
   return msbs | (value >> shiftNum);
 }
 
-uint shiftByConstant(uint shiftPart) {
-  // integer specified by bits 7-4
-  return shiftPart >> GET_SHIFT_CONSTANT_SHIFT;
-}
-
-uint shiftByRegister(arm *state, uint shiftPart) {
-  // Rs (register) can be any general purpose register except the PC
-  uint rs = shiftPart >> GET_RS_SHIFT;
-  // bottom byte of value in Rs specifies the amount to be shifted
-  return state->registers[rs] & LEAST_BYTE;
+word rotateRight(word value, uint rotateNum) {
+  uint lsbs = value & ((1 << rotateNum) - 1);
+  return (value >> rotateNum) | (lsbs << (WORD_SIZE - rotateNum));
 }
 
 uint leftCarryOut(word value, uint shiftNum) {
-  if (!shiftNum) {
-    return 0;
+  if (shiftNum == 0) {
+    return NO_ROTATION;
   }
   return (value << (shiftNum - 1)) >> (WORD_SIZE - 1);
 }
 
 uint rightCarryOut(word value, uint shiftNum) {
-  if (!shiftNum) {
-    return 0;
+  if (shiftNum == 0) {
+    return NO_ROTATION;
   }
   return (value >> (shiftNum - 1)) & LSB_MASK;
 }
@@ -70,7 +60,7 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   uint shiftNum = shiftByReg ? shiftByRegister(state, shiftPart)
                              : shiftByConstant(shiftPart);
   // bits that specify the shift operation
-  enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE_SHIFT;
+  enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE;
   // tuple for the result and the carry out bit
   operation_t *output = (operation_t *)malloc(sizeof(operation_t));
   check_ptr(output, "Not enough memory!");
@@ -104,19 +94,19 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
 
 operation_t *opRegister(arm *state, uint op2) {
   // register that holds the value to be shifted
-  uint rm = op2 & LSN_MASK;
+  uint rm = op2 & LEAST_NIBBLE_MASK;
   // value to be shifted
   word value = state->registers[rm];
   // bits indicating the shift instruction (bits 11-4)
-  uint shiftPart = op2 >> GET_SHIFT_INSTRUCTION_SHIFT;
+  uint shiftPart = op2 >> GET_SHIFT_INSTRUCTION;
   return barrelShifter(state, value, shiftPart);
 }
 
 operation_t *opImmediate(arm *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
-  word imm = op2 & LEAST_BYTE;
+  word imm = op2 & LEAST_BYTE_MASK;
   // number to rotate by
-  uint rotateNum = (op2 >> GET_ROTATE_SHIFT) * ROTATION_FACTOR;
+  uint rotateNum = (op2 >> GET_ROTATION_NUM) * ROTATION_FACTOR;
   // struct for the result and the carry out bit
   operation_t *output = (operation_t *)malloc(sizeof(operation_t));
   check_ptr(output, "Not enough memory!");
@@ -241,15 +231,13 @@ bool checkValidAddress(word address) {
 
 // function which transfers data from one register to another
 void store(arm *state, word sourceReg, word destAddr) {
-  if (checkValidAddress(destAddr)) {
-    word value = state->registers[sourceReg];
-    for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-      state->memory[destAddr + i] = value >> 8 * i;
-    }
+  if (!checkValidAddress(destAddr)) {
+    return;
   }
-  // getting address from source register
-  // checking if address is valide
-  // if valid then transferring address to destination register
+  word value = state->registers[sourceReg];
+  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
+    state->memory[destAddr + i] = value >> BYTE * i;
+  }
 }
 
 void load(arm *state, word destReg, word sourceAddr) {
@@ -299,20 +287,20 @@ void executesdti(arm *state, word instruction) {
 }
 
 void executeMultiply(arm *state, word instruction) {
-  // Extraction of information from the instruction;
+  // extraction of information from the instruction;
   int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
   int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
   int regM = instruction & MULT_REG_M_MASK;
 
-  // Initial execution of instruction
+  // initial execution of instruction
   int result = state->registers[regM] * state->registers[regS];
 
-  // Obtain value from Rn and add to result if Accumulate is set
+  // obtain value from Rn and add to result if Accumulate is set
   if (instruction & ACCUMULATE_FLAG) {
     int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
     result += state->registers[regN];
   }
-  // Update CPSR flags if S (bit 20 in instruction) is set
+  // update CPSR flags if S (bit 20 in instruction) is set
   if (UPDATE_CPSR(instruction)) {
     // same as Data Processing but no carry out
     setCPSR(state, result, GET_CPSR_C(state->registers[CPSR]));
@@ -400,27 +388,20 @@ bool checkCond(arm *state, word instruction) {
  * memory and register
  * pointers on heap, where memory is of size MEMORY_CAPACITY bytes */
 void init_arm(arm *state, const char *fname) {
-
   /* load binary file into memory */
   byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
   check_ptr(memory, "Not enough memory.\n");
-
+  // file handling
   FILE *bin_obj = fopen(fname, "rb");
   check_ptr(bin_obj, "File could not be opened\n");
-
   fseek(bin_obj, SEEK_SET, SEEK_END);
   long file_size = ftell(bin_obj);
   rewind(bin_obj);
-
   /* Asserts that fread read the whole file */
   assert(fread(memory, 1, file_size, bin_obj) == file_size);
-
-  // printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
-
   fclose(bin_obj);
-
   /* initialise registers */
-  word *registers = (word *)calloc(NO_REGISTERS, sizeof(word));
+  word *registers = (word *)calloc(NUM_REGISTERS, sizeof(word));
 
   /* construct ARM state */
   state->memory = memory;
@@ -432,7 +413,7 @@ void init_arm(arm *state, const char *fname) {
 word get_word(byte *start_addr) {
   word w = 0;
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    w += start_addr[i] << 8 * (i);
+    w += start_addr[i] << BYTE * (i);
   }
   return w;
 }
@@ -440,7 +421,7 @@ word get_word(byte *start_addr) {
 word get_word_big_end(byte *start_addr) {
   word w = 0;
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    w += start_addr[i] << 8 * (WORD_SIZE_BYTES - 1 - i);
+    w += start_addr[i] << BYTE * (WORD_SIZE_BYTES - 1 - i);
   }
   return w;
 }
@@ -455,7 +436,6 @@ void decode(arm *state) {
   word instruction = state->fetched;
   state->decoded.instr = instruction;
   if (state->fetched == 0) {
-    // printf("null decode\n");
     return;
   }
 

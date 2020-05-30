@@ -3,9 +3,10 @@
 
 // general constants
 #define MEMORY_CAPACITY 65536
-#define NO_REGISTERS 17
+#define NUM_REGISTERS 17
 #define ADDRESS_SIZE 4
 #define WORD_SIZE_BYTES 4
+#define BYTE 8
 #define CPSR_N_MASK (1 << 31)
 #define CPSR_Z_MASK (1 << 30)
 #define CPSR_C_MASK (1 << 29)
@@ -76,16 +77,17 @@
 #define DPI_OPCODE_SHIFT 21
 #define DPI_RN_SHIFT 16
 #define DPI_RD_SHIFT 12
-#define LEAST_BYTE 0xFF
-#define GET_ROTATE_SHIFT 8
+#define LEAST_BYTE_MASK 0xFF
+#define GET_ROTATION_NUM 8
 #define ROTATION_FACTOR 2
 #define GET_RS_SHIFT 4
 #define SHIFT_TYPE_MASK 0x06
-#define GET_SHIFT_TYPE_SHIFT 1
-#define LSN_MASK 0xF
-#define GET_SHIFT_INSTRUCTION_SHIFT 4
+#define GET_SHIFT_TYPE 1
+#define LEAST_NIBBLE_MASK 0xF
+#define GET_SHIFT_INSTRUCTION 4
 #define GET_SHIFT_CONSTANT_SHIFT 3
 #define WORD_SIZE 32
 #define MSB_MASK 1 << 31
 #define LSB_MASK 0x1
+#define NO_ROTATION 0
 #endif
