@@ -12,6 +12,12 @@ typedef unsigned int uint;
 // ARM instruction set
 typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionSet;
 
+// TODO: consider changing name (and type of carryOut)
+typedef struct {
+  word result;
+  word carryOut;
+} operation_t;
+
 // tuple for instruction and instructionSet enum
 typedef struct {
   bool is_set;
