@@ -24,11 +24,7 @@ extern void init_arm(arm *state, const char *fname);
 // execution of the multiply instruction
 extern void multiply(arm *state, word instruction);
 
-<<<<<<< HEAD
 // execution of a branch instruction
-=======
-//execution of a branch instruction
->>>>>>> 00b65c97653e6ade6a5b0dade28bddceaaed08ab
 extern void branch(arm *state, word instruction);
 
 extern word get_word(byte *start_addr);
