@@ -127,7 +127,7 @@ tuple_t *opImmediate(arm *state, uint op2) {
   check_ptr(output, "Not enough memory!");
   // result of the rotation operation
   output->result = rotateRight(imm, rotateNum);
-  // carry out for CSPR flagF
+  // carry out for CSPR flag
   output->carryOut = rightCarryOut(imm, rotateNum);
   return output;
 }
@@ -345,6 +345,36 @@ bool checkCond(arm *state, word instruction) {
   uint z = GET_CPSR_Z(cpsr);
   uint v = GET_CPSR_V(cpsr);
   enum Cond cond = GET_CPSR_FLAGS(instruction);
+  // conditions for instruction
+  switch (cond) {
+  case EQ:
+    return z;
+  case NE:
+    return !z;
+  case GE:
+    return n == v;
+  case LT:
+    return n != v;
+  case GT:
+    return !z && (n == v);
+  case LE:
+    return z || (n != v);
+  case AL:
+    return true;
+  default:
+    // no other instruction
+    // should never happen
+    assert(false);
+  }
+}
+
+bool checkCond(arm *state, word instruction) {
+  // CPSR flag bits
+  word cpsr = state->registers[CPSR];
+  uint n = GET_CPSR_N(cpsr);
+  uint z = GET_CPSR_Z(cpsr);
+  uint v = GET_CPSR_V(cpsr);
+  enum Cond cond = GET_CPSR_FLAGS(cpsr);
   // conditions for instruction
   switch (cond) {
   case EQ:
