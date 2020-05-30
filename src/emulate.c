@@ -9,8 +9,10 @@ void print_arm_state(arm *state) {
   printf("Registers:\n");
   char reg_name[5];
   for (int i = 0; i < NO_REGISTERS; i++) {
-    if (i == 13 || i == 14)
-      continue; // Not used in this exercise
+    if (i == 13 || i == 14) {
+        // Not used in this exercise
+        continue;
+    }
 
     if (i == 15) {
       strcpy(reg_name, "PC");
@@ -37,7 +39,6 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
-  // free memory before code termination
   arm *state = malloc(sizeof(arm));
   init_arm(state, argv[1]);
 
@@ -52,6 +53,7 @@ int main(int argc, char **argv) {
 
   print_arm_state(state);
 
+  // free memory before code termination
   free(state->memory);
   free(state->registers);
   free(state);
