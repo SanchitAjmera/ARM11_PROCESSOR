@@ -385,19 +385,19 @@ word fetch(arm *state) {
 tuple_instruction decode(arm *state, word instruction) {
   tuple_instruction instructionTuple;
   if (!checkCond(state, instruction)) {
-    instructionTuple.instrSet = 4;
+    instructionTuple.instrSet = IGNR;
     return instructionTuple;
   }
 
   instructionTuple.instr = instruction;
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
-    instructionTuple.instrSet = 2;
+    instructionTuple.instrSet = BR;
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
-    instructionTuple.instrSet = 3;
+    instructionTuple.instrSet = SDTI;
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
-    instructionTuple.instrSet = 1;
+    instructionTuple.instrSet = MULT;
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
-    instructionTuple.instrSet = 0;
+    instructionTuple.instrSet = DPI;
   }
   return instructionTuple;
 }
