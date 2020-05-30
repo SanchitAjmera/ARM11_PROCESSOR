@@ -131,10 +131,9 @@ tuple_t *opImmediate(arm *state, uint op2) {
 word getCarryOut(word op1, word op2, bool isAddition) {
   if (isAddition) {
     return (op1 <= UINT32_MAX - op2) ? 0 : 1;
-  } else {
-    // pre: op1 - op2
-    return op1 < op2 ? 0 : 1;
   }
+  // pre: op1 - op2
+  return op1 < op2 ? 0 : 1;
 }
 
 void setCPSR(arm *state, word result, word carryOut) {
@@ -181,16 +180,19 @@ void dpi(arm *state, word instruction) {
     break;
   case SUB:
     result = op1 - op2;
+    // subtraction, so isAddition is false
     carryOut = getCarryOut(op1, op2, false);
     state->registers[rd] = result;
     break;
   case RSB:
     result = op2 - op1;
+    // subtraction, so isAddition is false
     carryOut = getCarryOut(op2, op1, false);
     state->registers[rd] = result;
     break;
   case ADD:
     result = op1 + op2;
+    // addition, so isAddition is true
     carryOut = getCarryOut(op1, op2, true);
     state->registers[rd] = result;
     break;
@@ -202,6 +204,7 @@ void dpi(arm *state, word instruction) {
     break;
   case CMP:
     result = op1 - op2;
+    // subtraction, so isAddition is false
     carryOut = getCarryOut(op1, op2, false);
     break;
   case ORR:
