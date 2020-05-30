@@ -14,17 +14,16 @@ emulate: emulate.o emulate_util.o
 testme: testme.o emulate_util.o
 	$(CC) $(CFLAGS) testme.o emulate_util.o -o testme
 
-emulate.o: emulate_util.h emulate.c
+emulate.o: emulate_util.h
 	$(CC) $(CFLAGS) -c emulate.c
-emulate_util.o: emulate_util.h emulate_util.c
+emulate_util.o: emulate_util.h
 	$(CC) $(CFLAGS) -c emulate_util.c
-testme.o: emulate_util.h testme.c
+testme.o: emulate_util.h
 	$(CC) $(CFLAGS) -c testme.c
 
 test:
 	./emulate ~/arm11_testsuite/test_cases/add01
 	./testme | grep ^T
-
 
 clean:
 	rm -f $(wildcard *.o)
