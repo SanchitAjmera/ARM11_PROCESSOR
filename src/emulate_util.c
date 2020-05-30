@@ -121,7 +121,7 @@ tuple_t *opImmediate(arm *state, uint op2) {
   check_ptr(output, "Not enough memory!");
   // result of the rotation operation
   output->result = rotateRight(imm, rotateNum);
-  // carry out for CSPR flag
+  // carry out for CSPR flagF
   output->carryOut = rightCarryOut(imm, rotateNum);
   return output;
 }
@@ -233,12 +233,18 @@ bool checkValidAddress(word address) {
 }
 
 // function which transfers data from one register to another
-void transfer(arm *state, unsigned int sourceReg, unsigned int destReg) {
+void store(arm *state, word sourceReg, word destAddr) {
   // getting address from source register
-  word address = state->registers[sourceReg];
+  word value = state->registers[sourceReg];
   // checking if address is valide
   // if valid then transferring address to destination register
-  checkValidAddress(address) ? (state->registers[destReg] = address)
+  checkValidAddress(destAddr) ? (state->memory[destAddr] = value)
+                              : printf("address is not valid");
+}
+
+void load(arm *state, word destReg, word sourceAddr) {
+  word value = state->memory[sourceAddr];
+  checkValidAddress(destReg) ? (state->registers[destReg] = value)
                              : printf("address is not valid");
 }
 
@@ -266,7 +272,8 @@ void executesdti(arm *state, word instruction) {
   // Because PRE-INDEXING doesn't change the value of the base register rn
   // the data will always be transferred regardless of the indexing bit p.
   // transfering Data:
-  l ? transfer(state, rn, rd) : transfer(state, rd, rn);
+  l ? load(state, rn, state->registers[rd])
+    : store(state, rd, state->registers[rn]);
   // POST-INDEXING is set
   if (!p) {
     // indexing base regsiter Rn according to Up bit
@@ -297,14 +304,19 @@ void executeMultiply(arm *state, word instruction) {
 }
 
 void executeBranch(arm *state, word instruction) {
+  // Flush pipeline
+  state->decoded.is_set = false;
+  state->decoded.instr = 0;
+  state->fetched = 0;
+
   // Extraction of information
   int offset = instruction & BRANCH_OFFSET_MASK;
   int signBit = offset & BRANCH_SIGN_BIT;
 
   // Shift, sign extension and addition of offset onto current address
   state->registers[PC] +=
-      (offset << CURRENT_INSTRUCTION_SHIFT) |
-      (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND);
+      ((offset << CURRENT_INSTRUCTION_SHIFT) |
+       (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND));
 }
 
 bool checkCond(arm *state, word instruction) {
@@ -313,7 +325,7 @@ bool checkCond(arm *state, word instruction) {
   uint n = GET_CPSR_N(cpsr);
   uint z = GET_CPSR_Z(cpsr);
   uint v = GET_CPSR_V(cpsr);
-  enum Cond cond = GET_CPSR_FLAGS(cpsr);
+  enum Cond cond = GET_CPSR_FLAGS(instruction);
   // conditions for instruction
   switch (cond) {
   case EQ:
@@ -356,7 +368,7 @@ void init_arm(arm *state, const char *fname) {
   /* Asserts that fread read the whole file */
   assert(fread(memory, 1, file_size, bin_obj) == file_size);
 
-  printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
+  // printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
 
   fclose(bin_obj);
 
@@ -366,9 +378,19 @@ void init_arm(arm *state, const char *fname) {
   /* construct ARM state */
   state->memory = memory;
   state->registers = registers;
+  state->fetched = 0;
+  state->decoded.is_set = false;
 }
 
 word get_word(byte *start_addr) {
+  word w = 0;
+  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
+    w += start_addr[i] << 8 * (i);
+  }
+  return w;
+}
+
+word get_word_big_end(byte *start_addr) {
   word w = 0;
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
     w += start_addr[i] << 8 * (WORD_SIZE_BYTES - 1 - i);
@@ -376,46 +398,59 @@ word get_word(byte *start_addr) {
   return w;
 }
 
-word fetch(arm *state) {
+void fetch(arm *state) {
   word memory_offset = state->registers[PC];
   state->registers[PC] += WORD_SIZE_BYTES;
-  return get_word(state->memory + memory_offset);
+  state->fetched = get_word(state->memory + memory_offset);
 }
 
-tuple_instruction decode(arm *state, word instruction) {
-  tuple_instruction instructionTuple;
-  if (!checkCond(state, instruction)) {
-    instructionTuple.instrSet = IGNR;
-    return instructionTuple;
+void decode(arm *state) {
+  word instruction = state->fetched;
+  state->decoded.instr = instruction;
+  if (state->fetched == 0) {
+    // printf("null decode\n");
+    return;
   }
 
-  instructionTuple.instr = instruction;
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
-    instructionTuple.instrSet = BR;
+    state->decoded.instrSet = BR;
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
-    instructionTuple.instrSet = SDTI;
+    state->decoded.instrSet = SDTI;
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
-    instructionTuple.instrSet = MULT;
+    state->decoded.instrSet = MULT;
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
-    instructionTuple.instrSet = DPI;
+    state->decoded.instrSet = DPI;
   }
-  return instructionTuple;
+  state->decoded.is_set = true;
 }
 
-void execute(arm *state, tuple_instruction instructionTuple) {
+void execute(arm *state) {
+  if (state->decoded.is_set == false) {
+    // printf("null exec\n");
+    return;
+  }
+  tuple_instruction instructionTuple = state->decoded;
   InstructionSet instructionSet = instructionTuple.instrSet;
   word instruction = instructionTuple.instr;
-  switch (instructionSet) {
-  case BR:
-    executeBranch(state, instruction);
-  case DPI:
-    executedpi(state, instruction);
-  case SDTI:
-    executesdti(state, instruction);
-  case MULT:
-    executeMultiply(state, instruction);
-  default:
 
-    assert(false);
+  if (checkCond(state, instruction)) {
+    switch (instructionSet) {
+    case BR:
+      executeBranch(state, instruction);
+      break;
+    case DPI:
+      executedpi(state, instruction);
+      break;
+    case SDTI:
+      executesdti(state, instruction);
+      break;
+    case MULT:
+      executeMultiply(state, instruction);
+      break;
+    case IGNR:
+      break;
+    default:
+      assert(false);
+    }
   }
 }
