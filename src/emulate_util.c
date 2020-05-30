@@ -5,12 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// TODO: consider changing name (and type of carryOut)
-typedef struct {
-  word result;
-  word carryOut;
-} tuple_t;
-
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
 enum Register { PC = 15, CPSR = 16 };
@@ -69,7 +63,7 @@ uint rightCarryOut(word value, uint shiftNum) {
   return (value >> (shiftNum - 1)) & LSB_MASK;
 }
 
-tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
+operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   // bit to determine what to shift by
   bool shiftByReg = shiftPart & LSB_MASK;
   // number to shift by
@@ -78,7 +72,7 @@ tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
   // bits that specify the shift operation
   enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE_SHIFT;
   // tuple for the result and the carry out bit
-  tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
+  operation_t *output = (operation_t *)malloc(sizeof(operation_t));
   check_ptr(output, "Not enough memory!");
   word result;
   // carry out from a right shift operation
@@ -107,7 +101,7 @@ tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
   return output;
 }
 
-tuple_t *opRegister(arm *state, uint op2) {
+operation_t *opRegister(arm *state, uint op2) {
   // register that holds the value to be shifted
   uint rm = op2 & LSN_MASK;
   // value to be shifted
@@ -117,13 +111,13 @@ tuple_t *opRegister(arm *state, uint op2) {
   return barrelShifter(state, value, shiftPart);
 }
 
-tuple_t *opImmediate(arm *state, uint op2) {
+operation_t *opImmediate(arm *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = op2 & LEAST_BYTE;
   // number to rotate by
   uint rotateNum = (op2 >> GET_ROTATE_SHIFT) * ROTATION_FACTOR;
   // tuple for the result and the carry out bit
-  tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
+  operation_t *output = (operation_t *)malloc(sizeof(operation_t));
   check_ptr(output, "Not enough memory!");
   // result of the rotation operation
   output->result = rotateRight(imm, rotateNum);
@@ -167,7 +161,7 @@ void executedpi(arm *state, word instruction) {
   // first operand
   word op1 = state->registers[rn];
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
-  tuple_t *output = i ? opImmediate(state, op2) : opRegister(state, op2);
+  operation_t *output = i ? opImmediate(state, op2) : opRegister(state, op2);
   op2 = output->result;
   word carryOut = output->carryOut;
   // execution
@@ -280,7 +274,8 @@ void executesdti(arm *state, word instruction) {
   word offset = (instruction & SDTI_OFFSET_MASK);
 
   // Immediate Offset
-  tuple_t *output = i ? opRegister(state, offset) : opImmediate(state, offset);
+  operation_t *output =
+      i ? opRegister(state, offset) : opImmediate(state, offset);
   offset = output->result;
 
   // Because PRE-INDEXING doesn't change the value of the base register rn
