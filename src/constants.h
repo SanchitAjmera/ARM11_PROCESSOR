@@ -6,7 +6,6 @@
 #define NO_REGISTERS 17
 #define ADDRESS_SIZE 4
 #define WORD_SIZE 32
-#define WORD_SIZE_BYTES 4
 #define MSB_MASK 1 << 31
 #define LSB_MASK 0x1
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
