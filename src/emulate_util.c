@@ -56,10 +56,16 @@ uint shiftByRegister(arm *state, uint shiftPart) {
 }
 
 uint leftCarryOut(word value, uint shiftNum) {
+  if (!shiftNum) {
+    return 0;
+  }
   return (value << (shiftNum - 1)) >> (WORD_SIZE - 1);
 }
 
 uint rightCarryOut(word value, uint shiftNum) {
+  if (!shiftNum) {
+    return 0;
+  }
   return (value >> (shiftNum - 1)) & LSB_MASK;
 }
 
