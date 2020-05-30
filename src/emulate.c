@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     execute(state, decoded);
     decoded = decode(state, instruction);
     instruction = fetch(state);
-  } while (instruction != 0);
+  } while (instruction);
 
   print_arm_state(state);
 
