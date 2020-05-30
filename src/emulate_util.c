@@ -79,6 +79,7 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   word carryOut = rightCarryOut(value, shiftNum);
   switch (shiftType) {
   case LSL:
+    // carry out from a left shift operation
     carryOut = leftCarryOut(value, shiftNum);
     result = value << shiftNum;
     break;
@@ -116,7 +117,7 @@ operation_t *opImmediate(arm *state, uint op2) {
   word imm = op2 & LEAST_BYTE;
   // number to rotate by
   uint rotateNum = (op2 >> GET_ROTATE_SHIFT) * ROTATION_FACTOR;
-  // tuple for the result and the carry out bit
+  // struct for the result and the carry out bit
   operation_t *output = (operation_t *)malloc(sizeof(operation_t));
   check_ptr(output, "Not enough memory!");
   // result of the rotation operation
@@ -126,6 +127,7 @@ operation_t *opImmediate(arm *state, uint op2) {
   return output;
 }
 
+// carry out from arithmetic opertaion
 word getCarryOut(word op1, word op2, bool isAddition) {
   if (isAddition) {
     return (op1 <= UINT32_MAX - op2) ? 0 : 1;
@@ -161,6 +163,7 @@ void executedpi(arm *state, word instruction) {
   // first operand
   word op1 = state->registers[rn];
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
+  // TODO: change variable name
   operation_t *output = i ? opImmediate(state, op2) : opRegister(state, op2);
   op2 = output->result;
   word carryOut = output->carryOut;
@@ -259,17 +262,17 @@ void load(arm *state, word destReg, word sourceAddr) {
 void executesdti(arm *state, word instruction) {
   // Components of the instruction
   // Immediate Offset
-  unsigned int i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
+  uint i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
   // Pre/Post indexing bit
-  unsigned int p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
+  uint p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
   // Up bit
-  unsigned int u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
+  uint u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
   // Load/Store bit
-  unsigned int l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
+  uint l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
   // Base Register
-  unsigned int rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
+  uint rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
   // Source/Destination register
-  unsigned int rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
+  uint rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
   // Offset
   word offset = (instruction & SDTI_OFFSET_MASK);
 
@@ -318,16 +321,16 @@ void executeMultiply(arm *state, word instruction) {
 }
 
 void executeBranch(arm *state, word instruction) {
-  // Flush pipeline
+  // flush pipeline
+  state->fetched = 0;
   state->decoded.is_set = false;
   state->decoded.instr = 0;
-  state->fetched = 0;
 
-  // Extraction of information
+  // extraction of information
   int offset = instruction & BRANCH_OFFSET_MASK;
   int signBit = offset & BRANCH_SIGN_BIT;
 
-  // Shift, sign extension and addition of offset onto current address
+  // shift, sign extension and addition of offset onto current address
   state->registers[PC] +=
       ((offset << CURRENT_INSTRUCTION_SHIFT) |
        (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND));
@@ -369,7 +372,7 @@ bool checkCond(arm *state, word instruction) {
   uint n = GET_CPSR_N(cpsr);
   uint z = GET_CPSR_Z(cpsr);
   uint v = GET_CPSR_V(cpsr);
-  enum Cond cond = GET_CPSR_FLAGS(cpsr);
+  enum Cond cond = GET_CPSR_FLAGS(instruction);
   // conditions for instruction
   switch (cond) {
   case EQ:
@@ -405,7 +408,7 @@ void init_arm(arm *state, const char *fname) {
   FILE *bin_obj = fopen(fname, "rb");
   check_ptr(bin_obj, "File could not be opened\n");
 
-  fseek(bin_obj, 0, SEEK_END);
+  fseek(bin_obj, SEEK_SET, SEEK_END);
   long file_size = ftell(bin_obj);
   rewind(bin_obj);
 
