@@ -15,19 +15,19 @@ typedef struct {
   word carryOut;
 } operation_t;
 
-// tuple for instruction and instructionSet enum
+// struct for instruction and instructionSet enum
 typedef struct {
   bool is_set;
   word instr;
   InstructionSet instrSet;
-} tuple_instruction;
+} currInstruction;
 
 typedef struct {
   byte *memory;
   /* 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR */
   word *registers;
   word fetched;
-  tuple_instruction decoded;
+  currInstruction decoded;
 } arm;
 
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
@@ -41,7 +41,6 @@ enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 enum Shift { LSL, LSR, ASR, ROR };
 // ARM instruction set
 typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionSet;
-
 
 extern void check_ptr(const void *ptr, const char *error_msg);
 
