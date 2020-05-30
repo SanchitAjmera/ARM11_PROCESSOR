@@ -229,23 +229,31 @@ void executedpi(arm *state, word instruction) {
 // ADDRESS_SIZE is taken away from MEMORY_CAPACITY as address must be
 // ADDRESS_SIZE less than MEMORY_CAPACITY in order for word to be read
 bool checkValidAddress(word address) {
-  return (address <= MEMORY_CAPACITY - ADDRESS_SIZE);
+  if (address > MEMORY_CAPACITY) {
+    printf("Error: Out of bounds memory access at address 0x%08x\n", address);
+    return false;
+  }
+  return true;
 }
 
 // function which transfers data from one register to another
 void store(arm *state, word sourceReg, word destAddr) {
+  if (checkValidAddress(destAddr)) {
+    word value = state->registers[sourceReg];
+    for (int i = 0; i < WORD_SIZE_BYTES; i++) {
+      state->memory[destAddr + i] = value >> 8 * i;
+    }
+  }
   // getting address from source register
-  word value = state->registers[sourceReg];
   // checking if address is valide
   // if valid then transferring address to destination register
-  checkValidAddress(destAddr) ? (state->memory[destAddr] = value)
-                              : printf("address is not valid");
 }
 
 void load(arm *state, word destReg, word sourceAddr) {
-  word value = state->memory[sourceAddr];
-  checkValidAddress(destReg) ? (state->registers[destReg] = value)
-                             : printf("address is not valid");
+  if (checkValidAddress(sourceAddr)) {
+    word value = get_word(state->memory + sourceAddr);
+    state->registers[destReg] = value;
+  }
 }
 
 void executesdti(arm *state, word instruction) {
@@ -272,12 +280,17 @@ void executesdti(arm *state, word instruction) {
   // Because PRE-INDEXING doesn't change the value of the base register rn
   // the data will always be transferred regardless of the indexing bit p.
   // transfering Data:
-  l ? load(state, rn, state->registers[rd])
-    : store(state, rd, state->registers[rn]);
+
   // POST-INDEXING is set
-  if (!p) {
+  offset = u ? offset : -offset;
+  word destAddr = state->registers[rn];
+  if (p) {
     // indexing base regsiter Rn according to Up bit
-    u ? (rn += offset) : (rn -= offset);
+    l ? load(state, rd, destAddr + offset)
+      : store(state, rd, destAddr + offset);
+  } else {
+    l ? load(state, rd, destAddr) : store(state, rd, destAddr);
+    state->registers[rn] += offset;
   }
 }
 
