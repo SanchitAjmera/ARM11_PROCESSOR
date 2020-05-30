@@ -39,5 +39,6 @@ extern void branch(arm *state, word instruction);
 extern word get_word(byte *start_addr);
 extern word fetch(arm *state);
 extern tuple_instruction decode(arm *state, word instruction);
+extern void execute(arm *state, tuple_instruction instructionTuple);
 
 #endif
