@@ -28,8 +28,6 @@ void check_ptr(const void *ptr, const char *error_msg) {
   }
 }
 
-// dpi ----------------------------------------------------------------------
-
 word rotateRight(word value, uint rotateNum) {
   uint lsbs = value & ((1 << rotateNum) - 1);
   return (value >> rotateNum) | (lsbs << (WORD_SIZE - rotateNum));
@@ -227,8 +225,6 @@ void dpi(arm *state, word instruction) {
   free(output);
 }
 
-// end of dpi ---------------------------------------------------------------
-
 // function for checking if word is within MEMORY_CAPACITY
 // ADDRESS_SIZE is taken away from MEMORY_CAPACITY as address must be
 // ADDRESS_SIZE less than MEMORY_CAPACITY in order for word to be read
@@ -389,9 +385,6 @@ void decode(arm *state, word instruction) {
   if (!checkCond(state, instruction)) {
     return;
   }
-
-  // TODO: determine how to differentiate ...
-  // ... `data processing` from `multiply`
 
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
     executeBranch(state, instruction);
