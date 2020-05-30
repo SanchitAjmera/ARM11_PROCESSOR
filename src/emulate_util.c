@@ -18,45 +18,6 @@ void check_ptr(const void *ptr, const char *error_msg) {
   }
 }
 
-/* Takes in the ARM binary file's name and returns an ARM state pointer with
- * memory and register
- * pointers on heap, where memory is of size MEM_LIMIT bytes */
-void init_arm(arm *state, const char *fname) {
-
-  /* load binary file into memory */
-  byte *memory = (byte *)calloc(MEM_BYTE_CAPACITY, sizeof(byte));
-  check_ptr(memory, "Not enough memory.\n");
-
-  FILE *bin_obj = fopen(fname, "rb");
-  check_ptr(bin_obj, "File could not be opened\n");
-
-  fseek(bin_obj, SEEK_SET, SEEK_END);
-  long file_size = ftell(bin_obj);
-  rewind(bin_obj);
-
-  /* Asserts that fread read the whole file */
-  assert(fread(memory, 1, file_size, bin_obj) == file_size);
-
-  printf("Read %ld words into memory.\n", file_size / WORD_LEN);
-
-  fclose(bin_obj);
-
-  /* initialise registers */
-  word *registers = (word *)calloc(REG_COUNT, sizeof(word));
-
-  /* construct ARM state */
-  state->memory = memory;
-  state->registers = registers;
-}
-
-word get_word(const byte *start_addr) {
-  word w = 0;
-  for (int i = 0; i < WORD_LEN; i++) {
-    w += start_addr[i] << 8 * i;
-  }
-  return w;
-}
-
 // function for checking if word is within MEMORY_CAPACITY
 // ADDRESS_SIZE is taken away from MEMORY_CAPACITY as address must be
 // ADDRESS_SIZE less than MEMORY_CAPACITY in order for word to be read
@@ -168,6 +129,53 @@ bool checkCond(arm *state, word instruction) {
   }
 }
 
+/* Takes in the ARM binary file's name and returns an ARM state pointer with
+ * memory and register
+ * pointers on heap, where memory is of size MEMORY_CAPACITY bytes */
+void init_arm(arm *state, const char *fname) {
+
+  /* load binary file into memory */
+  byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
+  check_ptr(memory, "Not enough memory.\n");
+
+  FILE *bin_obj = fopen(fname, "rb");
+  check_ptr(bin_obj, "File could not be opened\n");
+
+  fseek(bin_obj, 0, SEEK_END);
+  long file_size = ftell(bin_obj);
+  rewind(bin_obj);
+
+  /* Asserts that fread read the whole file */
+  assert(fread(memory, 1, file_size, bin_obj) == file_size);
+
+  printf("Read %ld words into memory.\n", file_size / WORD_SIZE_BYTES);
+
+  fclose(bin_obj);
+
+  /* initialise registers */
+  word *registers = (word *)calloc(NO_REGISTERS, sizeof(word));
+
+  /* construct ARM state */
+  state->memory = memory;
+  state->registers = registers;
+}
+
+
+word get_word(byte *start_addr) {
+  word w = 0;
+  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
+    w += start_addr[i] << 8 * (WORD_SIZE_BYTES-1-i);
+  }
+  return w;
+}
+
+word fetch(arm *state) {
+  word memory_offset = state->registers[PC];
+  state->registers[PC] += WORD_SIZE_BYTES;
+  return get_word(state->memory + memory_offset);
+}
+
+
 void decode(arm *state, word instruction) {
   if (!checkCond(state, instruction)) {
     return;
@@ -179,7 +187,7 @@ void decode(arm *state, word instruction) {
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
     executeBranch(state, instruction);
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
-    executestdi(state, instruction)
+    executesdti(state, instruction);
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
     executeMultiply(state, instruction);
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {

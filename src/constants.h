@@ -5,6 +5,7 @@
 #define MEMORY_CAPACITY 65536
 #define NO_REGISTERS 17
 #define ADDRESS_SIZE 4
+#define WORD_SIZE_BYTES 4
 #define CPSR_N_MASK (1 << 31)
 #define CPSR_Z_MASK (1 << 30)
 #define CPSR_C_MASK (1 << 29)
