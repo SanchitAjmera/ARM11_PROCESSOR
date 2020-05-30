@@ -140,7 +140,7 @@ void setCPSR(arm *state, word result, word carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & CPSR_N_MASK;
   // set only if the result is all zeros
-  word z = result ? 0 : CPSR_ZMASK;
+  word z = result ? 0 : CPSR_Z_MASK;
   // carry out from the instruction
   word c = carryOut ? SET_CPSR_C : 0;
   // v is unaffected
