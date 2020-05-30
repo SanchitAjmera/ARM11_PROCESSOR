@@ -43,12 +43,19 @@ int main(int argc, char **argv) {
   init_arm(state, argv[1]);
 
   word instruction;
-  do {
-    instruction = fetch(state);
-    printf("%08x\n", instruction);
+  tuple_instruction decoded;
 
-    // TODO: decode(state, instruction)
-    // TODO: execute(state) ??
+  // initialise instruction
+  instruction = fetch(state);
+  // initialise decode
+  decoded = decode(state, instruction);
+  // re-intialise instruction
+  instruction = fetch(state);
+
+  do {
+    execute(state, decoded);
+    decoded = decode(state, instruction);
+    instruction = fetch(state);
   } while (instruction != 0);
 
   print_arm_state(state);
