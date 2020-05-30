@@ -35,7 +35,6 @@ word rotateRight(word value, uint rotateNum) {
 
 word arithShift(word value, uint shiftNum) {
   word msb = value & MSB_MASK;
-  // TODO: change variable name
   word msbs = msb;
   for (int i = 0; i < shiftNum; i++) {
     msbs = msbs >> 1;
@@ -76,6 +75,7 @@ tuple_t *barrelShifter(arm *state, word value, uint shiftPart) {
   tuple_t *output = (tuple_t *)malloc(sizeof(tuple_t));
   check_ptr(output, "Not enough memory!");
   word result;
+  // carry out from a right shift operation
   word carryOut = rightCarryOut(value, shiftNum);
   switch (shiftType) {
   case LSL:
@@ -288,9 +288,8 @@ void executeMultiply(arm *state, word instruction) {
   }
   // Update CPSR flags if S (bit 20 in instruction) is set
   if (UPDATE_CPSR(instruction)) {
-    state->registers[CPSR] |= (result & CPSR_N_MASK);
-    if (!result)
-      state->registers[CPSR] |= CPSR_Z_MASK;
+    // same as Data Processing but no carry out
+    setCPSR(state, result, GET_CPSR_C(state->registers[CPSR]));
   }
   state->registers[destination] = result;
 }
