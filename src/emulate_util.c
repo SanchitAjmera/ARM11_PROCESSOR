@@ -62,8 +62,8 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   // bits that specify the shift operation
   enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE;
   // tuple for the result and the carry out bit
-  operation_t *output = (operation_t *)malloc(sizeof(operation_t));
-  validatePtr(output, "Not enough memory!");
+  operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(operation_t));
+  validatePtr(shiftedOp2, "Not enough memory!");
   word result;
   // carry out from a right shift operation
   word carryOut = rightCarryOut(value, shiftNum);
@@ -87,9 +87,9 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
     // should never happen
     assert(false);
   }
-  output->result = result;
-  output->carryOut = carryOut;
-  return output;
+  shiftedOp2->result = result;
+  shiftedOp2->carryOut = carryOut;
+  return shiftedOp2;
 }
 
 operation_t *opRegister(arm *state, uint op2) {
@@ -108,13 +108,13 @@ operation_t *opImmediate(arm *state, uint op2) {
   // number to rotate by
   uint rotateNum = (op2 >> GET_ROTATION_NUM) * ROTATION_FACTOR;
   // struct for the result and the carry out bit
-  operation_t *output = (operation_t *)malloc(sizeof(operation_t));
-  validatePtr(output, "Not enough memory!");
+  operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(operation_t));
+  validatePtr(shiftedOp2, "Not enough memory!");
   // result of the rotation operation
-  output->result = rotateRight(imm, rotateNum);
+  shiftedOp2->result = rotateRight(imm, rotateNum);
   // carry out for CSPR flag
-  output->carryOut = rightCarryOut(imm, rotateNum);
-  return output;
+  shiftedOp2->carryOut = rightCarryOut(imm, rotateNum);
+  return shiftedOp2;
 }
 
 // carry out from arithmetic opertaion
@@ -153,10 +153,10 @@ void executeDPI(arm *state, word instruction) {
   // first operand
   word op1 = state->registers[rn];
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
-  // TODO: change variable name
-  operation_t *output = i ? opImmediate(state, op2) : opRegister(state, op2);
-  op2 = output->result;
-  word carryOut = output->carryOut;
+  operation_t *shiftedOp2 =
+      i ? opImmediate(state, op2) : opRegister(state, op2);
+  op2 = shiftedOp2->result;
+  word carryOut = shiftedOp2->carryOut;
   // execution
   word result;
   switch (opcode) {
@@ -215,7 +215,7 @@ void executeDPI(arm *state, word instruction) {
   if (UPDATE_CPSR(instruction)) {
     setCPSR(state, result, carryOut);
   }
-  free(output);
+  free(shiftedOp2);
 }
 
 // function for checking if word is within MEMORY_CAPACITY
@@ -263,11 +263,10 @@ void executeSTDI(arm *state, word instruction) {
   uint rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
   // offset
   word offset = (instruction & SDTI_OFFSET_MASK);
-  operation_t *output =
+  operation_t *shiftedOffset =
       i ? opRegister(state, offset) : opImmediate(state, offset);
   // no carry out from this instruction
-  offset = output->result;
-  // TODO: rn is PC
+  offset = shiftedOffset->result;
   if (rn == PC) {
     // must ensure it contains the instruction’s address plus 8 bytes
   }
