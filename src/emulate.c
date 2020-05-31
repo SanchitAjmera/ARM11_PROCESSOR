@@ -7,7 +7,7 @@
 
 void print_arm_state(arm *state) {
   printf("Registers:\n");
-  char reg_name[5];
+  char registerName[5];
   for (int i = 0; i < NO_REGISTERS; i++) {
     if (i == 13 || i == 14) {
       // Not used in this exercise
@@ -15,22 +15,22 @@ void print_arm_state(arm *state) {
     }
 
     if (i == 15) {
-      strcpy(reg_name, "PC");
+      strcpy(registerName, "PC");
     } else if (i == 16) {
-      strcpy(reg_name, "CPSR");
+      strcpy(registerName, "CPSR");
     } else {
-      sprintf(reg_name, "$%i", i);
+      sprintf(registerName, "$%i", i);
     }
 
-    printf("%-4s: %10i (0x%08x)\n", reg_name, state->registers[i],
+    printf("%-4s: %10i (0x%08x)\n", registerName, state->registers[i],
            state->registers[i]);
   }
 
   printf("Non-zero memory:\n");
   for (int i = 0; i < MEMORY_CAPACITY; i += 4) {
-    word memory_val = get_word_big_end(state->memory + i);
-    if (memory_val != 0)
-      printf("0x%08x: 0x%08x\n", i, memory_val);
+    word memoryVal = getWordBigEnd(state->memory + i);
+    if (memoryVal != 0)
+      printf("0x%08x: 0x%08x\n", i, memoryVal);
   }
 }
 
@@ -41,11 +41,11 @@ int main(int argc, char **argv) {
   }
 
   arm *state = malloc(sizeof(arm));
-  init_arm(state, argv[1]);
+  initArm(state, argv[1]);
 
   // PIPELINE
-  while ((state->decoded.is_set && state->decoded.instr) ||
-         !state->decoded.is_set) {
+  while ((state->decoded.isSet && state->decoded.instr) ||
+         !state->decoded.isSet) {
     execute(state);
     decode(state);
     fetch(state);

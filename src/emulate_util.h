@@ -29,7 +29,7 @@ typedef struct {
 
 // struct for instruction and instructionSet enum
 typedef struct {
-  bool is_set;
+  bool isSet;
   word instr;
   InstructionSet instrSet;
 } instructionState;
@@ -42,12 +42,12 @@ typedef struct {
   instructionState decoded;
 } arm;
 
-extern void check_ptr(const void *ptr, const char *error_msg);
+extern void validatePtr(const void *ptr, const char *error_msg);
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEM_LIMIT bytes */
-extern void init_arm(arm *state, const char *fname);
+extern void initArm(arm *state, const char *fname);
 
 // execution of the multiply instruction
 extern void multiply(arm *state, word instruction);
@@ -55,8 +55,8 @@ extern void multiply(arm *state, word instruction);
 // execution of a branch instruction
 extern void branch(arm *state, word instruction);
 
-extern word get_word(byte *start_addr);
-word get_word_big_end(byte *start_addr);
+extern word getWord(byte *start_addr);
+word getWordBigEnd(byte *start_addr);
 extern void fetch(arm *state);
 extern void decode(arm *state);
 extern void execute(arm *state);

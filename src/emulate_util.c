@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void check_ptr(const void *ptr, const char *error_msg) {
+void validatePtr(const void *ptr, const char *error_msg) {
   if (ptr == NULL) {
     printf("Error: %s\n", error_msg);
     exit(EXIT_FAILURE);
@@ -63,7 +63,7 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE;
   // tuple for the result and the carry out bit
   operation_t *output = (operation_t *)malloc(sizeof(operation_t));
-  check_ptr(output, "Not enough memory!");
+  validatePtr(output, "Not enough memory!");
   word result;
   // carry out from a right shift operation
   word carryOut = rightCarryOut(value, shiftNum);
@@ -109,7 +109,7 @@ operation_t *opImmediate(arm *state, uint op2) {
   uint rotateNum = (op2 >> GET_ROTATION_NUM) * ROTATION_FACTOR;
   // struct for the result and the carry out bit
   operation_t *output = (operation_t *)malloc(sizeof(operation_t));
-  check_ptr(output, "Not enough memory!");
+  validatePtr(output, "Not enough memory!");
   // result of the rotation operation
   output->result = rotateRight(imm, rotateNum);
   // carry out for CSPR flag
@@ -242,7 +242,7 @@ void store(arm *state, word sourceReg, word destAddr) {
 
 void load(arm *state, word destReg, word sourceAddr) {
   if (checkValidAddress(sourceAddr)) {
-    word value = get_word(state->memory + sourceAddr);
+    word value = getWord(state->memory + sourceAddr);
     state->registers[destReg] = value;
   }
 }
@@ -264,23 +264,22 @@ void executeSTDI(arm *state, word instruction) {
   // Offset
   word offset = (instruction & SDTI_OFFSET_MASK);
 
+  // TODO: case - PC is used as the base register (Rn)
+
   // Immediate Offset
   operation_t *output =
       i ? opRegister(state, offset) : opImmediate(state, offset);
+  // no carry out from this instruction
   offset = output->result;
 
-  // Because PRE-INDEXING doesn't change the value of the base register rn
-  // the data will always be transferred regardless of the indexing bit p.
-  // transfering Data:
-
-  // POST-INDEXING is set
   offset = u ? offset : -offset;
   word destAddr = state->registers[rn];
   if (p) {
-    // indexing base regsiter Rn according to Up bit
+    // pre-indexing
     l ? load(state, rd, destAddr + offset)
       : store(state, rd, destAddr + offset);
   } else {
+    // post-indexing
     l ? load(state, rd, destAddr) : store(state, rd, destAddr);
     state->registers[rn] += offset;
   }
@@ -311,7 +310,7 @@ void executeMultiply(arm *state, word instruction) {
 void flushPipeline(arm *state) {
   state->fetched = 0;
   state->decoded.instr = 0;
-  state->decoded.is_set = false;
+  state->decoded.isSet = false;
 }
 
 void executeBranch(arm *state, word instruction) {
@@ -329,48 +328,48 @@ void executeBranch(arm *state, word instruction) {
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEMORY_CAPACITY bytes */
-void init_arm(arm *state, const char *fname) {
+void initArm(arm *state, const char *fname) {
   /* load binary file into memory */
   byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
-  check_ptr(memory, "Not enough memory.\n");
+  validatePtr(memory, "Not enough memory.\n");
   // file handling
-  FILE *bin_obj = fopen(fname, "rb");
-  check_ptr(bin_obj, "File could not be opened\n");
-  fseek(bin_obj, SEEK_SET, SEEK_END);
-  long file_size = ftell(bin_obj);
-  rewind(bin_obj);
-  /* Asserts that fread read the whole file */
-  assert(fread(memory, 1, file_size, bin_obj) == file_size);
-  fclose(bin_obj);
-  /* initialise registers */
+  FILE *binFile = fopen(fname, "rb");
+  validatePtr(binFile, "File could not be opened\n");
+  fseek(binFile, SEEK_SET, SEEK_END);
+  long fileSize = ftell(binFile);
+  rewind(binFile);
+  // Asserts that fread read the whole file
+  assert(fread(memory, 1, fileSize, binFile) == fileSize);
+  fclose(binFile);
+  // initialise registers
   word *registers = (word *)calloc(NUM_REGISTERS, sizeof(word));
 
-  /* construct ARM state */
+  // construct ARM state
   state->memory = memory;
   state->registers = registers;
   flushPipeline(state);
 }
 
-word get_word(byte *start_addr) {
+word getWord(byte *startAddress) {
   word w = 0;
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    w += start_addr[i] << BYTE * (i);
+    w += startAddress[i] << BYTE * (i);
   }
   return w;
 }
 
-word get_word_big_end(byte *start_addr) {
+word getWordBigEnd(byte *startAddress) {
   word w = 0;
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    w += start_addr[i] << BYTE * (WORD_SIZE_BYTES - 1 - i);
+    w += startAddress[i] << BYTE * (WORD_SIZE_BYTES - 1 - i);
   }
   return w;
 }
 
 void fetch(arm *state) {
-  word memory_offset = state->registers[PC];
+  word memoryOffset = state->registers[PC];
   state->registers[PC] += WORD_SIZE_BYTES;
-  state->fetched = get_word(state->memory + memory_offset);
+  state->fetched = getWord(state->memory + memoryOffset);
 }
 
 void decode(arm *state) {
@@ -389,7 +388,7 @@ void decode(arm *state) {
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
     state->decoded.instrSet = DPI;
   }
-  state->decoded.is_set = true;
+  state->decoded.isSet = true;
 }
 
 // checks the instruction condition with the CPSR flags
@@ -424,7 +423,7 @@ bool checkCond(arm *state, word instruction) {
 }
 
 void execute(arm *state) {
-  if (state->decoded.is_set == false) {
+  if (state->decoded.isSet == false) {
     return;
   }
   instructionState currInstructionState = state->decoded;
