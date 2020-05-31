@@ -1,8 +1,22 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 
 \usepackage{fullpage}
 
+\usepackage{tikz}
+
+\usetikzlibrary{shapes.geometric, arrows}
+
 \setlength{\parindent}{0pt}
+
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!30]
+
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+
+\tikzstyle{process} = [rectangle,text width=3cm , minimum width=3cm, minimum height = 1cm, text centered, draw=black, fill=orange!30]
+
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height = 1cm, text centered, draw=black, fill=green!30]
+
+\tikzstyle{arrow} = [thick, ->, >=stealth]
 
 \begin{document}
 
@@ -18,8 +32,7 @@
 Our first course of action for this project was to decide which technologies we will use to manage our tasks
 and keep track of our progress. After trialling a few different options, including the Microsoft Teams Planner,
 we decided to use the \textsl{‘Issues’} feature within GitLab. \textsl{Issues} allowed us to keep track of both our tasks and code
-progress in one place, which made the delegation and completion of tasks more streamlined. Being well coordinated was a priority in our plan for this project as it meant we could effectively carry out our tasks and
-successfully build up the project. We also had regular meetings, via Discord, to discuss each member’s plans
+progress in one place, which made the delegation and completion of tasks more streamlined. Being well coordinated was a priority in our plan for this project as it meant we could effectively carry out our tasks and successfully build up the project. We also had regular meetings, via Discord, to discuss each member’s plans
 for the project, what they had completed and what they intended to complete by the end of each day. 
 
 
@@ -32,7 +45,7 @@ These tasks were naturally divided into three types: \textsl{Fetch, Decode} and 
 
 
 The \textsl{'Fetch'} task was to generate several functions which handled the loading of the binary file and initialised
-the state of our emulator. 
+the state of our emulator. Morkus worked on this...
 Morkus add a sentence or two here for Fetch and that memory stuff you did. 
 The loading of the binary file into memory is handled by the function {\tt init\_arm}.
 
@@ -41,10 +54,9 @@ The \textsl{‘Decode’} task…Need to finish this
 
 
 The \textsl{‘Execute’} task was split further into four types based on each of the four instructions that were to be
-implemented. We decided to have one member working solely on the \textsl{Data Processing Instruction} and another
-for the \textsl{Single Data Transfer Instructions} as they required more time to complete. The \textsl{Multiply} and \textsl{Branch}
-instructions were relatively shorter and only needed one member to implement both functions.
-Are we meant to write the names of the members i.e. This person did this task etc…?
+implemented. We decided to have one member working solely on the \textsl{Data Processing Instruction} (Alex) and another
+for the \textsl{Single Data Transfer Instructions} (Sanchit) as they required more time to complete. The \textsl{Multiply} and \textsl{Branch}
+instructions were relatively shorter and only needed one member to implement both functions - (Luqman).
 
 \section*{Current Evaluation}
 As a team, we feel that we have worked well together so far. Any conflicts on plans for a feature were solved
@@ -66,28 +78,60 @@ During the first few days, we had a small problem with the times each of us had 
 for the day, mainly due to different sleeping patterns. This staggered timing meant it was harder for us to
 communicate effectively and work on the project together. However, after a constructive meeting, we solved
 that problem and had every member available to work on the project or help another member within a fixed
-period every day.
-+something we will change for the future 
+period every day. For future implementations in this project the team has been adviced to be more open if they
+are having difficulties implementing a solution to prevent wasted and time when running tests. 
 
 \section*{Emulator Implementation}
 Our aim in designing the structure of the emulator was to ensure that it was as clear as possible for an external
 programmer to understand how our code worked and where everything could be found. This was achieved by
 maintaining a consistent naming convention, splitting files and effectively commenting our code.
+
+
 We decided to alter the initial structure of the project by incorporating additional files. This was necessary as
 having all our code in one place was both difficult to work on and difficult for someone else to understand. As
-a result, our emulate.c file only consisted of the main function which initialised the emulator. We extracted the
-remainder of the code into a new file called ****emulate utils.c. + [need an explanation as to why we did this]
-Another aspect of the project that we noticed had to be improved was the use of ‘magic numbers’. We found
+a result, our {\tt emulate.c} file only consisted of the {tt\ main} function which initialised the emulator. We extracted the
+remainder of the code into a new file called {tt\ emulate\_ utils.c}. This ensured better readability and organisation in our code.
+ 
+
+Another aspect of the project that we noticed had to be improved was the use of \textsl{‘magic numbers’}. We found
 that our code quickly became unreadable and difficult to comprehend with several numbers used for masks
 and shifts within our functions. We agreed to eliminate this issue by having clearly named pre-processor
 constants at the top of our file. However, even this became too cluttered, and a better solution was needed to
-uphold clarity and readability within the program. This led us to create a new header file, constants.h, which
+uphold clarity and readability within the program. This led us to create a new header file, {\tt constants.h}, which
 housed all the constants that were used in our emulator. These constants were grouped by where and how
 they were used, which were indicated by comments.
+
+
 The following diagram provides a brief overview of our project structure for the emulator and includes the
 general contents of each file:
 @Sanchit A small diagram will be nice here showing the type of stuff we put into each file; Something like this
 but nicer and more LATEX style:
+
+\begin{tikzpicture}[node distance=2cm]
+
+\node (start) [startstop] {Start};
+\node (in1) [io, below of=start] {Input};
+\node (pro1) [process, below of=in1] {Process 1};
+\node (dec1) [process, below of=pro1, yshift=-0.5cm] {Decision 1};
+
+\node (pro2a) [process, below of=dec1, yshift=-0.5cm] {Process 2a text texttexttexttexttexttexttexttexttexttexttexttexttexttext};
+\node (pro2b) [process, right of=dec1, xshift=2cm] {Process 2b};
+
+\node (out1) [io, below of=pro2a] {Output};
+\node (stop) [startstop, below of=out1] {Stop};
+
+\draw [arrow] (start) -- (in1);
+\draw [arrow] (in1) -- (pro1);
+\draw [arrow] (pro1) -- (dec1);
+\draw [arrow] (dec1) -- node [anchor=east] {yes} (pro2a);
+\draw [arrow] (dec1) -- node [anchor=south] {no} (pro2b);
+\draw [arrow] (pro2b) |- (pro1);
+\draw [arrow] (pro2a) -- (out1);
+\draw [arrow] (out1) -- (stop);
+
+
+
+\end{tikzpicture}
 
 
 \section*{Upcoming Challenges}
