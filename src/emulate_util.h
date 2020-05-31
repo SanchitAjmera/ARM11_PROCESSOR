@@ -15,7 +15,7 @@ enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 // shift types
 enum Shift { LSL, LSR, ASR, ROR };
 // ARM instruction set
-typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionSet;
+typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionType;
 
 typedef uint32_t word;
 typedef uint8_t byte;
@@ -27,11 +27,11 @@ typedef struct {
   word carryOut;
 } operation_t;
 
-// struct for instruction and instructionSet enum
+// struct for instruction and InstructionType enum
 typedef struct {
   bool isSet;
-  word instr;
-  InstructionSet instrSet;
+  word instruction;
+  InstructionType instructionType;
 } instructionState;
 
 typedef struct {
@@ -55,8 +55,7 @@ extern void multiply(arm *state, word instruction);
 // execution of a branch instruction
 extern void branch(arm *state, word instruction);
 
-extern word getWord(byte *start_addr);
-word getWordBigEnd(byte *start_addr);
+extern word getWord(byte *start_addr, bool isBigEndian);
 extern void fetch(arm *state);
 extern void decode(arm *state);
 extern void execute(arm *state);

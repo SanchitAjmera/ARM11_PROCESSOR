@@ -171,19 +171,19 @@ void executeDPI(arm *state, word instruction) {
   case SUB:
     result = op1 - op2;
     // subtraction, so isAddition is false
-    carryOut = getCarryOut(op1, op2, false);
+    carryOut = getCarryOut(op1, op2, NOT_ADDITION);
     state->registers[rd] = result;
     break;
   case RSB:
     result = op2 - op1;
     // subtraction, so isAddition is false
-    carryOut = getCarryOut(op2, op1, false);
+    carryOut = getCarryOut(op2, op1, NOT_ADDITION);
     state->registers[rd] = result;
     break;
   case ADD:
     result = op1 + op2;
     // addition, so isAddition is true
-    carryOut = getCarryOut(op1, op2, true);
+    carryOut = getCarryOut(op1, op2, IS_ADDITION);
     state->registers[rd] = result;
     break;
   case TST:
@@ -195,7 +195,7 @@ void executeDPI(arm *state, word instruction) {
   case CMP:
     result = op1 - op2;
     // subtraction, so isAddition is false
-    carryOut = getCarryOut(op1, op2, false);
+    carryOut = getCarryOut(op1, op2, NOT_ADDITION);
     break;
   case ORR:
     result = op1 | op2;
@@ -242,38 +242,38 @@ void store(arm *state, word sourceReg, word destAddr) {
 
 void load(arm *state, word destReg, word sourceAddr) {
   if (checkValidAddress(sourceAddr)) {
-    word value = getWord(state->memory + sourceAddr);
+    word value = getWord(state->memory + sourceAddr, NOT_BIG_ENDIAN);
     state->registers[destReg] = value;
   }
 }
 
 void executeSTDI(arm *state, word instruction) {
   // Components of the instruction
-  // Immediate Offset
+  // immediate Offset
   uint i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
-  // Pre/Post indexing bit
+  // pre/Post indexing bit
   uint p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
-  // Up bit
+  // up bit
   uint u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
-  // Load/Store bit
+  // load/Store bit
   uint l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
-  // Base Register
+  // base Register
   uint rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
-  // Source/Destination register
+  // source/Destination register
   uint rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
-  // Offset
+  // offset
   word offset = (instruction & SDTI_OFFSET_MASK);
-
-  // TODO: case - PC is used as the base register (Rn)
-
-  // Immediate Offset
   operation_t *output =
       i ? opRegister(state, offset) : opImmediate(state, offset);
   // no carry out from this instruction
   offset = output->result;
-
-  offset = u ? offset : -offset;
+  // TODO: rn is PC
+  if (rn == PC) {
+    // must ensure it contains the instruction’s address plus 8 bytes
+  }
   word destAddr = state->registers[rn];
+  // offset if added if u is set, subtracted if not
+  offset = u ? offset : -offset;
   if (p) {
     // pre-indexing
     l ? load(state, rd, destAddr + offset)
@@ -309,7 +309,7 @@ void executeMultiply(arm *state, word instruction) {
 
 void flushPipeline(arm *state) {
   state->fetched = 0;
-  state->decoded.instr = 0;
+  state->decoded.instruction = 0;
   state->decoded.isSet = false;
 }
 
@@ -350,18 +350,12 @@ void initArm(arm *state, const char *fname) {
   flushPipeline(state);
 }
 
-word getWord(byte *startAddress) {
+word getWord(byte *startAddress, bool isBigEndian) {
   word w = 0;
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    w += startAddress[i] << BYTE * (i);
-  }
-  return w;
-}
-
-word getWordBigEnd(byte *startAddress) {
-  word w = 0;
-  for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    w += startAddress[i] << BYTE * (WORD_SIZE_BYTES - 1 - i);
+    // TODO: change `temp` variable name
+    uint temp = isBigEndian ? (WORD_SIZE_BYTES - 1 - i) : i;
+    w += startAddress[i] << BYTE * temp;
   }
   return w;
 }
@@ -369,24 +363,25 @@ word getWordBigEnd(byte *startAddress) {
 void fetch(arm *state) {
   word memoryOffset = state->registers[PC];
   state->registers[PC] += WORD_SIZE_BYTES;
-  state->fetched = getWord(state->memory + memoryOffset);
+  state->fetched = getWord(state->memory + memoryOffset, NOT_BIG_ENDIAN);
 }
 
 void decode(arm *state) {
   word instruction = state->fetched;
-  state->decoded.instr = instruction;
+  state->decoded.instruction = instruction;
+  // halt instruction
   if (state->fetched == 0) {
     return;
   }
 
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
-    state->decoded.instrSet = BR;
+    state->decoded.instructionType = BR;
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
-    state->decoded.instrSet = SDTI;
+    state->decoded.instructionType = SDTI;
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
-    state->decoded.instrSet = MULT;
+    state->decoded.instructionType = MULT;
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
-    state->decoded.instrSet = DPI;
+    state->decoded.instructionType = DPI;
   }
   state->decoded.isSet = true;
 }
@@ -427,10 +422,10 @@ void execute(arm *state) {
     return;
   }
   instructionState currInstructionState = state->decoded;
-  InstructionSet instructionSet = currInstructionState.instrSet;
-  word instruction = currInstructionState.instr;
+  InstructionType instructionType = currInstructionState.instructionType;
+  word instruction = currInstructionState.instruction;
   if (checkCond(state, instruction)) {
-    switch (instructionSet) {
+    switch (instructionType) {
     case BR:
       executeBranch(state, instruction);
       break;

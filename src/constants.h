@@ -7,6 +7,8 @@
 #define ADDRESS_SIZE 4
 #define WORD_SIZE_BYTES 4
 #define BYTE 8
+#define NOT_BIG_ENDIAN false
+#define IS_BIG_ENDIAN true
 #define CPSR_N_MASK (1 << 31)
 #define CPSR_Z_MASK (1 << 30)
 #define CPSR_C_MASK (1 << 29)
@@ -90,4 +92,6 @@
 #define MSB_MASK 1 << 31
 #define LSB_MASK 0x1
 #define NO_ROTATION 0
+#define IS_ADDITION true
+#define NOT_ADDITION false
 #endif
