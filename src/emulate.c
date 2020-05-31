@@ -1,14 +1,13 @@
 #include "constants.h"
 #include "emulate_util.h"
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void print_arm_state(arm *state) {
+void printArmState(arm *state) {
   printf("Registers:\n");
   char registerName[5];
-  for (int i = 0; i < NO_REGISTERS; i++) {
+  for (int i = 0; i < NUM_REGISTERS; i++) {
     if (i == 13 || i == 14) {
       // Not used in this exercise
       continue;
@@ -28,7 +27,7 @@ void print_arm_state(arm *state) {
 
   printf("Non-zero memory:\n");
   for (int i = 0; i < MEMORY_CAPACITY; i += 4) {
-    word memoryVal = getWordBigEnd(state->memory + i);
+    word memoryVal = getWord(state->memory + i, IS_BIG_ENDIAN);
     if (memoryVal != 0)
       printf("0x%08x: 0x%08x\n", i, memoryVal);
   }
@@ -44,14 +43,14 @@ int main(int argc, char **argv) {
   initArm(state, argv[1]);
 
   // PIPELINE
-  while ((state->decoded.isSet && state->decoded.instr) ||
+  while ((state->decoded.isSet && state->decoded.instruction) ||
          !state->decoded.isSet) {
     execute(state);
     decode(state);
     fetch(state);
   }
 
-  print_arm_state(state);
+  printArmState(state);
 
   // free memory before code termination
   free(state->memory);
