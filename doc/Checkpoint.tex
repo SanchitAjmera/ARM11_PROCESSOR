@@ -8,19 +8,15 @@
 
 \setlength{\parindent}{0pt}
 
-\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!30]
+\tikzstyle{boxEmulate} = [rectangle, rounded corners,  text width=4cm, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=white]
 
-\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
-
-\tikzstyle{process} = [rectangle,text width=3cm , minimum width=3cm, minimum height = 1cm, text centered, draw=black, fill=orange!30]
-
-\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height = 1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{boxUtils} = [rectangle, rounded corners,  text width=6cm, minimum width=3cm, minimum height=1cm, draw=black, fill=white]
 
 \tikzstyle{arrow} = [thick, ->, >=stealth]
 
 \begin{document}
 
-\title{ARM-11 CHECKPOINT}
+\title{\vspace{-2cm}ARM-11 CHECKPOINT}
 
 \author{Top of the morning, Luqmaaaaaaan, Memory man, Hi I'm Sanchit}
 
@@ -89,8 +85,8 @@ maintaining a consistent naming convention, splitting files and effectively comm
 
 We decided to alter the initial structure of the project by incorporating additional files. This was necessary as
 having all our code in one place was both difficult to work on and difficult for someone else to understand. As
-a result, our {\tt emulate.c} file only consisted of the {tt\ main} function which initialised the emulator. We extracted the
-remainder of the code into a new file called {tt\ emulate\_ utils.c}. This ensured better readability and organisation in our code.
+a result, our {\tt emulate.c} file only consisted of the {\tt main} function which initialised the emulator. We extracted the
+remainder of the code into a new file called {\tt emulate\_utils.c}. This ensured better readability and organisation in our code.
  
 
 Another aspect of the project that we noticed had to be improved was the use of \textsl{‘magic numbers’}. We found
@@ -104,32 +100,52 @@ they were used, which were indicated by comments.
 
 The following diagram provides a brief overview of our project structure for the emulator and includes the
 general contents of each file:
-@Sanchit A small diagram will be nice here showing the type of stuff we put into each file; Something like this
-but nicer and more LATEX style:
+
+\vspace{0.5cm}
 
 \begin{tikzpicture}[node distance=2cm]
 
-\node (start) [startstop] {Start};
-\node (in1) [io, below of=start] {Input};
-\node (pro1) [process, below of=in1] {Process 1};
-\node (dec1) [process, below of=pro1, yshift=-0.5cm] {Decision 1};
+\node (constants) [boxEmulate, yshift =10cm] {
+\textbf{ constants.h} 
+\rule{\textwidth}{0.4pt}
+contains constants for masks and shifts used within arm instruction set functions in {\tt emulate\_util.c} to eliminate magic numbers
 
-\node (pro2a) [process, below of=dec1, yshift=-0.5cm] {Process 2a text texttexttexttexttexttexttexttexttexttexttexttexttexttext};
-\node (pro2b) [process, right of=dec1, xshift=2cm] {Process 2b};
+};
 
-\node (out1) [io, below of=pro2a] {Output};
-\node (stop) [startstop, below of=out1] {Stop};
+\node (emulate) [boxEmulate, right of=constants, xshift=3cm] {
 
-\draw [arrow] (start) -- (in1);
-\draw [arrow] (in1) -- (pro1);
-\draw [arrow] (pro1) -- (dec1);
-\draw [arrow] (dec1) -- node [anchor=east] {yes} (pro2a);
-\draw [arrow] (dec1) -- node [anchor=south] {no} (pro2b);
-\draw [arrow] (pro2b) |- (pro1);
-\draw [arrow] (pro2a) -- (out1);
-\draw [arrow] (out1) -- (stop);
+\textbf{ emulate.c} 
+\rule{\textwidth}{0.4pt}
+Binary file is read and pushed throught the pipeline for instructions to be fetched, decoded and executed\\
+ - {\tt main}
+
+};
 
 
+
+\node[boxUtils,xshift = 4cm, yshift = 5cm, right of=emulate] (a) at (5,5) (emulateutil){
+\center\textbf{ emulate\_util.c}
+\rule{\textwidth}{0.4pt}
+
+\textbf{Arm Instruction Set} \\
+{\tt executedpi},    
+ {\tt executesdti}, 
+ {\tt executeMultiply}, 
+ {\tt executeBranch}\\
+\vspace{0.3cm}
+\textbf{Pipeline functions} \\
+{\tt fetch},
+ {\tt decode},
+ {\tt execute}\\
+\vspace{0.3cm}
+\textbf{Initialisation of memory, registers, fetched and decoded}\\
+ {\tt init\_arm}
+
+};
+
+\draw [arrow] (emulateutil) -- (emulate);
+\draw [arrow] (constants) -- (emulate);
+\draw [arrow] (constants.south) |- (emulateutil.south) + (-3,0);
 
 \end{tikzpicture}
 
