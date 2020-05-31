@@ -4,7 +4,6 @@
 
 #include "constants.h"
 #include "emulate_util.h"
-#include "constants.h"
 
 void test_bool(bool cond, char *test_name) {
   printf("T: %s : %s\n", test_name, cond ? "OK" : "FAIL");
@@ -13,7 +12,7 @@ void test_bool(bool cond, char *test_name) {
 /* Loads a binary file fname into state memory and returns strcmp() between
    memory contents and the expected file dump fdump */
 int test_file_load(arm *state, const char *fname, const char *fdump) {
-  init_arm(state, fname);
+  initArm(state, fname);
 
   /* read state->memory contents into string */
   char mem_contents[strlen(fdump)];
@@ -38,7 +37,7 @@ int test_file_load(arm *state, const char *fname, const char *fdump) {
   1) correctly,
   2) in their entirety
   3) in the correct byte order. */
-void test_init_arm() {
+void test_initArm() {
   arm *state = malloc(sizeof(arm));
 
   /* hex dump of binary object files used in this test */
@@ -110,8 +109,8 @@ void test_CPSR() {
 }
 
 int main(void) {
-  printf("----Testing init_arm----\n");
-  test_init_arm();
+  printf("----Testing initArm----\n");
+  test_initArm();
 
   printf("----Testing CPSR flags----\n");
   test_CPSR();
