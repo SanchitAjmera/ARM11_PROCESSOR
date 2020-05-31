@@ -230,13 +230,13 @@ bool checkValidAddress(word address) {
 }
 
 // function which transfers data from one register to another
-void store(arm *state, word sourceReg, word destAddr) {
-  if (!checkValidAddress(destAddr)) {
+void store(arm *state, word sourceReg, word baseReg) {
+  if (!checkValidAddress(baseReg)) {
     return;
   }
   word value = state->registers[sourceReg];
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    state->memory[destAddr + i] = value >> BYTE * i;
+    state->memory[baseReg + i] = value >> BYTE * i;
   }
 }
 
@@ -270,17 +270,17 @@ void executeSTDI(arm *state, word instruction) {
   if (rn == PC) {
     // must ensure it contains the instruction’s address plus 8 bytes
   }
-  word destAddr = state->registers[rn];
+  word *baseReg = state->registers + rn;
   // offset if added if u is set, subtracted if not
   offset = u ? offset : -offset;
   if (p) {
     // pre-indexing
-    l ? load(state, rd, destAddr + offset)
-      : store(state, rd, destAddr + offset);
+    l ? load(state, rd, *baseReg + offset)
+      : store(state, rd, *baseReg + offset);
   } else {
     // post-indexing
-    l ? load(state, rd, destAddr) : store(state, rd, destAddr);
-    state->registers[rn] += offset;
+    l ? load(state, rd, *baseReg) : store(state, rd, *baseReg);
+    *baseReg += offset;
   }
 }
 
