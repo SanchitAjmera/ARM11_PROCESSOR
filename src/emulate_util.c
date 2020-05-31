@@ -352,9 +352,8 @@ void initArm(arm *state, const char *fname) {
 word getWord(byte *startAddress, bool isBigEndian) {
   word w = 0;
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
-    // TODO: change `temp` variable name
-    uint temp = isBigEndian ? (WORD_SIZE_BYTES - 1 - i) : i;
-    w += startAddress[i] << BYTE * temp;
+    uint byte_index = isBigEndian ? (WORD_SIZE_BYTES - 1 - i) : i;
+    w += startAddress[i] << BYTE * byte_index;
   }
   return w;
 }
