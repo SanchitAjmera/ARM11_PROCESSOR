@@ -21,10 +21,9 @@ typedef uint32_t word;
 typedef uint8_t byte;
 typedef unsigned int uint;
 
-// TODO: consider changing the type of carryOut
 typedef struct {
   word result;
-  word carryOut;
+  uint carryOut;
 } operation_t;
 
 // struct for instruction and InstructionType enum
