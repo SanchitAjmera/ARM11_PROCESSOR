@@ -219,8 +219,7 @@ void executeDPI(arm *state, word instruction) {
 }
 
 // function for checking if word is within MEMORY_CAPACITY
-// ADDRESS_SIZE is taken away from MEMORY_CAPACITY as address must be
-// ADDRESS_SIZE less than MEMORY_CAPACITY in order for word to be read
+// prints error if memory is out of bounds
 bool checkValidAddress(word address) {
   if (address > MEMORY_CAPACITY) {
     printf("Error: Out of bounds memory access at address 0x%08x\n", address);
@@ -229,20 +228,27 @@ bool checkValidAddress(word address) {
   return true;
 }
 
-// function which transfers data from one register to another
+// function which stores address inside source register Rd into the the memory
 void store(arm *state, word sourceReg, word baseReg) {
+  // check for making sure address is within bounds of MEMORY_CAPACITY
   if (!checkValidAddress(baseReg)) {
     return;
   }
+  // value inside source register Rd
   word value = state->registers[sourceReg];
+  // storing value within memory located by address inside base register
   for (int i = 0; i < WORD_SIZE_BYTES; i++) {
     state->memory[baseReg + i] = value >> BYTE * i;
   }
 }
 
+// function which loads address inside base register Rn into the memory
 void load(arm *state, word destReg, word sourceAddr) {
+  // check for making sure address is within bounds of MEMORY_CAPACITY
   if (checkValidAddress(sourceAddr)) {
+    // value inside base register
     word value = getWord(state->memory + sourceAddr, NOT_BIG_ENDIAN);
+    // laoding value into destination register Rd
     state->registers[destReg] = value;
   }
 }
