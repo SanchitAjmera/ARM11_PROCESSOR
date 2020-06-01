@@ -21,10 +21,22 @@ typedef uint32_t word;
 typedef uint8_t byte;
 typedef unsigned int uint;
 
+// struct for the result and carry out from shift/arithmetic operation
 typedef struct {
   word result;
   uint carryOut;
 } operation_t;
+
+// struct for the extraction of Data Processing instructions
+typedef struct {
+  word instruction;
+  uint i;
+  enum Opcode opcode;
+  uint rn;
+  uint rd;
+  word op1;
+  word op2;
+} dpi;
 
 // struct for instruction and InstructionType enum
 typedef struct {
