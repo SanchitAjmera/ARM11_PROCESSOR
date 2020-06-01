@@ -267,6 +267,7 @@ void executeSTDI(arm *state, word instruction) {
       i ? opRegister(state, offset) : opImmediate(state, offset);
   // no carry out from this instruction
   offset = shiftedOffset->result;
+  free(offset);
   if (rn == PC) {
     // must ensure it contains the instruction’s address plus 8 bytes
   }
