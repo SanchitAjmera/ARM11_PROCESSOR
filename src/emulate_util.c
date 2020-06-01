@@ -257,7 +257,7 @@ void load(arm *state, word destReg, word sourceAddr) {
   }
 }
 
-void executeSTDI(arm *state, word instruction) {
+void executeSDTI(arm *state, word instruction) {
   // Components of the instruction
   // immediate Offset
   uint i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
@@ -317,6 +317,7 @@ void executeMultiply(arm *state, word instruction) {
   state->registers[destination] = result;
 }
 
+// Pipeline flush required for a branch instruction
 void flushPipeline(arm *state) {
   state->fetched = 0;
   state->decoded.instruction = 0;
@@ -325,11 +326,11 @@ void flushPipeline(arm *state) {
 
 void executeBranch(arm *state, word instruction) {
   flushPipeline(state);
-  // extraction of information
+  // extraction of information from instruction
   int offset = instruction & BRANCH_OFFSET_MASK;
   int signBit = offset & BRANCH_SIGN_BIT;
 
-  // shift, sign extension and addition of offset onto current address
+  // shift, sign extension and addition of offset onto current address in PC
   state->registers[PC] +=
       ((offset << CURRENT_INSTRUCTION_SHIFT) |
        (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND));
@@ -339,7 +340,7 @@ void executeBranch(arm *state, word instruction) {
  * memory and register
  * pointers on heap, where memory is of size MEMORY_CAPACITY bytes */
 void initArm(arm *state, const char *fname) {
-  /* load binary file into memory */
+  // load binary file into memory
   byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
   validatePtr(memory, "Not enough memory.\n");
   // file handling
@@ -442,7 +443,7 @@ void execute(arm *state) {
       executeDPI(state, instruction);
       break;
     case SDTI:
-      executeSTDI(state, instruction);
+      executeSDTI(state, instruction);
       break;
     case MULT:
       executeMultiply(state, instruction);
