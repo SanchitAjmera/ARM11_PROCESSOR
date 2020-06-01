@@ -139,11 +139,35 @@ void setCPSR(arm *state, word result, uint carryOut) {
   state->registers[CPSR] = n | z | c | v;
 }
 
-void operationDPI(arm *state, const enum Opcode opcode, word op1, word op2,
-                  uint rd, uint carryOut, bool updateCPSR) {
-  // execution
+dpi *extractDPI(arm *state, word instruction) {
+  dpi *extraction = malloc(sizeof(dpi));
+  extraction->instruction = instruction;
+  // extraction of code
+  extraction->i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
+  // instruction to execute
+  extraction->opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
+  // op1 is always the contents of register Rn
+  extraction->rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
+  // destination register
+  extraction->rd = (instruction & DPI_RD_MASK) >> DPI_RD_SHIFT;
+  // first operand
+  extraction->op1 = state->registers[extraction->rn];
+  // second operand
+  extraction->op2 = instruction & DPI_OP2_MASK;
+  return extraction;
+}
+
+void executeDPI(arm *state, word instruction) {
+  dpi *extraction = extractDPI(state, instruction);
+  // if i is set, op2 is an immediate const, otherwise it's a shifted register
+  operation_t *shiftedOp2 = extraction->i ? opImmediate(state, extraction->op2)
+                                          : opRegister(state, extraction->op2);
+  word op1 = extraction->op1;
+  word op2 = shiftedOp2->result;
+  uint rd = extraction->rd;
+  uint carryOut = shiftedOp2->carryOut;
   word result;
-  switch (opcode) {
+  switch (extraction->opcode) {
   case AND:
     result = op1 & op2;
     state->registers[rd] = result;
@@ -191,32 +215,11 @@ void operationDPI(arm *state, const enum Opcode opcode, word op1, word op2,
     assert(false);
   }
   // if s (bit 20) is set then the CPSR flags should be updated
-  if (updateCPSR) {
+  if (UPDATE_CPSR(extraction->instruction)) {
     setCPSR(state, result, carryOut);
   }
-}
-
-void executeDPI(arm *state, word instruction) {
-  // TODO: make a struct for the exraction of data
-  // extraction of code
-  const uint i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
-  // instruction to execute
-  const enum Opcode opcode =
-      (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
-  // op1 is always the contents of register Rn
-  const uint rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
-  // destination register
-  const uint rd = (instruction & DPI_RD_MASK) >> DPI_RD_SHIFT;
-  // second operand
-  word op2 = instruction & DPI_OP2_MASK;
-  // first operand
-  const word op1 = state->registers[rn];
-  // if i is set, op2 is an immediate const, otherwise it's a shifted register
-  operation_t *shiftedOp2 =
-      i ? opImmediate(state, op2) : opRegister(state, op2);
-  operationDPI(state, opcode, op1, shiftedOp2->result, rd, shiftedOp2->carryOut,
-               UPDATE_CPSR(instruction));
   free(shiftedOp2);
+  free(extraction);
 }
 
 // function for checking if word is within MEMORY_CAPACITY
