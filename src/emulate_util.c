@@ -66,7 +66,7 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   validatePtr(shiftedOp2, "Not enough memory!");
   word result;
   // carry out from a right shift operation
-  word carryOut = rightCarryOut(value, shiftNum);
+  uint carryOut = rightCarryOut(value, shiftNum);
   switch (shiftType) {
   case LSL:
     // carry out from a left shift operation
@@ -126,7 +126,64 @@ word getCarryOut(word op1, word op2, bool isAddition) {
   return op1 < op2 ? 0 : 1;
 }
 
-void setCPSR(arm *state, word result, word carryOut) {
+void operationDPI(arm *state, word op1, word op2, uint rd, unit carryOut) {
+  // execution
+  word result;
+  switch (opcode) {
+  case AND:
+    result = op1 & op2;
+    state->registers[rd] = result;
+    break;
+  case EOR:
+    result = op1 ^ op2;
+    state->registers[rd] = result;
+    break;
+  case SUB:
+    result = op1 - op2;
+    carryOut = getCarryOut(op1, op2, NOT_ADDITION);
+    state->registers[rd] = result;
+    break;
+  case RSB:
+    result = op2 - op1;
+    carryOut = getCarryOut(op2, op1, NOT_ADDITION);
+    state->registers[rd] = result;
+    break;
+  case ADD:
+    result = op1 + op2;
+    carryOut = getCarryOut(op1, op2, IS_ADDITION);
+    state->registers[rd] = result;
+    break;
+  case TST:
+    result = op1 & op2;
+    break;
+  case TEQ:
+    result = op1 ^ op2;
+    break;
+  case CMP:
+    result = op1 - op2;
+    carryOut = getCarryOut(op1, op2, NOT_ADDITION);
+    break;
+  case ORR:
+    result = op1 | op2;
+    state->registers[rd] = result;
+    break;
+  case MOV:
+    result = op2;
+    state->registers[rd] = result;
+    break;
+  default:
+    // no other instructions
+    // should never happen
+    assert(false);
+  }
+
+  // if s (bit 20) is set then the CPSR flags should be updated
+  if (UPDATE_CPSR(instruction)) {
+    setCPSR(state, result, carryOut);
+  }
+}
+
+void setCPSR(arm *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & CPSR_N_MASK;
   // set only if the result is all zeros
@@ -151,70 +208,11 @@ void executeDPI(arm *state, word instruction) {
   // second operand
   word op2 = instruction & DPI_OP2_MASK;
   // first operand
-  word op1 = state->registers[rn];
+  const word op1 = state->registers[rn];
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
   operation_t *shiftedOp2 =
       i ? opImmediate(state, op2) : opRegister(state, op2);
-  op2 = shiftedOp2->result;
-  word carryOut = shiftedOp2->carryOut;
-  // execution
-  word result;
-  switch (opcode) {
-  case AND:
-    result = op1 & op2;
-    state->registers[rd] = result;
-    break;
-  case EOR:
-    result = op1 ^ op2;
-    state->registers[rd] = result;
-    break;
-  case SUB:
-    result = op1 - op2;
-    // subtraction, so isAddition is false
-    carryOut = getCarryOut(op1, op2, NOT_ADDITION);
-    state->registers[rd] = result;
-    break;
-  case RSB:
-    result = op2 - op1;
-    // subtraction, so isAddition is false
-    carryOut = getCarryOut(op2, op1, NOT_ADDITION);
-    state->registers[rd] = result;
-    break;
-  case ADD:
-    result = op1 + op2;
-    // addition, so isAddition is true
-    carryOut = getCarryOut(op1, op2, IS_ADDITION);
-    state->registers[rd] = result;
-    break;
-  case TST:
-    result = op1 & op2;
-    break;
-  case TEQ:
-    result = op1 ^ op2;
-    break;
-  case CMP:
-    result = op1 - op2;
-    // subtraction, so isAddition is false
-    carryOut = getCarryOut(op1, op2, NOT_ADDITION);
-    break;
-  case ORR:
-    result = op1 | op2;
-    state->registers[rd] = result;
-    break;
-  case MOV:
-    result = op2;
-    state->registers[rd] = result;
-    break;
-  default:
-    // no other instructions
-    // should never happen
-    assert(false);
-  }
-
-  // if s (bit 20) is set then the CPSR flags should be updated
-  if (UPDATE_CPSR(instruction)) {
-    setCPSR(state, result, carryOut);
-  }
+  operationDPI(state, op1, shiftedOp2->result, rd, shiftedOp2->carryOut);
   free(shiftedOp2);
 }
 
