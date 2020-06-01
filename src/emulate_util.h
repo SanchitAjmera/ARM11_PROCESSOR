@@ -60,12 +60,6 @@ extern void validatePtr(const void *ptr, const char *error_msg);
  * pointers on heap, where memory is of size MEM_LIMIT bytes */
 extern void initArm(arm *state, const char *fname);
 
-// execution of the multiply instruction
-extern void multiply(arm *state, word instruction);
-
-// execution of a branch instruction
-extern void branch(arm *state, word instruction);
-
 extern word getWord(byte *start_addr, bool isBigEndian);
 extern void fetch(arm *state);
 extern void decode(arm *state);
