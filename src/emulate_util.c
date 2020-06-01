@@ -126,7 +126,8 @@ word getCarryOut(word op1, word op2, bool isAddition) {
   return op1 < op2 ? 0 : 1;
 }
 
-void operationDPI(arm *state, word op1, word op2, uint rd, unit carryOut) {
+void operationDPI(arm *state, word op1, word op2, uint rd, unit carryOut,
+                  bool updateCPSR) {
   // execution
   word result;
   switch (opcode) {
@@ -176,9 +177,8 @@ void operationDPI(arm *state, word op1, word op2, uint rd, unit carryOut) {
     // should never happen
     assert(false);
   }
-
   // if s (bit 20) is set then the CPSR flags should be updated
-  if (UPDATE_CPSR(instruction)) {
+  if (updateCPSR) {
     setCPSR(state, result, carryOut);
   }
 }
@@ -212,7 +212,8 @@ void executeDPI(arm *state, word instruction) {
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
   operation_t *shiftedOp2 =
       i ? opImmediate(state, op2) : opRegister(state, op2);
-  operationDPI(state, op1, shiftedOp2->result, rd, shiftedOp2->carryOut);
+  operationDPI(state, op1, shiftedOp2->result, rd, shiftedOp2->carryOut,
+               UPDATE_CPSR(instruction));
   free(shiftedOp2);
 }
 
