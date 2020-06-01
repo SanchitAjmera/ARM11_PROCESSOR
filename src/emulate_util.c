@@ -126,8 +126,21 @@ word getCarryOut(word op1, word op2, bool isAddition) {
   return op1 < op2 ? 0 : 1;
 }
 
-void operationDPI(arm *state, word op1, word op2, uint rd, unit carryOut,
-                  bool updateCPSR) {
+void setCPSR(arm *state, word result, uint carryOut) {
+  // set to the logical value of bit 31 of the result
+  word n = result & CPSR_N_MASK;
+  // set only if the result is all zeros
+  word z = result ? 0 : CPSR_Z_MASK;
+  // carry out from the instruction
+  word c = carryOut ? SET_CPSR_C : 0;
+  // v is unaffected
+  word v = state->registers[CPSR] & CPSR_V_MASK;
+  // updated flag bits
+  state->registers[CPSR] = n | z | c | v;
+}
+
+void operationDPI(arm *state, const enum Opcode opcode, word op1, word op2,
+                  uint rd, uint carryOut, bool updateCPSR) {
   // execution
   word result;
   switch (opcode) {
@@ -183,24 +196,13 @@ void operationDPI(arm *state, word op1, word op2, uint rd, unit carryOut,
   }
 }
 
-void setCPSR(arm *state, word result, uint carryOut) {
-  // set to the logical value of bit 31 of the result
-  word n = result & CPSR_N_MASK;
-  // set only if the result is all zeros
-  word z = result ? 0 : CPSR_Z_MASK;
-  // carry out from the instruction
-  word c = carryOut ? SET_CPSR_C : 0;
-  // v is unaffected
-  word v = state->registers[CPSR] & CPSR_V_MASK;
-  // updated flag bits
-  state->registers[CPSR] = n | z | c | v;
-}
-
 void executeDPI(arm *state, word instruction) {
+  // TODO: make a struct for the exraction of data
   // extraction of code
   const uint i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
   // instruction to execute
-  enum Opcode opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
+  const enum Opcode opcode =
+      (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
   // op1 is always the contents of register Rn
   const uint rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
   // destination register
@@ -212,7 +214,7 @@ void executeDPI(arm *state, word instruction) {
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
   operation_t *shiftedOp2 =
       i ? opImmediate(state, op2) : opRegister(state, op2);
-  operationDPI(state, op1, shiftedOp2->result, rd, shiftedOp2->carryOut,
+  operationDPI(state, opcode, op1, shiftedOp2->result, rd, shiftedOp2->carryOut,
                UPDATE_CPSR(instruction));
   free(shiftedOp2);
 }
@@ -272,7 +274,7 @@ void executeSTDI(arm *state, word instruction) {
       i ? opRegister(state, offset) : opImmediate(state, offset);
   // no carry out from this instruction
   offset = shiftedOffset->result;
-  free(offset);
+  free(shiftedOffset);
   if (rn == PC) {
     // must ensure it contains the instruction’s address plus 8 bytes
   }
