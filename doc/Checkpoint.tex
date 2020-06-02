@@ -62,7 +62,7 @@ general contents of each file:
 
 \begin{tikzpicture}[node distance=2cm]
 
-\node (constants) [boxEmulate, yshift =10cm] {
+\node (constants) [boxEmulate] {
 \textbf{ constants.h} 
 \rule{\textwidth}{0.4pt}
 contains constants for masks and shifts used within arm instruction set functions in {\tt emulate\_util.c} to eliminate magic numbers
@@ -78,7 +78,7 @@ Binary file is read and pushed throught the pipeline for instructions to be fetc
 
 };
 
-\node[boxUtils,xshift = 4cm, yshift = 5cm, right of=emulate] (a) at (5,5) (emulateutil){
+\node[boxUtils,xshift = 4cm, right of=emulate](emulateutil){
 \center\textbf{ emulate\_util.c}
 \rule{\textwidth}{0.4pt}
 
@@ -98,9 +98,9 @@ Binary file is read and pushed throught the pipeline for instructions to be fetc
 
 };
 
-\draw [arrow] (emulateutil) -- (emulate);
-\draw [arrow] (constants) -- (emulate);
-\draw [arrow] (constants.south) |- (emulateutil.south) + (-3,0);
+\draw [arrow] (emulateutil.west) -- (emulate.east);
+\draw [arrow] (constants.east) -- (emulate.west);
+\draw [arrow] (constants.south) |- (emulateutil.south west) ;
 
 \end{tikzpicture}
 
