@@ -27,7 +27,7 @@ typedef struct {
   uint carryOut;
 } operation_t;
 
-// struct for the extraction of Data Processing instructions
+// struct for the decoding of Data Processing instructions
 typedef struct {
   word instruction;
   uint i;
@@ -36,7 +36,44 @@ typedef struct {
   uint rd;
   word op1;
   word op2;
-} dpi;
+} dp_t;
+
+// struct for the decoding of Multiply instructions
+typedef struct {
+  word instruction;
+  uint a;
+  uint s;
+  int destination;
+  int regN;
+  int regS;
+  int regM;
+} multiply_t;
+
+// struct for the decoding of Single Data Transfer instructions
+typedef struct {
+  word instruction;
+  uint i;
+  uint p;
+  uint u;
+  uint l;
+  uint rn;
+  uint rd;
+  word offset;
+} sdt_t;
+
+// struct for the decoding of Branch instructions
+typedef struct {
+  word instruction;
+  int offset;
+} branch_t;
+
+// union for the decoded instruction types
+typedef union {
+  dp_t *dp;
+  multiply_t *multiply;
+  sdt_t *sdt;
+  branch_t *branch;
+} decoded_t;
 
 // struct for instruction and InstructionType enum
 typedef struct {
