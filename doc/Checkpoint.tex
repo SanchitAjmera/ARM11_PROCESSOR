@@ -73,7 +73,7 @@ contains constants for masks and shifts used within arm instruction set function
 
 \textbf{ emulate.c} 
 \rule{\textwidth}{0.4pt}
-Binary file is read and pushed through the pipeline for instructions to be fetched, decoded and executed\\
+Binary file is read and pushed through the Pipeline for instructions to be fetched, decoded and executed\\
  - {\tt main}
 
 };
@@ -82,7 +82,7 @@ Binary file is read and pushed through the pipeline for instructions to be fetch
 \center\textbf{ emulate\_util.c}
 \rule{\textwidth}{0.4pt}
 
-\textbf{Arm Instruction Set, Pipe Line} \\
+\textbf{Arm Instruction Set, Pipeline} \\
 {\tt executeDPI},    
  {\tt executeSDTI}, 
  {\tt executeMultiply}, 
@@ -103,7 +103,7 @@ Binary file is read and pushed through the pipeline for instructions to be fetch
 
 
 \section*{Plans for the Assembler}
-After discussing our plans for the assembler, we found that there are some parts of the Emulator which could be reused partly. One crucial component that will be reused is our {\tt constants.h} file which will again eliminate any magic numbers. The instruction-specific mask and shift constants will also be useful in the functions for assembling each instruction. The general structure of our instruction functions will be helpful when planning and designing our corresponding assembler functions. Finally, our error checking functions, such as the pointer validate function, could be reused to defend against common errors.
+After discussing our plans for the assembler, we found that there are some parts of the Emulator which could be reused partly. One crucial component that will be reused is our {\tt constants.h} file which will again eliminate any magic numbers. The instruction-specific mask and shift constants will also be useful in the functions for assembling each instruction. The general structure of our instruction functions will be helpful when planning and designing our corresponding assembler functions. Finally, our error checking functions, such as the \textsl{pointer validate} function, could be reused to defend against common errors.
 \\ 
 
 An implementation task we may find challenging is creating an efficient ADT for the symbol table. We will mitigate this problem by carrying out effective research and using the lectures to their full extent. Implementing the tokenizer could be another difficult task. However, we will mitigate this problem by considering our previous projects and labs, such as the Java Spreadsheet Lab, and applying similar techniques to produce a solution. In general, our method to mitigate difficult implementation tasks consists of working together, code reviews and research. 
