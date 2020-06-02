@@ -139,35 +139,16 @@ void setCPSR(arm *state, word result, uint carryOut) {
   state->registers[CPSR] = n | z | c | v;
 }
 
-dpi *extractDPI(arm *state, word instruction) {
-  dpi *extraction = malloc(sizeof(dpi));
-  extraction->instruction = instruction;
-  // extraction of code
-  extraction->i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
-  // instruction to execute
-  extraction->opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
-  // op1 is always the contents of register Rn
-  extraction->rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
-  // destination register
-  extraction->rd = (instruction & DPI_RD_MASK) >> DPI_RD_SHIFT;
-  // first operand
-  extraction->op1 = state->registers[extraction->rn];
-  // second operand
-  extraction->op2 = instruction & DPI_OP2_MASK;
-  return extraction;
-}
-
-void executeDPI(arm *state, word instruction) {
-  dpi *extraction = extractDPI(state, instruction);
+void executeDPI(arm *state, dp_t *decoded) {
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
-  operation_t *shiftedOp2 = extraction->i ? opImmediate(state, extraction->op2)
-                                          : opRegister(state, extraction->op2);
-  word op1 = extraction->op1;
+  operation_t *shiftedOp2 = decoded->i ? opImmediate(state, decoded->op2)
+                                       : opRegister(state, decoded->op2);
+  word op1 = decoded->op1;
   word op2 = shiftedOp2->result;
-  uint rd = extraction->rd;
+  uint rd = decoded->rd;
   uint carryOut = shiftedOp2->carryOut;
   word result;
-  switch (extraction->opcode) {
+  switch (decoded->opcode) {
   case AND:
     result = op1 & op2;
     state->registers[rd] = result;
@@ -215,11 +196,11 @@ void executeDPI(arm *state, word instruction) {
     assert(false);
   }
   // if s (bit 20) is set then the CPSR flags should be updated
-  if (UPDATE_CPSR(extraction->instruction)) {
+  if (UPDATE_CPSR(decoded->instruction)) {
     setCPSR(state, result, carryOut);
   }
   free(shiftedOp2);
-  free(extraction);
+  free(decoded);
 }
 
 // function for checking if word is within MEMORY_CAPACITY
@@ -296,7 +277,7 @@ void executeSDTI(arm *state, word instruction) {
 }
 
 void executeMultiply(arm *state, word instruction) {
-  // extraction of information from the instruction;
+  // decoded of information from the instruction;
   int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
   int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
   int regM = instruction & MULT_REG_M_MASK;
@@ -317,7 +298,7 @@ void executeMultiply(arm *state, word instruction) {
   state->registers[destination] = result;
 }
 
-// Pipeline flush required for a branch instruction
+// pipeline flush required for a branch instruction
 void flushPipeline(arm *state) {
   state->fetched = 0;
   state->decoded.instruction = 0;
@@ -326,7 +307,7 @@ void flushPipeline(arm *state) {
 
 void executeBranch(arm *state, word instruction) {
   flushPipeline(state);
-  // extraction of information from instruction
+  // decoded of information from instruction
   int offset = instruction & BRANCH_OFFSET_MASK;
   int signBit = offset & BRANCH_SIGN_BIT;
 
@@ -374,6 +355,53 @@ void fetch(arm *state) {
   word memoryOffset = state->registers[PC];
   state->registers[PC] += WORD_SIZE_BYTES;
   state->fetched = getWord(state->memory + memoryOffset, NOT_BIG_ENDIAN);
+}
+
+dp_t *decodeDPI(arm *state, word instruction) {
+  dp_t *decoded = malloc(sizeof(dp_t));
+  decoded->instruction = instruction;
+  // decoded of code
+  decoded->i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
+  // instruction to execute
+  decoded->opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
+  // op1 is always the contents of register Rn
+  decoded->rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
+  // destination register
+  decoded->rd = (instruction & DPI_RD_MASK) >> DPI_RD_SHIFT;
+  // first operand
+  decoded->op1 = state->registers[decoded->rn];
+  // second operand
+  decoded->op2 = instruction & DPI_OP2_MASK;
+  return decoded;
+}
+
+multiply_t *decodeMultiply(arm *state, word instruction) {
+  multiply_t *decoded = malloc(sizeof(multiply_t));
+  decoded->instruction = instruction;
+  decoded->a = instruction & ACCUMULATE_FLAG;
+  decoded->s = UPDATE_CPSR(instruction);
+  decoded->destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
+  decoded->regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
+  decoded->regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
+  decoded->regM = instruction & MULT_REG_M_MASK;
+}
+
+sdt_t *decodeSDTI(arm *state, word instruction) {
+  sdt_t *decoded = malloc(sizeof(sdt_t));
+  decoded->instruction = instruction;
+  decoded->i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
+  decoded->p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
+  decoded->u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
+  decoded->l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
+  decoded->rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
+  decoded->rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
+  decoded->offset = instruction & SDTI_OFFSET_MASK;
+}
+
+branch_t *decodeBranch(arm *state, word instruction) {
+  branch_t *decoded = malloc(sizeof(branch_t));
+  decoded->instruction = instruction;
+  decoded->offset = instruction & BRANCH_OFFSET_MASK;
 }
 
 void decode(arm *state) {
@@ -428,33 +456,29 @@ bool checkCond(arm *state, word instruction) {
 }
 
 void execute(arm *state) {
-  if (state->decoded.isSet == false) {
+  word instruction = state->decoded.instruction;
+  if (!state->decoded.isSet || !checkCond(state, instruction)) {
     return;
   }
-  instructionState currInstructionState = state->decoded;
-  InstructionType instructionType = currInstructionState.instructionType;
-  word instruction = currInstructionState.instruction;
-  if (checkCond(state, instruction)) {
-    switch (instructionType) {
-    case BR:
-      executeBranch(state, instruction);
-      break;
-    case DPI:
-      executeDPI(state, instruction);
-      break;
-    case SDTI:
-      executeSDTI(state, instruction);
-      break;
-    case MULT:
-      executeMultiply(state, instruction);
-      break;
-    case IGNR:
-      // the instruction is ignored
-      break;
-    default:
-      // no other instructions
-      // should never happen
-      assert(false);
-    }
+  switch (state->decoded.instructionType) {
+  case BR:
+    executeBranch(state, instruction);
+    break;
+  case DPI:
+    executeDPI(state, instruction);
+    break;
+  case SDTI:
+    executeSDTI(state, instruction);
+    break;
+  case MULT:
+    executeMultiply(state, instruction);
+    break;
+  case IGNR:
+    // the instruction is ignored
+    break;
+  default:
+    // no other instructions
+    // should never happen
+    assert(false);
   }
 }
