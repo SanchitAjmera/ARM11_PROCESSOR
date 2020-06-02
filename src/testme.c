@@ -11,7 +11,7 @@ void test_bool(bool cond, char *test_name) {
 
 /* Loads a binary file fname into state memory and returns strcmp() between
    memory contents and the expected file dump fdump */
-int test_file_load(arm *state, const char *fname, const char *fdump) {
+int test_file_load(arm_t *state, const char *fname, const char *fdump) {
   initArm(state, fname);
 
   /* read state->memory contents into string */
@@ -38,7 +38,7 @@ int test_file_load(arm *state, const char *fname, const char *fdump) {
   2) in their entirety
   3) in the correct byte order. */
 void test_initArm() {
-  arm *state = malloc(sizeof(arm));
+  arm_t *state = malloc(sizeof(arm_t));
 
   /* hex dump of binary object files used in this test */
   char *add01_dump = "0110a0e3022081e2";
