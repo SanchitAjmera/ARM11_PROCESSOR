@@ -238,34 +238,19 @@ void load(arm *state, word destReg, word sourceAddr) {
   }
 }
 
-void executeSDTI(arm *state, word instruction) {
-  // Components of the instruction
-  // immediate Offset
-  uint i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
-  // pre/Post indexing bit
-  uint p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
-  // up bit
-  uint u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
-  // load/Store bit
-  uint l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
-  // base Register
-  uint rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
-  // source/Destination register
-  uint rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
-  // offset
-  word offset = (instruction & SDTI_OFFSET_MASK);
+void executeSDTI(arm *state, sdt_t *decoded) {
+  uint l = decoded->l;
+  uint rd = decoded->rd;
+  word offset = decoded->offset;
   operation_t *shiftedOffset =
-      i ? opRegister(state, offset) : opImmediate(state, offset);
+      decoded->i ? opRegister(state, offset) : opImmediate(state, offset);
   // no carry out from this instruction
   offset = shiftedOffset->result;
   free(shiftedOffset);
-  if (rn == PC) {
-    // must ensure it contains the instruction’s address plus 8 bytes
-  }
-  word *baseReg = state->registers + rn;
+  word *baseReg = state->registers + decoded->rn;
   // offset if added if u is set, subtracted if not
-  offset = u ? offset : -offset;
-  if (p) {
+  offset = decoded->u ? offset : -offset;
+  if (decoded->p) {
     // pre-indexing
     l ? load(state, rd, *baseReg + offset)
       : store(state, rd, *baseReg + offset);
@@ -274,28 +259,25 @@ void executeSDTI(arm *state, word instruction) {
     l ? load(state, rd, *baseReg) : store(state, rd, *baseReg);
     *baseReg += offset;
   }
+  free(decoded);
 }
 
-void executeMultiply(arm *state, word instruction) {
-  // decoded of information from the instruction;
-  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
-  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
-  int regM = instruction & MULT_REG_M_MASK;
-
+void executeMultiply(arm *state, multiply_t *decoded) {
+  int regS = decoded->regS;
+  int regM = decoded->regM;
   // initial execution of instruction
   int result = state->registers[regM] * state->registers[regS];
-
-  // obtain value from Rn and add to result if Accumulate is set
-  if (instruction & ACCUMULATE_FLAG) {
-    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
-    result += state->registers[regN];
+  // obtain value from Rn and add to result if Accumulate (A) is set
+  if (decoded->a) {
+    result += state->registers[decoded->regN];
   }
   // update CPSR flags if S (bit 20 in instruction) is set
-  if (UPDATE_CPSR(instruction)) {
+  if (decoded->s) {
     // same as Data Processing but no carry out
     setCPSR(state, result, GET_CPSR_C(state->registers[CPSR]));
   }
-  state->registers[destination] = result;
+  state->registers[decoded->destination] = result;
+  free(decoded);
 }
 
 // pipeline flush required for a branch instruction
@@ -305,16 +287,16 @@ void flushPipeline(arm *state) {
   state->decoded.isSet = false;
 }
 
-void executeBranch(arm *state, word instruction) {
+void executeBranch(arm *state, branch_t *decoded) {
   flushPipeline(state);
-  // decoded of information from instruction
-  int offset = instruction & BRANCH_OFFSET_MASK;
+  int offset = decoded->offset;
+  // extracting information from instruction
   int signBit = offset & BRANCH_SIGN_BIT;
-
   // shift, sign extension and addition of offset onto current address in PC
   state->registers[PC] +=
       ((offset << CURRENT_INSTRUCTION_SHIFT) |
        (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND));
+  free(decoded);
 }
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
@@ -384,6 +366,7 @@ multiply_t *decodeMultiply(arm *state, word instruction) {
   decoded->regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
   decoded->regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
   decoded->regM = instruction & MULT_REG_M_MASK;
+  return decoded;
 }
 
 sdt_t *decodeSDTI(arm *state, word instruction) {
@@ -396,30 +379,35 @@ sdt_t *decodeSDTI(arm *state, word instruction) {
   decoded->rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
   decoded->rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
   decoded->offset = instruction & SDTI_OFFSET_MASK;
+  return decoded;
 }
 
 branch_t *decodeBranch(arm *state, word instruction) {
   branch_t *decoded = malloc(sizeof(branch_t));
   decoded->instruction = instruction;
   decoded->offset = instruction & BRANCH_OFFSET_MASK;
+  return decoded;
 }
 
-void decode(arm *state) {
+void decode(arm *state, decoded_t *decoded) {
   word instruction = state->fetched;
   state->decoded.instruction = instruction;
   // halt instruction
   if (state->fetched == 0) {
     return;
   }
-
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
     state->decoded.instructionType = BR;
+    decoded->branch = decodeBranch(state, instruction);
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
     state->decoded.instructionType = SDTI;
+    decoded->sdt = decodeSDTI(state, instruction);
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
     state->decoded.instructionType = MULT;
+    decoded->multiply = decodeMultiply(state, instruction);
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
     state->decoded.instructionType = DPI;
+    decoded->dp = decodeDPI(state, instruction);
   }
   state->decoded.isSet = true;
 }
@@ -455,23 +443,24 @@ bool checkCond(arm *state, word instruction) {
   }
 }
 
-void execute(arm *state) {
+void execute(arm *state, decoded_t *decoded) {
   word instruction = state->decoded.instruction;
   if (!state->decoded.isSet || !checkCond(state, instruction)) {
     return;
   }
   switch (state->decoded.instructionType) {
+  // TODO: consider removing instruction from the paramter of each execution
   case BR:
-    executeBranch(state, instruction);
+    executeBranch(state, decoded->branch);
     break;
   case DPI:
-    executeDPI(state, instruction);
+    executeDPI(state, decoded->dp);
     break;
   case SDTI:
-    executeSDTI(state, instruction);
+    executeSDTI(state, decoded->sdt);
     break;
   case MULT:
-    executeMultiply(state, instruction);
+    executeMultiply(state, decoded->multiply);
     break;
   case IGNR:
     // the instruction is ignored
