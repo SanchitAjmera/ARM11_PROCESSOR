@@ -17,7 +17,7 @@ uint shiftByConstant(uint shiftPart) {
   return shiftPart >> GET_SHIFT_CONSTANT_SHIFT;
 }
 
-uint shiftByRegister(arm *state, uint shiftPart) {
+uint shiftByRegister(arm_t *state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
   uint rs = shiftPart >> GET_RS_SHIFT;
   // bottom byte of value in Rs specifies the amount to be shifted
@@ -53,7 +53,7 @@ uint rightCarryOut(word value, uint shiftNum) {
   return (value >> (shiftNum - 1)) & LSB_MASK;
 }
 
-operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
+operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   // bit to determine what to shift by
   bool shiftByReg = shiftPart & LSB_MASK;
   // number to shift by
@@ -92,7 +92,7 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   return shiftedOp2;
 }
 
-operation_t *opRegister(arm *state, uint op2) {
+operation_t *opRegister(arm_t *state, uint op2) {
   // register that holds the value to be shifted
   uint rm = op2 & LEAST_NIBBLE_MASK;
   // value to be shifted
@@ -102,7 +102,7 @@ operation_t *opRegister(arm *state, uint op2) {
   return barrelShifter(state, value, shiftPart);
 }
 
-operation_t *opImmediate(arm *state, uint op2) {
+operation_t *opImmediate(arm_t *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = op2 & LEAST_BYTE_MASK;
   // number to rotate by
@@ -126,7 +126,7 @@ word getCarryOut(word op1, word op2, bool isAddition) {
   return op1 < op2 ? 0 : 1;
 }
 
-void setCPSR(arm *state, word result, uint carryOut) {
+void setCPSR(arm_t *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & CPSR_N_MASK;
   // set only if the result is all zeros
@@ -139,7 +139,7 @@ void setCPSR(arm *state, word result, uint carryOut) {
   state->registers[CPSR] = n | z | c | v;
 }
 
-void executeDPI(arm *state, dp_t *decoded) {
+void executeDPI(arm_t *state, dp_t *decoded) {
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
   operation_t *shiftedOp2 = decoded->i ? opImmediate(state, decoded->op2)
                                        : opRegister(state, decoded->op2);
@@ -214,7 +214,7 @@ bool checkValidAddress(word address) {
 }
 
 // function which stores address inside source register Rd into the the memory
-void store(arm *state, word sourceReg, word baseReg) {
+void store(arm_t *state, word sourceReg, word baseReg) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (!checkValidAddress(baseReg)) {
     return;
@@ -228,7 +228,7 @@ void store(arm *state, word sourceReg, word baseReg) {
 }
 
 // function which loads address inside base register Rn into the memory
-void load(arm *state, word destReg, word sourceAddr) {
+void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (checkValidAddress(sourceAddr)) {
     // value inside base register
@@ -238,7 +238,7 @@ void load(arm *state, word destReg, word sourceAddr) {
   }
 }
 
-void executeSDTI(arm *state, sdt_t *decoded) {
+void executeSDTI(arm_t *state, sdt_t *decoded) {
   uint l = decoded->l;
   uint rd = decoded->rd;
   word offset = decoded->offset;
@@ -262,7 +262,7 @@ void executeSDTI(arm *state, sdt_t *decoded) {
   free(decoded);
 }
 
-void executeMultiply(arm *state, multiply_t *decoded) {
+void executeMultiply(arm_t *state, multiply_t *decoded) {
   int regS = decoded->regS;
   int regM = decoded->regM;
   // initial execution of instruction
@@ -281,13 +281,13 @@ void executeMultiply(arm *state, multiply_t *decoded) {
 }
 
 // pipeline flush required for a branch instruction
-void flushPipeline(arm *state) {
+void flushPipeline(arm_t *state) {
   state->fetched = 0;
   state->decoded.instruction = 0;
   state->decoded.isSet = false;
 }
 
-void executeBranch(arm *state, branch_t *decoded) {
+void executeBranch(arm_t *state, branch_t *decoded) {
   flushPipeline(state);
   int offset = decoded->offset;
   // extracting information from instruction
@@ -302,7 +302,7 @@ void executeBranch(arm *state, branch_t *decoded) {
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEMORY_CAPACITY bytes */
-void initArm(arm *state, const char *fname) {
+void initArm(arm_t *state, const char *fname) {
   // load binary file into memory
   byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
   validatePtr(memory, "Not enough memory.\n");
@@ -333,13 +333,13 @@ word getWord(byte *startAddress, bool isBigEndian) {
   return w;
 }
 
-void fetch(arm *state) {
+void fetch(arm_t *state) {
   word memoryOffset = state->registers[PC];
   state->registers[PC] += WORD_SIZE_BYTES;
   state->fetched = getWord(state->memory + memoryOffset, NOT_BIG_ENDIAN);
 }
 
-dp_t *decodeDPI(arm *state, word instruction) {
+dp_t *decodeDPI(arm_t *state, word instruction) {
   dp_t *decoded = malloc(sizeof(dp_t));
   decoded->instruction = instruction;
   // decoded of code
@@ -357,7 +357,7 @@ dp_t *decodeDPI(arm *state, word instruction) {
   return decoded;
 }
 
-multiply_t *decodeMultiply(arm *state, word instruction) {
+multiply_t *decodeMultiply(arm_t *state, word instruction) {
   multiply_t *decoded = malloc(sizeof(multiply_t));
   decoded->instruction = instruction;
   decoded->a = instruction & ACCUMULATE_FLAG;
@@ -369,7 +369,7 @@ multiply_t *decodeMultiply(arm *state, word instruction) {
   return decoded;
 }
 
-sdt_t *decodeSDTI(arm *state, word instruction) {
+sdt_t *decodeSDTI(arm_t *state, word instruction) {
   sdt_t *decoded = malloc(sizeof(sdt_t));
   decoded->instruction = instruction;
   decoded->i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
@@ -382,14 +382,14 @@ sdt_t *decodeSDTI(arm *state, word instruction) {
   return decoded;
 }
 
-branch_t *decodeBranch(arm *state, word instruction) {
+branch_t *decodeBranch(arm_t *state, word instruction) {
   branch_t *decoded = malloc(sizeof(branch_t));
   decoded->instruction = instruction;
   decoded->offset = instruction & BRANCH_OFFSET_MASK;
   return decoded;
 }
 
-void decode(arm *state, decoded_t *decoded) {
+void decode(arm_t *state, decoded_t *decoded) {
   word instruction = state->fetched;
   state->decoded.instruction = instruction;
   // halt instruction
@@ -413,7 +413,7 @@ void decode(arm *state, decoded_t *decoded) {
 }
 
 // checks the instruction condition with the CPSR flags
-bool checkCond(arm *state, word instruction) {
+bool checkCond(arm_t *state, word instruction) {
   // CPSR flag bits
   word cpsr = state->registers[CPSR];
   uint n = GET_CPSR_N(cpsr);
@@ -443,7 +443,7 @@ bool checkCond(arm *state, word instruction) {
   }
 }
 
-void execute(arm *state, decoded_t *decoded) {
+void execute(arm_t *state, decoded_t *decoded) {
   word instruction = state->decoded.instruction;
   if (!state->decoded.isSet || !checkCond(state, instruction)) {
     return;

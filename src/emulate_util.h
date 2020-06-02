@@ -29,7 +29,6 @@ typedef struct {
 
 // struct for the decoding of Data Processing instructions
 typedef struct {
-  word instruction;
   uint i;
   enum Opcode opcode;
   uint rn;
@@ -40,7 +39,6 @@ typedef struct {
 
 // struct for the decoding of Multiply instructions
 typedef struct {
-  word instruction;
   uint a;
   uint s;
   int destination;
@@ -51,7 +49,6 @@ typedef struct {
 
 // struct for the decoding of Single Data Transfer instructions
 typedef struct {
-  word instruction;
   uint i;
   uint p;
   uint u;
@@ -63,7 +60,6 @@ typedef struct {
 
 // struct for the decoding of Branch instructions
 typedef struct {
-  word instruction;
   int offset;
 } branch_t;
 
@@ -75,31 +71,32 @@ typedef union {
   branch_t *branch;
 } decoded_t;
 
-// struct for instruction and InstructionType enum
+// struct for state of the instruction
 typedef struct {
   bool isSet;
   word instruction;
   InstructionType instructionType;
-} instructionState;
+} instructionState_t;
 
+// struct for the state of the ARM
 typedef struct {
   byte *memory;
-  /* 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR */
+  // 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR
   word *registers;
   word fetched;
-  instructionState decoded;
-} arm;
+  instructionState_t decoded;
+} arm_t;
 
 extern void validatePtr(const void *ptr, const char *error_msg);
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEM_LIMIT bytes */
-extern void initArm(arm *state, const char *fname);
+extern void initArm(arm_t *state, const char *fname);
 
 extern word getWord(byte *start_addr, bool isBigEndian);
-extern void fetch(arm *state);
-extern void decode(arm *state);
-extern void execute(arm *state);
+extern void fetch(arm_t *state);
+extern void decode(arm_t *state, decoded_t *decoded);
+extern void execute(arm_t *state, decoded_t *decoded);
 
 #endif
