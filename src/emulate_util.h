@@ -31,6 +31,7 @@ typedef struct {
 typedef struct {
   uint i;
   enum Opcode opcode;
+  uint s;
   uint rn;
   uint rd;
   word op1;
