@@ -20,8 +20,6 @@
  
 \author{Alex Richardson, Luqman Liaquat, Morkus Salasevicius, Sanchit Ajmera}
 
-\date{\today}
-
 \maketitle
 
 \section*{Introduction}
@@ -30,35 +28,35 @@ Our first course of action for this project was to decide which technologies we 
 
 \section*{Task Delegation}
 We collectively decided to begin creating our own implementations of the foundations for this project. This included how the registers and memory were to be defined within our code. Upon completion of this initial task, we had a meeting on which features from each member’s code we will use in the project. After confirming our memory and register design, we created a list of tasks which were then split among the group. These tasks were naturally divided into three types: \textsl{Fetch, Decode} and \textsl{Execute}.
-
+\\
 
 The \textsl{'Fetch'} task was to generate several functions which handled the loading of the binary file and initialised
-the state of our emulator. The \textsl{‘Decode’} task was to deduce the type of instruction that was loaded. The \textsl{‘Execute’} task was split further into four types based on each of the four instructions that were to be implemented. We decided to have one member working solely on the \textsl{Data Processing Instruction} - (Alex) and another for the \textsl{Single Data Transfer Instructions} - (Sanchit) as they required more time to complete. The \textsl{Multiply} and \textsl{Branch} instructions were relatively shorter and only needed one member to implement both functions - (Luqman).
+the state of our emulator. The \textsl{‘Decode’} task was to deduce the type of instruction that was loaded. The \textsl{‘Execute’} task was split further into four types based on each of the four instructions that were to be implemented. We decided to have one member working solely on the \textsl{Data Processing Instruction} and another for the \textsl{Single Data Transfer Instructions} as they required more time to complete. The \textsl{Multiply} and \textsl{Branch} instructions were relatively shorter and only needed one member to implement both functions.
 
 
 \section*{Current Evaluation}
 As a team, we feel that we have worked well together so far. Any conflicts on plans for a feature were solved quickly, and we have not had any issues with the work ethic of any member. Our team has been using Git to constantly commit changes with useful messages, create branches to prevent problems in the Master and updating the Git \textsl{issues}, which all translates to a well-structured process in tackling this project.
-
+\\
 
 The cohesive nature of our group is supported by the extensive internal code reviews we conduct for our fellow members’ tasks. To ensure that we remove logical errors within our programs and improve the definitions of some functions, we decided to work on reviewing and testing each other’s code. Although the reviews took many hours on some occasions, each member of the group was happy to help another. This meant that our overall implementation improved immensely. The reviews are an aspect of our group working that we are proud of and hope to maintain throughout this project.
+\\
 
+During the first few days, we had a problem with the sleeping patterns. This staggered timing meant it was harder for us to communicate effectively and work on the project together. However, after a constructive meeting, we solved that problem and had every member available to work on the project together.
+\\
 
-During the first few days, we had a small problem with the times each of us had started and ended their work for the day, mainly due to different sleeping patterns. This staggered timing meant it was harder for us to communicate effectively and work on the project together. However, after a constructive meeting, we solved that problem and had every member available to work on the project or help another member within a fixed period every day. 
-
-
-There are a few improvements we would like to make for future tasks. Firstly, we aim to produce our own tests \textsl{before} attempting to complete some functions, so we are confident about the expected results. We also aim to have well-commented code and limit spelling mistakes while we are coding as we had to fix many of these issues after completing the first draft of the Emulator.
+There are a few improvements we would like to make for future tasks. Firstly, we aim to produce our own tests \textsl{before} attempting to complete some functions, so we are confident about the expected results. We also plan to include the names of all collaborators on our future git commits, as we weren't fully consistent with this.  
 
 \section*{Emulator Implementation}
 Our aim in designing the structure of the Emulator was to ensure that it was as clear as possible for an external programmer to understand how our code worked and where everything could be found. This was achieved by maintaining a consistent naming convention, splitting files, and effectively commenting our code.
 
 
 We decided to alter the initial structure of the project by incorporating additional files. This was necessary as having all our code in one place was both difficult to work on and difficult for someone else to understand. As a result, our {\tt emulate.c} file only consisted of the {\tt main} function which initialised the emulator. We extracted the remainder of the code into a new file called {\tt emulate\_utils.c}. This also removed the conflict between the main functions in our {\tt testme.c} and {\tt emulate.c} files.
- 
+ \\
 
-Another aspect of the project that we noticed had to be improved was the use of \textsl{‘magic numbers’}. We found that our code quickly became unreadable and difficult to comprehend with several numbers used for masks and shifts within our functions. We agreed to eliminate this issue by having sensibly named pre-processor constants at the top of our file. However, even this became too cluttered, and a better solution was needed to uphold clarity and readability within the program. This led us to create a new header file, {\tt constants.h}, which housed all the constants that were used in our Emulator. These constants were grouped by where and how they were used, which were indicated by comments. The following diagram provides a brief overview of our project structure for the emulator and includes the
+We found that our code quickly became unreadable and difficult to comprehend with \textsl{‘magic numbers’} numbers used for masks and shifts within our functions. We eliminated this issue by having sensibly named pre-processor constants at the top of our file. However, even this became too cluttered, and a better solution was needed to uphold clarity and readability within the program. This led us to create a new header file, {\tt constants.h}, which housed all the constants that were used in our Emulator. These constants were grouped by where and how they were used, which were indicated by comments. The following diagram provides a brief overview of our project structure for the emulator and includes the
 general contents of each file:
 
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \begin{tikzpicture}[node distance=2cm]
 
@@ -73,7 +71,7 @@ contains constants for masks and shifts used within arm instruction set function
 
 \textbf{ emulate.c} 
 \rule{\textwidth}{0.4pt}
-Binary file is read and pushed throught the pipeline for instructions to be fetched, decoded and executed\\
+Binary file is read and pushed through the pipeline for instructions to be fetched, decoded and executed\\
  - {\tt main}
 
 };
@@ -82,16 +80,13 @@ Binary file is read and pushed throught the pipeline for instructions to be fetc
 \center\textbf{ emulate\_util.c}
 \rule{\textwidth}{0.4pt}
 
-\textbf{Arm Instruction Set} \\
-{\tt executedpi},    
- {\tt executesdti}, 
+\textbf{Arm Instruction Set, Pipe Line} \\
+{\tt executeDPI},    
+ {\tt executeSDTI}, 
  {\tt executeMultiply}, 
  {\tt executeBranch}\\
 \vspace{0.3cm}
-\textbf{Pipeline functions} \\
-{\tt fetch},
- {\tt decode},
- {\tt execute}\\
+
 \vspace{0.3cm}
 \textbf{Initialisation of memory, registers, fetched and decoded}\\
  {\tt init\_arm}
@@ -107,6 +102,7 @@ Binary file is read and pushed throught the pipeline for instructions to be fetc
 
 \section*{Plans for the Assembler}
 After discussing our plans for the assembler, we found that there are some parts of the Emulator which could be reused partly. One crucial component that will be reused is our {\tt constants.h} file which will again eliminate any magic numbers. The instruction-specific mask and shift constants will also be useful in the functions for assembling each instruction. The general structure of our instruction functions will be helpful when planning and designing our corresponding assembler functions. Finally, our error checking functions, such as the pointer validate function, could be reused to defend against common errors.
+\\ 
 
-An implementation task we may find challenging is creating an efficient ADT for the symbol table. We will mitigate this problem by carrying out effective research and using the lectures to their full extent. Implementing the tokenizer could be another difficult task. However, we will mitigate this problem by considering our previous projects and labs, such as the Java Spreadsheet Lab, and applying similar techniques to produce a solution. In general, our method to mitigate difficult implementation tasks consists of working together, code reviews and research.
+An implementation task we may find challenging is creating an efficient ADT for the symbol table. We will mitigate this problem by carrying out effective research and using the lectures to their full extent. Implementing the tokenizer could be another difficult task. However, we will mitigate this problem by considering our previous projects and labs, such as the Java Spreadsheet Lab, and applying similar techniques to produce a solution. In general, our method to mitigate difficult implementation tasks consists of working together, code reviews and research. 
 \end{document}
