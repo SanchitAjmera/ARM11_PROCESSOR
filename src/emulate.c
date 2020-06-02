@@ -41,12 +41,13 @@ int main(int argc, char **argv) {
 
   arm *state = malloc(sizeof(arm));
   initArm(state, argv[1]);
+  decoded_t *decoded = malloc(sizeof(decoded_t));
 
   // PIPELINE
   while ((state->decoded.isSet && state->decoded.instruction) ||
          !state->decoded.isSet) {
-    execute(state);
-    decode(state);
+    execute(state, decoded);
+    decode(state, decoded);
     fetch(state);
   }
 
@@ -56,6 +57,7 @@ int main(int argc, char **argv) {
   free(state->memory);
   free(state->registers);
   free(state);
+  free(decoded);
 
   return EXIT_SUCCESS;
 }
