@@ -60,7 +60,7 @@
 #define MULT_RDEST_SHIFT 16
 #define ACCUMULATE_FLAG (1 << 21)
 #define INSTRUCTION_S_MASK (1 << 20)
-#define HARDCODE (0x90)
+#define MULT_HARDCODE (0x90)
 #define UPDATE_CPSR(instruction) (instruction & INSTRUCTION_S_MASK)
 
 // constants for Branch instruction

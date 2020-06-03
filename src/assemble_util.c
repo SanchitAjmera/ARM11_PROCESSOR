@@ -56,5 +56,5 @@ word assembleMultiply(instruction *input) {
   }
   // S is set to 0 so no need to explicitly write it
   // Bits 4-7 are hardcoded as 1001
-  return ALWAYS | accumulate | rd | rn | rs | HARDCODE | rm;
+  return ALWAYS | accumulate | rd | rn | rs | MULT_HARDCODE | rm;
 }
