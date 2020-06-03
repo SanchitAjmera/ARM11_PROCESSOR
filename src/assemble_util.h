@@ -11,4 +11,6 @@ typedef struct {
 
 extern file_lines *scanFile(FILE *armFile, symbol_table *symbolTable);
 
+extern word assembleSDTI(instruction *input);
+
 #endif
