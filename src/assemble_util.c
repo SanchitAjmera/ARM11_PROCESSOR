@@ -39,7 +39,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
-word assembleMultiply(instruction *input) {
+word assembleMultiply(symbol_table *symbolTable, instruction *input) {
   // Defining the components of the instruction
   word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
   word rm = rem(input->fields[1]);
@@ -56,5 +56,23 @@ word assembleMultiply(instruction *input) {
   }
   // S is set to 0 so no need to explicitly write it
   // Bits 4-7 are hardcoded as 1001
-  return ALWAYS | accumulate | rd | rn | rs | HARDCODE | rm;
+  return ALWAYS | accumulate | rd | rn | rs | MULT_HARDCODE | rm;
+}
+
+int isLabel(char *string) { return !; }
+// to complete
+word assembleBranch(symbol_table *symbolTable, instruction *input) {
+  // likely to change condition into an enum
+  word cond = ALWAYS;
+  // need to find out how to obtain current address
+  word currentAddress = 0;
+
+  word offset = 0;
+  char *target = input->fields[0];
+  word targetAddress = (target[0] == '#')
+                           ? rem(target)
+                           : getSymbol(symbolTable, target).body.address;
+}
+
+return cond | BRANCH_HARDCODE | offset;
 }
