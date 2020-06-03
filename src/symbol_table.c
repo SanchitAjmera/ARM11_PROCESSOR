@@ -26,6 +26,10 @@ symbol *getSymbol(const symbol_table *s, const char *name) {
 }
 
 void addSymbol(symbol_table *s, symbol entry) {
+  if (getSymbol(s, entry.name) != NULL) { // Label already defined
+    return;
+  }
+
   if (s->entry_count == s->max_entries) {
     s->max_entries *= 2;
     if (!realloc(s->symbols, s->max_entries))
