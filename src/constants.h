@@ -17,6 +17,7 @@
 #define CPSR_Z_SHIFT 30
 #define CPSR_C_SHIFT 29
 #define CPSR_V_SHIFT 28
+#define ALWAYS (14 << CPSR_V_SHIFT)
 #define GET_CPSR_N(cpsr) ((cpsr & CPSR_N_MASK) >> CPSR_N_SHIFT)
 #define GET_CPSR_Z(cpsr) ((cpsr & CPSR_Z_MASK) >> CPSR_Z_SHIFT)
 #define GET_CPSR_C(cpsr) ((cpsr & CPSR_C_MASK) >> CPSR_C_SHIFT)
@@ -59,6 +60,7 @@
 #define MULT_RDEST_SHIFT 16
 #define ACCUMULATE_FLAG (1 << 21)
 #define INSTRUCTION_S_MASK (1 << 20)
+#define HARDCODE (0x90)
 #define UPDATE_CPSR(instruction) (instruction & INSTRUCTION_S_MASK)
 
 // constants for Branch instruction
