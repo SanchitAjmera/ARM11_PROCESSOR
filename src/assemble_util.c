@@ -1,4 +1,5 @@
 #include "assemble_util.h"
+#include "constants.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,4 +34,26 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   }
 
   return fileLines;
+}
+
+word rem(char *string) { return atoi(++string); }
+// Magic numbers to be removed
+word assembleMultiply(instruction *input) {
+  // Defining the components of the instruction
+  word cond = 14 << 28;
+  word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
+  word rm = rem(input->fields[1]);
+  word rs = rem(input->fields[2]) << MULT_REG_S_SHIFT;
+  word rn = 0;
+  word accumulate = 0;
+  // Bits 4-7 are hardcoded as 1001 in this input
+  word hardcode = 9 << 4;
+
+  // set rn and A for an 'accumulate' input
+  if (!strcmp(input->opcode, "mla")) {
+    rn = rem(input->fields[3]) << MULT_REG_N_SHIFT;
+    accumulate = ACCUMULATE_FLAG;
+  }
+  // S is set to 0 so no need to explicitly write it
+  return cond | accumulate | rd | rn | rs | hardcode | rm;
 }
