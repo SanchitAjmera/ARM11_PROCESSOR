@@ -59,7 +59,6 @@ word assembleMultiply(symbol_table *symbolTable, instruction *input) {
   return ALWAYS | accumulate | rd | rn | rs | MULT_HARDCODE | rm;
 }
 
-int isLabel(char *string) { return !; }
 // to complete
 word assembleBranch(symbol_table *symbolTable, instruction *input) {
   // likely to change condition into an enum
@@ -75,4 +74,3 @@ word assembleBranch(symbol_table *symbolTable, instruction *input) {
 }
 
 return cond | BRANCH_HARDCODE | offset;
-}
