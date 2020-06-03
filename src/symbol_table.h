@@ -1,40 +1,55 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
+struct instruction;
+struct symbol_table;
+struct symbol;
+
+typedef struct instruction instruction;
+typedef struct symbol_table symbol_table;
+typedef struct symbol symbol;
+
+typedef uint32_t word;
+typedef unsigned int uint;
+
 typedef struct {
-  Opcode opcode;
-  /*
-   Stores 2 pointers - one to the string tokens of the parts of the input that
-   represent registers, and the other to the tokens that compose operand2.
-  */
   char **registers, **operand2;
-  uint regCount, operandCount;
+} dpi;
+
+struct instruction {
+  char *opcode;  // String representing the instruction INCLUDING cond suffix
+  char **fields; // Array of string fields.
+  uint field_count;
   /*
   We can add a union of structs that represent dpi, sdri, branch, mult later
   if this makes it easier to code
   */
-} instruction;
+};
 
-typedef struct {
+struct symbol_table {
+  symbol *symbols;  // currently implemented as array of symbols
+  uint entry_count; // number of entries in the symbol table
+  uint max_entries; // size of the array storing the symbol table
+};
+
+struct symbol {
   char *name;
   bool isLabel;
   union {
     word address; // used if isLabel == true
-    struct {      // used if isLabel == false
-      word (*assembleFunc)(symbol_table, instruction);
-      uint operandCount;
-    }
-  };
-} symbol;
+    word (*assembleFunc)(symbol_table *,
+                         instruction); // used if isLabel == false
+  } body;
+  /* TODO: make symbol_table an abstract binary search tree?
+  symbol *left, *right; */
+};
 
-typedef struct {
-  symbol **symbols; // An index on the heap of pointers to symbols
-  uint entry_count;
-  uint max_entries;
-} symbol_table;
-
-extern symbol *getSymbol(symbol_table *symbolTable, char *name);
-extern symbol *addSymbol(symbol_table *symbolTable, symbol entry);
+extern void initSymbolTable(symbol_table *s);
+extern symbol *getSymbol(const symbol_table *s, const char *name);
+extern void addSymbol(symbol_table *symbolTable, symbol entry);
 extern void freeTable(symbol_table *symbolTable);
 
 #endif
