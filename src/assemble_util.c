@@ -39,7 +39,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
-word assembleMultiply(instruction *input) {
+word assembleMultiply(symbol_table *symbolTable, instruction *input) {
   // Defining the components of the instruction
   word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
   word rm = rem(input->fields[1]);
