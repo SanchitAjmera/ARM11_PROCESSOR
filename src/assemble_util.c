@@ -35,6 +35,17 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
-word rem(char *string) { return atoi(++string); }
+word rem(char *string) {
+  if (&string[0] == "[") {
+    return atoi(string + 2);
+  }
+  return atoi(string++);
+}
 
-word assembleSDTI(instruction *input) {}
+word assembleSDTI(instruction *input) {
+  word Rd = rem(input->fields[0]);
+  if (input->field_count == 3) {
+    word Rn = rem(input->fields[1]);
+  }
+  return Rd;
+}
