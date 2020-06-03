@@ -34,3 +34,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 
   return fileLines;
 }
+
+word rem(char *string) { return atoi(++string); }
+
+word assembleSDTI(instruction *input) {}
