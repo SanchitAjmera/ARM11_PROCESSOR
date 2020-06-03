@@ -1,4 +1,5 @@
 #include "assemble_util.h"
+#include "constants.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,16 +37,55 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 }
 
 word rem(char *string) {
-  if (&string[0] == "[") {
+  char *c = "[";
+  if (&string[0] == &c[0]) {
     return atoi(string + 2);
   }
   return atoi(string++);
 }
 
 word assembleSDTI(instruction *input) {
-  word Rd = rem(input->fields[0]);
+  char *ldr = "ldr";
+  // Load bit
+  word l;
+  (strcmp(input->opcode, ldr) == 0) ? (l = 0 << 31) : (l = 1 << 31);
+  // PRE/POST-INDEXING bits
+  word p;
+  // base register Rn
+  word Rn;
+  // offsets
+  word offset;
+  // source/ dest register Rd
+  word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
   if (input->field_count == 3) {
-    word Rn = rem(input->fields[1]);
+    p = 1 << SDTI_P_SHIFT;
+    // base register Rn
+    Rn = rem(input->fields[1]) << SDTI_RN_SHIFT;
+    // offset
+    offset = rem(input->fields[2]);
   }
-  return Rd;
+  // immediate offsets
+  word i = 1 << SDTI_I_SHIFT;
+  // up bits
+  word u = 1 << SDTI_U_SHIFT;
+
+  word always = 1 << 31;
+  word set = 1 << 26;
+  return always | set | i | p | u | l | Rn | Rd | offset;
 }
+/*
+
+int main(void) {
+  instruction *input = malloc(sizeof(instruction));
+  input->opcode = "ldr";
+  input->fields = malloc(sizeof(input->fields));
+  input->fields[0] = "[r3]";
+  input->fields[1] = "0x10";
+  input->field_count = 3;
+  word output = assembleSDTI(input);
+  printBits(output);
+  free(input->fields);
+  free(input);
+  return 1;
+}
+*/
