@@ -7,8 +7,8 @@ CFLAGS  = -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 all: assemble emulate testme
 
-assemble: assemble.o
-	$(CC) $(CFLAGS) assemble.o -o assemble
+assemble: assemble.o symbol_table.o assemble_util.o
+	$(CC) $(CFLAGS) assemble.o symbol_table.o assemble_util.o -o assemble
 emulate: emulate.o emulate_util.o
 	$(CC) $(CFLAGS) emulate.o emulate_util.o -o emulate
 testme: testme.o emulate_util.o
@@ -20,6 +20,10 @@ emulate_util.o: emulate_util.h emulate_util.c
 	$(CC) $(CFLAGS) -c emulate_util.c
 testme.o: emulate_util.h testme.c
 	$(CC) $(CFLAGS) -c testme.c
+symbol_table.o: symbol_table.c symbol_table.h
+	$(CC) $(CFLAGS) -c symbol_table.c
+assemble_util.o: assemble_util.c assemble_util.h symbol_table.h
+	$(CC) $(CFLAGS) -c assemble_util.c
 
 test:
 	./emulate ~/arm11_testsuite/test_cases/add01
