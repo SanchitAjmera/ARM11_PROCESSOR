@@ -9,14 +9,16 @@ int main(int argc, char **argv) {
   initSymbolTable(symbolTable);
 
   FILE *armFile = fopen(argv[1], "r");
-  free(scanFile(armFile, symbolTable));
+  file_lines *fileLines = scanFile(armFile, symbolTable);
+
+  printFileLines(fileLines);
 
   fclose(armFile);
 
   printf("\n");
 
   char buffer[512];
-  strcpy(buffer, "mov r1,1\nadd r2,r1,2\nfoo:\nldr r0,[r1,r2,lsl 2]\n");
+  strcpy(buffer, "mov r1,#1\nadd r2,r1,#2\nfoo:\nldr r0,[r1,r2,lsl #2]\n");
   char *delim = "#";
 
   char *word = strtok(buffer, delim);
@@ -26,6 +28,7 @@ int main(int argc, char **argv) {
   }
 
   freeTable(symbolTable);
+  freeFileLines(fileLines);
 
   return EXIT_SUCCESS;
 }
