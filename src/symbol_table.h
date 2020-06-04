@@ -15,6 +15,8 @@ typedef struct symbol symbol;
 typedef uint32_t word;
 typedef unsigned int uint;
 
+enum SymbolType { LABEL, INSTR };
+
 typedef struct {
   char **registers, **operand2;
 } dpi;
@@ -38,11 +40,10 @@ struct symbol_table {
 
 struct symbol {
   char *name;
-  bool isLabel;
+  SymbolType type;
   union {
-    word address; // used if isLabel == true
-    word (*assembleFunc)(symbol_table *,
-                         instruction); // used if isLabel == false
+    word address;                                      // LABEL
+    word (*assembleFunc)(symbol_table *, instruction); // INSTR
   } body;
   /* TODO: make symbol_table an abstract binary search tree?
   symbol *left, *right; */
