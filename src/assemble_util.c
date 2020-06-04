@@ -59,10 +59,39 @@ word assembleMultiply(symbol_table *symbolTable, instruction *input) {
   return ALWAYS | accumulate | rd | rn | rs | MULT_HARDCODE | rm;
 }
 
+// this is from emulate_util.h so could we maybe put it in constants.h
+// a lot of reused parts and #including emulate_util is not nice
+enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
+
+// No function in C which converts string to enum so
+// had to use this
+word getCondition(const char *condition) {
+  if (!strcmp(condition, "eq")) {
+    return EQ;
+  }
+  if (!strcmp(condition, "ne")) {
+    return NE;
+  }
+  if (!strcmp(condition, "ge")) {
+    return GE;
+  }
+  if (!strcmp(condition, "lt")) {
+    return LT;
+  }
+  if (!strcmp(condition, "gt")) {
+    return GT;
+  }
+  if (!strcmp(condition, "le")) {
+    return LE;
+  }
+  return ALWAYS;
+}
 // to complete
 word assembleBranch(symbol_table *symbolTable, instruction *input) {
   // need to change condition into an enum to cover all conds
-  word cond = ALWAYS;
+  word cond =
+      strlen(input->opcode) == 1 ? ALWAYS : getCondition(++(input->opcode));
+
   // need to find out how to obtain current address
   word currentAddress = 0;
 
