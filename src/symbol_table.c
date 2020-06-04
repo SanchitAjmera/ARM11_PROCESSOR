@@ -12,15 +12,15 @@ void initSymbolTable(symbol_table *s) {
   symbol *symbols = malloc(INIT_S_TABLE_SIZE * sizeof(symbol));
   assert(symbols != NULL);
   s->symbols = symbols;
-  s->max_entries = INIT_S_TABLE_SIZE;
-  s->entry_count = 0;
+  s->maxSymbols = INIT_S_TABLE_SIZE;
+  s->symbolCount = 0;
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
   assert(s != NULL);
 
   /* simple linear search by name */
-  for (int i = 0; i < s->entry_count; i++) {
+  for (int i = 0; i < s->symbolCount; i++) {
     if (strcmp(s->symbols[i].name, name) == 0) {
       return s->symbols + i;
     }
@@ -35,17 +35,38 @@ void addSymbol(symbol_table *s, symbol entry) {
     return;
   }
 
-  if (s->entry_count == s->max_entries) {
-    s->max_entries *= 2;
-    if ((s->symbols = realloc(s->symbols, s->max_entries)) == NULL) {
+  if (s->symbolCount == s->maxSymbols) {
+    s->maxSymbols *= 2;
+    if ((s->symbols = realloc(s->symbols, s->maxSymbols)) == NULL) {
       printf("error!");
     }
   }
-  s->symbols[s->entry_count] = entry;
-  s->entry_count += 1;
+  s->symbols[s->symbolCount] = entry;
+  s->symbolCount += 1;
 }
 
 void freeTable(symbol_table *s) {
+  for (int i = 0; i < s->maxSymbols; i++) {
+    free(s->symbols[i].name);
+  }
   free(s->symbols);
   free(s);
+}
+
+void printSymbol(symbol s) {
+  printf("[name: %s, type: %i, ", s.name, s.type);
+  switch (s.type) {
+  case LABEL:
+    printf("addr: %x", s.body.address);
+    break;
+  default:
+    break;
+  }
+  printf("]\n");
+}
+
+void printSymbolTable(symbol_table *s) {
+  for (int i = 0; i < s->symbolCount; i++) {
+    printSymbol(s->symbols[i]);
+  }
 }

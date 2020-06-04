@@ -34,13 +34,13 @@ struct instruction {
 
 struct symbol_table {
   symbol *symbols;  // currently implemented as array of symbols
-  uint entry_count; // number of entries in the symbol table
-  uint max_entries; // size of the array storing the symbol table
+  uint symbolCount; // number of entries in the symbol table
+  uint maxSymbols;  // size of the array storing the symbol table
 };
 
 struct symbol {
   char *name;
-  SymbolType type;
+  enum SymbolType type;
   union {
     word address;                                      // LABEL
     word (*assembleFunc)(symbol_table *, instruction); // INSTR
@@ -53,5 +53,6 @@ extern void initSymbolTable(symbol_table *s);
 extern symbol *getSymbol(const symbol_table *s, const char *name);
 extern void addSymbol(symbol_table *symbolTable, symbol entry);
 extern void freeTable(symbol_table *symbolTable);
+extern void printSymbolTable(symbol_table *s);
 
 #endif
