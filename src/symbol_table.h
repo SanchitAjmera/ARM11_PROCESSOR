@@ -23,6 +23,7 @@ struct instruction {
   char *opcode;  // String representing the instruction INCLUDING cond suffix
   char **fields; // Array of string fields.
   uint field_count;
+  word currentAddress; // The current address of the instruction being called
   /*
   We can add a union of structs that represent dpi, sdri, branch, mult later
   if this makes it easier to code
