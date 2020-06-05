@@ -1,5 +1,6 @@
 #include "assemble_util.h"
-#include "symbol_table.h"
+#include "include/file_lines.h"
+#include "include/symbol_table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,7 @@ int main(int argc, char **argv) {
   file_lines *fileLines = scanFile(armFile, symbolTable);
 
   printFileLines(fileLines);
+  printSymbolTable(symbolTable);
 
   fclose(armFile);
 
