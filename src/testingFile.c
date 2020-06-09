@@ -110,11 +110,13 @@ int main(void) {
   // printf("%" PRIu32 "\n", output);
   // free(input);
 
-  char *address = "[r3,#expression]";
+  char address[100] = "[r3,#expression]";
   // printBits(rem(address));
   // printBits(rem("2"));
   char *delim = ",";
   char *ptr = strtok(address, delim);
+  printf("%s\n", ptr);
+  ptr = strtok(NULL, delim);
   printf("%s\n", ptr);
 
   return 1;
