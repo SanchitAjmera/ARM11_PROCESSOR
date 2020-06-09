@@ -103,14 +103,15 @@ word assembleSDTI(instruction *input) {
   word offset;
   // source/ dest register Rd
   word Rd = rem(input->fields[0])[0] << SDTI_RD_SHIFT;
-  switch (SDTIdecode(input->fields, input->field_count)) {
+  SDTIOperation operation = SDTIdecode(input->fields, input->field_count);
+  switch (operation) {
   case POST_RN_EXP:
     // setting post indexing bit
     p = 0 << SDTI_P_SHIFT;
     // base register Rn
+    Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
     // offset
-    // Rn = rem(input->fields[1]) << SDTI_RN_SHIFT;
-    // offset = rem(input->fields[2]);
+    offset = rem(input->fields[2])[0];
   }
 
   // immediate offsets
