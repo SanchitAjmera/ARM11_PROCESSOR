@@ -43,20 +43,31 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
-word *remHash(char *string) {
-  word *addresses[2];
-  word[0] = atoi(++string);
+word *rem(char *string) {
+  word *addresses;
+  addresses[0] = atoi(++string);
+  return addresses;
 }
 word *remBracket(char *string) {
-  word *addresses[2];
+  word *addresses;
   int length = strlen(string);
-  char *unbracketed[length - 2];
+  char unbracketed[length - 2];
+  // removing brackets
   for (int i = 1; i < length - 1; i++) {
     unbracketed[i - 1] = string[i];
   }
-  if (includesExp) {
+  // separator
+  char *delim = ",";
+  // gets Rn
+  char *token = strtok(unbracketed, delim);
+  // gets address of register rn
+  addresses[0] = atoi(++token);
+  token = strtok(NULL, delim);
+  // if expression exists in address
+  if (token != NULL) {
+    addresses[1] = atoi(++token);
   }
-  return
+  return addresses;
 }
 
 // this function decodes the address provided within the instruction struct
@@ -85,15 +96,15 @@ word assembleSDTI(instruction *input) {
   // offsets
   word offset;
   // source/ dest register Rd
-  word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
+  word Rd = rem(input->fields[0])[0] << SDTI_RD_SHIFT;
   switch (SDTIdecode(input->fields, input->field_count)) {
   case POST_RN_EXP:
     // setting post indexing bit
     p = 0 << SDTI_P_SHIFT;
     // base register Rn
-    Rn = rem(input->fields[1]) << SDTI_RN_SHIFT;
     // offset
-    offset = rem(input->fields[2]);
+    // Rn = rem(input->fields[1]) << SDTI_RN_SHIFT;
+    // offset = rem(input->fields[2]);
   }
 
   // immediate offsets
