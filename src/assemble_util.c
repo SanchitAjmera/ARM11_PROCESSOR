@@ -77,7 +77,7 @@ enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
   // TODO: fix parse on mnemonic
-  switch (mnemonic) {
+  switch (*mnemonic) {
   case "and":
     return AND;
   case "eor":
@@ -108,6 +108,23 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
 // shift types
 enum Shift { LSL, LSR, ASR, ROR };
 
+enum Shift parseShiftType(char *shift) {
+  switch (*switch) {
+  case "LSL":
+    return LSL;
+  case "LSR":
+    return LSR;
+  case "ASR":
+    return ASR;
+  case "ROR":
+    return ROR;
+  default:
+    // no other case
+    // should never happen
+    assert(false);
+  }
+}
+
 uint parseOperand2(char *op2) {
   // <#expression> is a numeric constant - an 8 bit immediate value
   // decimal or hexadecimal (“#0x...”)
@@ -126,9 +143,13 @@ uint parseOperand2(char *op2) {
   // shifted register, Rm{,<shift>}
   // <shift> {<shiftname> <register> or <shiftname> <#expression>}
   // <shiftname> {enum Shift}
+
+  // op2 = "rN{<shiftname><#expression>}"
+  uint rm = op2[1] - '0';
+  // enum Shift shiftType = parseShiftType(shift);
 }
 
-#define DPI_COND (14) // 1110
+#define DPI_COND (14 << 28) // 1110
 
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // TODO: parse instruction
@@ -138,21 +159,34 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // instructions: and, eor, sub, rsb, add, orr
   // syntax: <opcode> Rd, Rn, <Operand2>
   if (input->field_count == 4) {
+    uint i;
+    uint opcode = parseDPIOpcode(input->opcode);
+    uint s = 0;
+    uint rn = rem(input->fields[1]);
+    uint rd = rem(input->fields[0]);
+    uint op2 = parseOperand2(input->fields[2]);
   }
 
   // instruction: mov
   // syntax: mov Rd, <Operand2>
-  if (input->opcde == "mov") {
+  if (input->opcode == "mov") {
     uint i;
     uint opcode = parseDPIOpcode(input->opcode);
     uint s = 0;
-    uint rn = ;
+    uint rn = 0;
     uint rd = rem(input->fields[0]);
     uint op2 = parseOperand2(input->fields[1]);
   }
 
   // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
+
+  uint i;
+  uint opcode = parseDPIOpcode(input->opcode);
+  uint s = 1;
+  uint rn = rem(input->fields[0]);
+  uint rd = 0;
+  uint op2 = parseOperand2(input->fields[1]);
 
   return 0x0;
 }
