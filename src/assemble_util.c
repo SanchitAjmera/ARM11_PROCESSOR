@@ -43,11 +43,17 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
+// removes first character of string
+// return unsigned int value of remaining string in array of words
 word *rem(char *string) {
   word *addresses;
   addresses[0] = atoi(++string);
   return addresses;
 }
+
+// removes bracketing around string
+// returns unsigned int value of remain string
+// returns array containing register address and expression address
 word *remBracket(char *string) {
   word *addresses;
   int length = strlen(string);
