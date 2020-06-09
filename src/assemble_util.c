@@ -43,7 +43,18 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
-word remHash(char *string) { return atoi(string++); }
+word *remHash(char *string) {
+  word *addresses[2];
+  word[0] = atoi(++string)
+}
+word *remBracket(char *string, bool) {
+  int length = strlen(string);
+  char *unbracketed[length - 2];
+  for (int i = 1; i < length - 1; i++) {
+    unbracketed[i - 1] = string[i];
+  }
+  return
+}
 
 // this function decodes the address provided within the instruction struct
 SDTIOperation SDTIdecode(char **fields, uint field_count) {
