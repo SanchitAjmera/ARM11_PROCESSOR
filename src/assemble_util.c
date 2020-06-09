@@ -94,7 +94,7 @@ SDTIOperation SDTIdecode(char **fields, uint field_count) {
   }
 }
 
-word assembleSDTI(instruction *input) {
+word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   // decoding address type
   SDTIOperation operation = SDTIdecode(input->fields, input->field_count);
   char *ldr = "ldr";
@@ -122,9 +122,8 @@ word assembleSDTI(instruction *input) {
     // offset
     offset = remBracket(input->fields[1])[1];
   case NUMERIC_CONST:
-    offset = 0;
+    (rem(input->fields[1])[0] <= SDTI_EXP_BOUND) : assembleDPI()
   }
-
   // immediate offsets
   word i = 1 << SDTI_I_SHIFT;
   // up bits
