@@ -6,8 +6,7 @@
 
 #define INIT_FILE_SIZE 16
 
-// this is from emulate_util.h so could we maybe put it in constants.h
-// a lot of reused parts and #including emulate_util is not nice
+// Will be removed from this file in future (accessible from constants)
 enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 
 /* Scans a file adding labels to the symbol table,
@@ -43,7 +42,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
-// Essentially a string to Cond enum function
+// Essentially a 'String-to-Enum' function for Cond enum
 // The enum values are defined to match their binary counterparts
 word getCondition(const char *condition) {
   if (!strcmp(condition, "eq")) {
@@ -67,6 +66,8 @@ word getCondition(const char *condition) {
   return ALWAYS;
 }
 
+/*Provides assembly function for 'mla' and 'mul' instructions and
+returns the corresponding ARM-binary based on the instruction arguments*/
 word assembleMultiply(symbol_table *symbolTable, instruction *input) {
   // Defining the components of the instruction
   word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
