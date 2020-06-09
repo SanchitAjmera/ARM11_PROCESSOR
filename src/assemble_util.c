@@ -100,7 +100,7 @@ word assembleSDTI(instruction *input) {
   // PRE/POST-INDEXING bits
   word p;
   // base register Rn
-  word Rn;
+  word Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
   // offsets
   word offset;
   // source/ dest register Rd
@@ -112,18 +112,12 @@ word assembleSDTI(instruction *input) {
   // switch case for different address types
   switch (operation) {
   case POST_RN_EXP:
-    // base register Rn
-    Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
     // offset
     offset = rem(input->fields[2])[0];
   case PRE_RN:
-    // base register Rn
-    Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
     // Offset is 0
     offset = 0;
   case PRE_RN_EXP:
-    // base register Rn
-    Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
     // offset
     offset = remBracket(input->fields[1])[1];
   }
