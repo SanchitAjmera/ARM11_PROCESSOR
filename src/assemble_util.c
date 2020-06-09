@@ -93,22 +93,21 @@ SDTIOperation SDTIdecode(char **fields, uint field_count) {
 }
 
 word assembleSDTI(instruction *input) {
+  // decoding address type
+  SDTIOperation operation = SDTIdecode(input->fields, input->field_count);
   char *ldr = "ldr";
   // Load bit
   word l;
-  (strcmp(input->opcode, ldr) == 0) ? (l = 0 << 31) : (l = 1 << 31);
+  (strcmp(input->opcode, ldr) == 0) ? (l = 1 << SDTI_L_SHIFT) : (l = 0);
   // PRE/POST-INDEXING bits
   word p;
+  operation ? (p = 1 << SDTI_P_SHIFT) : (p = 0);
   // base register Rn
   word Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
-  // offsets
-  word offset;
   // source/ dest register Rd
   word Rd = rem(input->fields[0])[0] << SDTI_RD_SHIFT;
-  // decoding address type
-  SDTIOperation operation = SDTIdecode(input->fields, input->field_count);
-  // setting pre-indexing bits
-  operation ? (p = 1 << SDTI_P_SHIFT) : (p = 0);
+  // offsets
+  word offset;
   // switch case for different address types
   switch (operation) {
   case POST_RN_EXP:
@@ -120,6 +119,8 @@ word assembleSDTI(instruction *input) {
   case PRE_RN_EXP:
     // offset
     offset = remBracket(input->fields[1])[1];
+  case NUMERIC_CONST:
+    //
   }
 
   // immediate offsets
