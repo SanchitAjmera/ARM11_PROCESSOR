@@ -105,6 +105,18 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
   }
 }
 
+uint8_t parseImmediate(char *imm) {
+  // TODO: throw error if numeric constant cannot be represented
+  // TODO: determine 4-bit for rotation number
+  uint8_t imm;
+  if (op2[1] == '0' && op2[2] == 'x') {
+    imm = atoi(op2 + 2);
+  } else {
+    imm = rem(op2);
+  }
+  return imm;
+}
+
 // shift types
 enum Shift { LSL, LSR, ASR, ROR };
 
@@ -126,18 +138,11 @@ enum Shift parseShiftType(char *shift) {
 }
 
 uint parseOperand2(char *op2) {
+  word operand2;
   // <#expression> is a numeric constant - an 8 bit immediate value
   // decimal or hexadecimal (“#0x...”)
   if (op2[0] == '#') {
-    // TODO: throw error if numeric constant cannot be represented
-    // TODO: determine 4-bit for rotation number
-    uint8_t imm;
-    if (op2[1] == '0' && op2[2] == 'x') {
-      imm = atoi(op2 + 2);
-    }
-  } else {
-    imm = rem(op2);
-    return imm;
+    return parseImmediate(op2);
   }
 
   // shifted register, Rm{,<shift>}
@@ -147,6 +152,7 @@ uint parseOperand2(char *op2) {
   // op2 = "rN{<shiftname><#expression>}"
   uint rm = op2[1] - '0';
   // enum Shift shiftType = parseShiftType(shift);
+  // uint shiftNum = parseImmediate(imm);
 }
 
 #define DPI_COND (14 << 28) // 1110
