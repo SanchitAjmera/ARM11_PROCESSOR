@@ -109,21 +109,26 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
 enum Shift { LSL, LSR, ASR, ROR };
 
 uint parseOperand2(char *op2) {
-  uint8_t imm;
-  // <#expression> is a numeric constant -  an 8 bit immediate value
+  // <#expression> is a numeric constant - an 8 bit immediate value
   // decimal or hexadecimal (“#0x...”)
   if (op2[0] == '#') {
+    // TODO: throw error if numeric constant cannot be represented
+    // TODO: determine 4-bit for rotation number
+    uint8_t imm;
     if (op2[1] == '0' && op2[2] == 'x') {
       imm = atoi(op2 + 2);
     }
   } else {
     imm = rem(op2);
+    return imm;
   }
 
   // shifted register, Rm{,<shift>}
   // <shift> {<shiftname> <register> or <shiftname> <#expression>}
   // <shiftname> {enum Shift}
 }
+
+#define DPI_COND (14) // 1110
 
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // TODO: parse instruction
@@ -138,10 +143,16 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // instruction: mov
   // syntax: mov Rd, <Operand2>
   if (input->opcde == "mov") {
+    uint i;
+    uint opcode = parseDPIOpcode(input->opcode);
+    uint s = 0;
+    uint rn = ;
+    uint rd = rem(input->fields[0]);
+    uint op2 = parseOperand2(input->fields[1]);
   }
 
   // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
 
-  return instruction;
+  return 0x0;
 }
