@@ -43,13 +43,8 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
-word rem(char *string) {
-  char *c = "[";
-  if (&string[0] == &c[0]) {
-    return atoi(string + 2);
-  }
-  return atoi(string++);
-}
+word remHash(char *string) { return atoi(string++); }
+
 // this function decodes the address provided within the instruction struct
 SDTIOperation SDTIdecode(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
@@ -86,6 +81,7 @@ word assembleSDTI(instruction *input) {
     // offset
     offset = rem(input->fields[2]);
   }
+
   // immediate offsets
   word i = 1 << SDTI_I_SHIFT;
   // up bits
