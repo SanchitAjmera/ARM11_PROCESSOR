@@ -111,9 +111,10 @@ int main(void) {
   // free(input);
   char *str1 = "hello, my name is sanchit";
   char *str2 = ",";
-  if (strstr(str1, str2) == NULL) {
-    printf("not a substring");
-    return 1;
-  }
-  printf("is substring");
+
+  char *address = "[r3, #expression]";
+  printBits(rem(address));
+  printBits(rem("2"));
+
+  return 1;
 }
