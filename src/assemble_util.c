@@ -72,18 +72,54 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
+// opcode mnemonics
+enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
+
+enum Opcode parseDPIOpcode(char *mnemonic) {
+  switch (mnemonic) {
+  case "and":
+    return AND;
+  case "eor":
+    return EOR;
+  case "sub":
+    return SUB;
+  case "rsb":
+    return RSB;
+  case "add":
+    return ADD;
+  case "tst":
+    return TST;
+  case "teq":
+    return TEQ;
+  case "cmp":
+    return CMP;
+  case "orr":
+    return ORR;
+  case "mov":
+    return MOV;
+  default:
+    // no other case
+    // should never happen
+    assert(false);
+  }
+}
+
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // TODO: parse instruction
   // TODO: generate 32 bit word
   // TODO: figure out if symbolTable needed
 
-  // and, eor, sub, rsb, add, orr
-  // syntax; <opcode> Rd, Rn, <Operand2>
+  // instructions: and, eor, sub, rsb, add, orr
+  // syntax: <opcode> Rd, Rn, <Operand2>
+  if (input->field_count == 4) {
+  }
 
-  // mov
+  // instruction: mov
   // syntax: mov Rd, <Operand2>
+  if (input->opcde == "mov") {
+  }
 
-  // tst, teq, cmp
+  // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
 
   return instruction;
