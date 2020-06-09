@@ -77,8 +77,10 @@ word assembleSDTI(instruction *input) {
   word offset;
   // source/ dest register Rd
   word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
-  if (input->field_count == 3) {
-    p = 1 << SDTI_P_SHIFT;
+  switch (SDTIdecode(input->fields, input->field_count)) {
+  case POST_RN_EXP:
+    // setting post indexing bit
+    p = 0 << SDTI_P_SHIFT;
     // base register Rn
     Rn = rem(input->fields[1]) << SDTI_RN_SHIFT;
     // offset
