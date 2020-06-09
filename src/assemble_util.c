@@ -6,6 +6,9 @@
 
 #define INIT_FILE_SIZE 16
 
+// Will be removed from this file in future (accessible from constants)
+enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
+
 /* Scans a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
@@ -39,6 +42,32 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
+// Essentially a 'String-to-Enum' function for Cond enum
+// The enum values are defined to match their binary counterparts
+word getCondition(const char *condition) {
+  if (!strcmp(condition, "eq")) {
+    return EQ;
+  }
+  if (!strcmp(condition, "ne")) {
+    return NE;
+  }
+  if (!strcmp(condition, "ge")) {
+    return GE;
+  }
+  if (!strcmp(condition, "lt")) {
+    return LT;
+  }
+  if (!strcmp(condition, "gt")) {
+    return GT;
+  }
+  if (!strcmp(condition, "le")) {
+    return LE;
+  }
+  return ALWAYS;
+}
+
+/*Provides assembly function for 'mla' and 'mul' instructions and
+returns the corresponding ARM-binary based on the instruction arguments*/
 word assembleMultiply(symbol_table *symbolTable, instruction *input) {
   // Defining the components of the instruction
   word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
@@ -57,4 +86,27 @@ word assembleMultiply(symbol_table *symbolTable, instruction *input) {
   // S is set to 0 so no need to explicitly write it
   // Bits 4-7 are hardcoded as 1001
   return ALWAYS | accumulate | rd | rn | rs | MULT_HARDCODE | rm;
+}
+
+/* Converts all intructions related to a branch instruction, including
+both conditional and unconditional, to the corresponding ARM-binary */
+word assembleBranch(symbol_table *symbolTable, instruction *input) {
+  // The 'b' instruction is always executed
+  // Otherwise the condition of the branch will be the letters following 'b'
+  word cond = !strcmp(input->opcode, "b")
+                  ? ALWAYS
+                  : getCondition(++(input->opcode)) << COND_SHIFT;
+
+  word currentAddress = input->currentAddress;
+  char *target = input->fields[0];
+
+  // A hashtag denotes a constant address, otherwise the address needs
+  // found from the symbol table
+  word targetAddress = (target[0] == '#')
+                           ? rem(target)
+                           : getSymbol(symbolTable, target)->body.address;
+  // Calculates the offset with the pipeline effect considered
+  word offset = (targetAddress - currentAddress + 8) >> 2;
+
+  return cond | BRANCH_HARDCODE | (offset | BRANCH_OFFSET_MASK);
 }
