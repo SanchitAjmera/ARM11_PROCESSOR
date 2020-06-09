@@ -87,6 +87,8 @@ word getCondition(const char *condition) {
   return ALWAYS;
 }
 
+/* Converts all intructions related to a branch instruction, including
+both conditional and unconditional, to the corresponding ARM-binary */
 word assembleBranch(symbol_table *symbolTable, instruction *input) {
   // The 'b' instruction is always executed
   // Otherwise the condition of the branch will be the letters following 'b'
@@ -102,6 +104,7 @@ word assembleBranch(symbol_table *symbolTable, instruction *input) {
   word targetAddress = (target[0] == '#')
                            ? rem(target)
                            : getSymbol(symbolTable, target)->body.address;
+  // Calculates the offset with the pipeline effect considered
   word offset = (targetAddress - currentAddress + 8) >> 2;
 
   return cond | BRANCH_HARDCODE | (offset | BRANCH_OFFSET_MASK);
