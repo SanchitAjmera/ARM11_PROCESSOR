@@ -6,11 +6,13 @@
 
 #define INIT_FILE_SIZE 16
 
+// Enum for different types of addresses in SDTI assembly instructions
+// set to 0 if post-indexing and not set if pre-indexing
 typedef enum SDTIOperation {
   NUMERIC_CONST,
   PRE_RN,
   PRE_RN_EXP,
-  POST_RN_EXP
+  POST_RN_EXP = 0
 } SDTIOperation;
 
 /* Scans a file adding labels to the symbol table,
@@ -103,22 +105,23 @@ word assembleSDTI(instruction *input) {
   word offset;
   // source/ dest register Rd
   word Rd = rem(input->fields[0])[0] << SDTI_RD_SHIFT;
+  // decoding address type
   SDTIOperation operation = SDTIdecode(input->fields, input->field_count);
+  // setting pre-indexing bits
+  operation ? (p = 1 << SDTI_P_SHIFT) : (p = 0);
+  // switch case for different address types
   switch (operation) {
   case POST_RN_EXP:
-    // setting post indexing bit
-    p = 0 << SDTI_P_SHIFT;
     // base register Rn
     Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
     // offset
     offset = rem(input->fields[2])[0];
   case PRE_RN:
-    // setting pre indexing bit
-    p = 1 << SDTI_P_SHIFT;
     // base register Rn
     Rn = remBracket(input->fields[0])[0] << SDTI_RN_SHIFT;
     // Offset is 0
     offset = 0;
+  case PRE_RN_EXP:
   }
 
   // immediate offsets
