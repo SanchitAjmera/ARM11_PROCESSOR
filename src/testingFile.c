@@ -109,12 +109,13 @@ int main(void) {
   // word output = assembleSDTI(input);
   // printf("%" PRIu32 "\n", output);
   // free(input);
-  char *str1 = "hello, my name is sanchit";
-  char *str2 = ",";
 
-  char *address = "[r3, #expression]";
-  printBits(rem(address));
-  printBits(rem("2"));
+  char *address = "[r3,#expression]";
+  // printBits(rem(address));
+  // printBits(rem("2"));
+  char *delim = ",";
+  char *ptr = strtok(address, delim);
+  printf("%s\n", ptr);
 
   return 1;
 }
