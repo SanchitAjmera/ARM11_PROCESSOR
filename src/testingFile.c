@@ -99,14 +99,21 @@ int main(void) {
 */
 
 int main(void) {
-  printf("yo\n");
-  instruction *input = malloc(sizeof(instruction));
-  input->opcode = "ldr";
-  input->fields[0] = "[r3]";
-  printf("%s\n", input->fields[0]);
-  input->fields[1] = "0x10";
-  input->field_count = 3;
-  word output = assembleSDTI(input);
-  printf("%" PRIu32 "\n", output);
-  free(input);
+  // printf("yo\n");
+  // instruction *input = malloc(sizeof(instruction));
+  // input->opcode = "ldr";
+  // input->fields[0] = "[r3]";
+  // printf("%s\n", input->fields[0]);
+  // input->fields[1] = "0x10";
+  // input->field_count = 3;
+  // word output = assembleSDTI(input);
+  // printf("%" PRIu32 "\n", output);
+  // free(input);
+  char *str1 = "hello, my name is sanchit";
+  char *str2 = ",";
+  if (strstr(str1, str2) == NULL) {
+    printf("not a substring");
+    return 1;
+  }
+  printf("is substring");
 }
