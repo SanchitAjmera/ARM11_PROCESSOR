@@ -71,3 +71,20 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   freeFileLines(expressions);
   return fileLines;
 }
+
+word assembleDPI(symbol_table *symbolTable, instruction *input) {
+  // TODO: parse instruction
+  // TODO: generate 32 bit word
+  // TODO: figure out if symbolTable needed
+
+  // and, eor, sub, rsb, add, orr
+  // syntax; <opcode> Rd, Rn, <Operand2>
+
+  // mov
+  // syntax: mov Rd, <Operand2>
+
+  // tst, teq, cmp
+  // syntax: <opcode> Rn, <Operand2>
+
+  return instruction;
+}
