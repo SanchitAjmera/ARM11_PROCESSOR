@@ -48,12 +48,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 }
 
 // removes first character of string
-// return unsigned int value of remaining string in array of words
-word *rem(char *string) {
-  word *addresses;
-  addresses[0] = atoi(++string);
-  return addresses;
-}
+word rem(char *string) { return atoi(++string); }
 
 // removes bracketing around string
 // returns unsigned int value of remain string
@@ -107,14 +102,14 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   // base register Rn
   word Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
   // source/ dest register Rd
-  word Rd = rem(input->fields[0])[0] << SDTI_RD_SHIFT;
+  word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
   // offsets
   word offset;
   // switch case for different address types
   switch (operation) {
   case POST_RN_EXP:
     // offset
-    offset = rem(input->fields[2])[0];
+    offset = rem(input->fields[2]);
   case PRE_RN:
     // Offset is 0
     offset = 0;
@@ -122,7 +117,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
     // offset
     offset = remBracket(input->fields[1])[1];
   case NUMERIC_CONST:
-    (rem(input->fields[1])[0] <= SDTI_EXP_BOUND) : assembleDPI()
+    (rem(input->fields[1]) <= SDTI_EXP_BOUND) ? assembleDPI(symbolTable, input):
   }
   // immediate offsets
   word i = 1 << SDTI_I_SHIFT;
