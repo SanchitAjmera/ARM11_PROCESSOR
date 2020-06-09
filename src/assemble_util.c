@@ -76,6 +76,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
+  // TODO: fix parse on mnemonic
   switch (mnemonic) {
   case "and":
     return AND;
@@ -102,6 +103,26 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
     // should never happen
     assert(false);
   }
+}
+
+// shift types
+enum Shift { LSL, LSR, ASR, ROR };
+
+uint parseOperand2(char *op2) {
+  uint8_t imm;
+  // <#expression> is a numeric constant -  an 8 bit immediate value
+  // decimal or hexadecimal (“#0x...”)
+  if (op2[0] == '#') {
+    if (op2[1] == '0' && op2[2] == 'x') {
+      imm = atoi(op2 + 2);
+    }
+  } else {
+    imm = rem(op2);
+  }
+
+  // shifted register, Rm{,<shift>}
+  // <shift> {<shiftname> <register> or <shiftname> <#expression>}
+  // <shiftname> {enum Shift}
 }
 
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
