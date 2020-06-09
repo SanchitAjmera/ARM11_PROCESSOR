@@ -86,13 +86,12 @@ word getCondition(const char *condition) {
   }
   return ALWAYS;
 }
-// to complete currentAddress
+
 word assembleBranch(symbol_table *symbolTable, instruction *input) {
-  // need to change condition into an enum to cover all conds
+
   word cond =
       strlen(input->opcode) == 1 ? ALWAYS : getCondition(++(input->opcode));
 
-  // need to find out how to obtain current address
   word currentAddress = input->currentAddress;
 
   char *target = input->fields[0];
