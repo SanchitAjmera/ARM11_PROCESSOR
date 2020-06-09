@@ -48,6 +48,7 @@
 #define SDTI_L_SHIFT 20
 #define SDTI_RN_SHIFT 16
 #define SDTI_RD_SHIFT 12
+#define SDTI_EXP_BOUND 0xFF
 
 // constants for Multiply instruction
 #define MULT_RDEST_MASK 0x000F0000
