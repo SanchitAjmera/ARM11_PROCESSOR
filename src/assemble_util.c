@@ -6,6 +6,13 @@
 
 #define INIT_FILE_SIZE 16
 
+typedef enum SDTIOperation {
+  NUMERIC_CONST,
+  PRE_RN,
+  PRE_RN_EXP,
+  POST_RN_EXP
+} SDTIOperation;
+
 /* Scans a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
@@ -42,6 +49,19 @@ word rem(char *string) {
     return atoi(string + 2);
   }
   return atoi(string++);
+}
+// this function decodes the address provided within the instruction struct
+SDTIOperation SDTIdecode(char **fields, uint field_count) {
+  // returns correct enum corresponding to decoded address
+  if (field_count == 3) {
+    return POST_RN_EXP;
+  } else if (strstr(fields[1], ",")) {
+    return PRE_RN_EXP;
+  } else if (strstr(fields[1], "r")) {
+    return PRE_RN;
+  } else {
+    return NUMERIC_CONST;
+  }
 }
 
 word assembleSDTI(instruction *input) {
