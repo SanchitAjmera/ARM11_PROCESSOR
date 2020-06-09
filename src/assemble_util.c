@@ -45,13 +45,16 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 
 word *remHash(char *string) {
   word *addresses[2];
-  word[0] = atoi(++string)
+  word[0] = atoi(++string);
 }
-word *remBracket(char *string, bool) {
+word *remBracket(char *string) {
+  word *addresses[2];
   int length = strlen(string);
   char *unbracketed[length - 2];
   for (int i = 1; i < length - 1; i++) {
     unbracketed[i - 1] = string[i];
+  }
+  if (includesExp) {
   }
   return
 }
