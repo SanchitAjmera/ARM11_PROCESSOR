@@ -63,8 +63,8 @@ word assembleMultiply(symbol_table *symbolTable, instruction *input) {
 // a lot of reused parts and #including emulate_util is not nice
 enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 
-// No function in C which converts string to enum so
-// had to use this
+// Essentially a string to Cond enum function
+// The enum values are defined to match their binary counterparts
 word getCondition(const char *condition) {
   if (!strcmp(condition, "eq")) {
     return EQ;
@@ -88,13 +88,17 @@ word getCondition(const char *condition) {
 }
 
 word assembleBranch(symbol_table *symbolTable, instruction *input) {
-
-  word cond =
-      strlen(input->opcode) == 1 ? ALWAYS : getCondition(++(input->opcode));
+  // The 'b' instruction is always executed
+  // Otherwise the condition of the branch will be the letters following 'b'
+  word cond = !strcmp(input->opcode, "b")
+                  ? ALWAYS
+                  : getCondition(++(input->opcode)) << COND_SHIFT;
 
   word currentAddress = input->currentAddress;
-
   char *target = input->fields[0];
+
+  // A hashtag denotes a constant address, otherwise the address needs
+  // found from the symbol table
   word targetAddress = (target[0] == '#')
                            ? rem(target)
                            : getSymbol(symbolTable, target)->body.address;
