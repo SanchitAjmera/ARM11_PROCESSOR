@@ -76,7 +76,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
-  // TODO: fix parse on mnemonic
+  // TODO: check parse on mnemonic
   switch (*mnemonic) {
   case "and":
     return AND;
@@ -105,12 +105,11 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
   }
 }
 
-uint8_t parseImmediate(char *imm) {
-  // TODO: throw error if numeric constant cannot be represented
-  // TODO: determine 4-bit for rotation number
+uint8_t parseImmediate(const char *imm) {
   uint8_t imm;
+  // TODO: check length before
   if (op2[1] == '0' && op2[2] == 'x') {
-    imm = atoi(op2 + 2);
+    // TODO: parse hex value
   } else {
     imm = rem(op2);
   }
@@ -121,7 +120,8 @@ uint8_t parseImmediate(char *imm) {
 enum Shift { LSL, LSR, ASR, ROR };
 
 enum Shift parseShiftType(char *shift) {
-  switch (*switch) {
+  // TODO: check parse on shift
+  switch (*shift) {
   case "LSL":
     return LSL;
   case "LSR":
@@ -137,62 +137,78 @@ enum Shift parseShiftType(char *shift) {
   }
 }
 
-uint parseOperand2(char *op2) {
+#define IS_IMMEDIATE(op2) (op2[0] == '#')
+
+uint parseOperand2(const char *op2) {
   word operand2;
   // <#expression> is a numeric constant - an 8 bit immediate value
   // decimal or hexadecimal (“#0x...”)
-  if (op2[0] == '#') {
-    return parseImmediate(op2);
+  if (IS_IMMEDIATE(op2)) {
+    // TODO: throw error if numeric constant cannot be represented
+    // TODO: determine 4-bit for rotation number
+    uint8_t imm = parseImmediate(op2);
+    return operand2;
   }
 
-  // shifted register, Rm{,<shift>}
+  // shifted register - Rm{,<shift>}
   // <shift> {<shiftname> <register> or <shiftname> <#expression>}
   // <shiftname> {enum Shift}
 
-  // op2 = "rN{<shiftname><#expression>}"
-  uint rm = op2[1] - '0';
-  // enum Shift shiftType = parseShiftType(shift);
-  // uint shiftNum = parseImmediate(imm);
+  // imm: r10{LSL #10}
+  // reg: r10{ROR r11}
+
+  // TODO: parse shifted immediate
+  uint rm = strtok(op2, "{") - '0';
+  enum Shift shiftType = parseShiftType(strtok(NULL, " "));
+  if (IS_IMMEDIATE(imm)) {
+    // uint shiftNum = parseImmediate(imm);
+    return (shiftNum << 3) & (shiftType << 1;
+  }
+
+  // TODO: parse shifted register
+  // uint rs = rem("<register>");
+  return (rs << 4) & (shiftType << 1) & 1;
 }
 
-#define DPI_COND (14 << 28) // 1110
+#define DPI_COND (14 << 28) // 1110 (al)
 
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // TODO: parse instruction
   // TODO: generate 32 bit word
-  // TODO: figure out if symbolTable needed
+  // TODO: figure out if symbolTable is needed
 
   // instructions: and, eor, sub, rsb, add, orr
   // syntax: <opcode> Rd, Rn, <Operand2>
   if (input->field_count == 4) {
-    uint i;
+    uint i = IS_IMMEDIATE(input->fields[2]) ? 1 : 0;
     uint opcode = parseDPIOpcode(input->opcode);
     uint s = 0;
     uint rn = rem(input->fields[1]);
     uint rd = rem(input->fields[0]);
     uint op2 = parseOperand2(input->fields[2]);
+    return 0x0;
   }
 
   // instruction: mov
   // syntax: mov Rd, <Operand2>
-  if (input->opcode == "mov") {
-    uint i;
-    uint opcode = parseDPIOpcode(input->opcode);
+  if (!strcmp(input->opcode, "mov")) {
+    uint i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
+    uint opcode = MOV;
     uint s = 0;
     uint rn = 0;
     uint rd = rem(input->fields[0]);
     uint op2 = parseOperand2(input->fields[1]);
+    return 0x0;
   }
 
   // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
 
-  uint i;
+  uint i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
   uint opcode = parseDPIOpcode(input->opcode);
   uint s = 1;
   uint rn = rem(input->fields[0]);
   uint rd = 0;
   uint op2 = parseOperand2(input->fields[1]);
-
   return 0x0;
 }
