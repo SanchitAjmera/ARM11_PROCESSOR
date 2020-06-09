@@ -112,6 +112,13 @@ word assembleSDTI(instruction *input) {
     Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
     // offset
     offset = rem(input->fields[2])[0];
+  case PRE_RN:
+    // setting pre indexing bit
+    p = 1 << SDTI_P_SHIFT;
+    // base register Rn
+    Rn = remBracket(input->fields[0])[0] << SDTI_RN_SHIFT;
+    // Offset is 0
+    offset = 0;
   }
 
   // immediate offsets
