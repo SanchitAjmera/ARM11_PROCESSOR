@@ -6,6 +6,10 @@
 
 #define INIT_FILE_SIZE 16
 
+// this is from emulate_util.h so could we maybe put it in constants.h
+// a lot of reused parts and #including emulate_util is not nice
+enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
+
 /* Scans a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
@@ -39,30 +43,6 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
-word assembleMultiply(symbol_table *symbolTable, instruction *input) {
-  // Defining the components of the instruction
-  word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
-  word rm = rem(input->fields[1]);
-  word rs = rem(input->fields[2]) << MULT_REG_S_SHIFT;
-
-  // Initialising for 'mul', may be updated if 'mla'
-  word rn = 0;
-  word accumulate = 0;
-
-  // set rn and A for an 'accumulate' input
-  if (!strcmp(input->opcode, "mla")) {
-    rn = rem(input->fields[3]) << MULT_REG_N_SHIFT;
-    accumulate = ACCUMULATE_FLAG;
-  }
-  // S is set to 0 so no need to explicitly write it
-  // Bits 4-7 are hardcoded as 1001
-  return ALWAYS | accumulate | rd | rn | rs | MULT_HARDCODE | rm;
-}
-
-// this is from emulate_util.h so could we maybe put it in constants.h
-// a lot of reused parts and #including emulate_util is not nice
-enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
-
 // Essentially a string to Cond enum function
 // The enum values are defined to match their binary counterparts
 word getCondition(const char *condition) {
@@ -85,6 +65,26 @@ word getCondition(const char *condition) {
     return LE;
   }
   return ALWAYS;
+}
+
+word assembleMultiply(symbol_table *symbolTable, instruction *input) {
+  // Defining the components of the instruction
+  word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
+  word rm = rem(input->fields[1]);
+  word rs = rem(input->fields[2]) << MULT_REG_S_SHIFT;
+
+  // Initialising for 'mul', may be updated if 'mla'
+  word rn = 0;
+  word accumulate = 0;
+
+  // set rn and A for an 'accumulate' input
+  if (!strcmp(input->opcode, "mla")) {
+    rn = rem(input->fields[3]) << MULT_REG_N_SHIFT;
+    accumulate = ACCUMULATE_FLAG;
+  }
+  // S is set to 0 so no need to explicitly write it
+  // Bits 4-7 are hardcoded as 1001
+  return ALWAYS | accumulate | rd | rn | rs | MULT_HARDCODE | rm;
 }
 
 /* Converts all intructions related to a branch instruction, including
