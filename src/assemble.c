@@ -1,6 +1,6 @@
-#include "assemble_util.h"
-#include "include/file_lines.h"
-#include "include/symbol_table.h"
+#include "assembler/assemble_util.h"
+#include "assembler/file_lines.h"
+#include "assembler/symbol_table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

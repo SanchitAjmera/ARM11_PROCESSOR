@@ -1,7 +1,7 @@
 #ifndef FILE_LINES_H
 #define FILE_LINES_H
 
-#include "constants.h"
+#include "../common/constants.h"
 
 #define INIT_FILE_LINES_SIZE 16
 

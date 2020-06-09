@@ -1,7 +1,7 @@
 #ifndef EMULATE_UTIL_H
 #define EMULATE_UTIL_H
 
-#include "include/constants.h"
+#include "../common/constants.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
