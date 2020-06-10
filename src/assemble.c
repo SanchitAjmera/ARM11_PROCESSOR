@@ -11,23 +11,26 @@ int main(int argc, char **argv) {
 
   FILE *armFile = fopen(argv[1], "r");
   scanFile(armFile, symbolTable, fileLines);
+  fclose(armFile);
 
   printFileLines(fileLines);
   printSymbolTable(symbolTable);
-
-  fclose(armFile);
 
   printf("\n");
 
   char buffer[512];
   strcpy(buffer, "mov r1,#1\nadd r2,r1,#2\nfoo:\nldr r0,[r1,r2,lsl #2]\n");
-  char *delim = "#";
+  char *delim = "[]";
 
   char *word = strtok(buffer, delim);
   while (word != NULL) {
     printf("%s\n", word);
     word = strtok(NULL, delim);
   }
+
+  FILE *binOutFile = fopen("out.bin", "wb");
+  parseLines(fileLines, symbolTable, binOutFile);
+  fclose(binOutFile);
 
   freeTable(symbolTable);
   freeFileLines(fileLines);

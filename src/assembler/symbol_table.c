@@ -37,12 +37,13 @@ void addSymbol(symbol_table *s, symbol entry) {
     return;
   }
 
-  if (s->symbolCount == s->maxSymbols) {
+  if (s->symbolCount == s->maxSymbols) { // Resize symbol table
     s->maxSymbols *= 2;
     if ((s->symbols = realloc(s->symbols, s->maxSymbols)) == NULL) {
       printf("error!");
     }
   }
+
   s->symbols[s->symbolCount] = entry;
   s->symbolCount += 1;
 }
