@@ -5,6 +5,6 @@
 #include "symbol_table.h"
 #include <stdio.h>
 
-extern file_lines *scanFile(FILE *armFile, symbol_table *symbolTable);
+extern void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output);
 
 #endif

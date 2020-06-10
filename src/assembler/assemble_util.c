@@ -13,22 +13,16 @@
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
     and stores expressions in their string form at the end of the array. */
-file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
-  assert(armFile != NULL && symbolTable != NULL);
-
-  /* Build a new file_lines struct which stores each line in the
-    ARM file in an array, and any expressions gathered at the end */
-  file_lines *fileLines = malloc(sizeof(file_lines));
-  initFileLines(fileLines);
+void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
+  assert(armFile != NULL && symbolTable != NULL && output != NULL);
 
   /* Will be used to store expressions found during the scan */
-  file_lines *expressions = malloc(sizeof(file_lines));
-  initFileLines(expressions);
+  file_lines *expressions = newFileLines();
 
   /* Scan file for labels and expressions */
   char line[LINE_CHAR_LIM];
   while (fgets(line, LINE_CHAR_LIM, armFile) != NULL) {
-    addLine(fileLines, strtok(line, "\n")); // Adds line stripped of \n
+    addLine(output, strtok(line, "\n")); // Adds line stripped of \n
 
     /* iterate through chars in line */
     for (int i = 0; i < strlen(line); i++) {
@@ -37,7 +31,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
         // Make a new symbol for this label
         symbol labelSymbol = {NULL, LABEL,
                               .body.address =
-                                  fileLines->lineCount * WORD_SIZE_BYTES};
+                                  output->lineCount * WORD_SIZE_BYTES};
         labelSymbol.name = malloc(sizeof(char) * strlen(label));
         strcpy(labelSymbol.name, label);
 
@@ -53,11 +47,11 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
     }
   }
 
-  /* Now that we have added all lines to fileLines, we can add all expressions
+  /* Now that we have added all lines to output, we can add all expressions
      to the symbol table and calculate their address using lineCount */
   for (int i = 0; i < expressions->lineCount; i++) {
     char *expr = expressions->lines[i];
-    word address = (fileLines->lineCount + i) * WORD_SIZE_BYTES;
+    word address = (output->lineCount + i) * WORD_SIZE_BYTES;
     // Make a new symbol for this expression
     symbol exprSymbol = {NULL, LABEL, .body.address = address};
     exprSymbol.name = malloc(sizeof(char) * strlen(expr));
@@ -66,8 +60,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
     addSymbol(symbolTable, exprSymbol);
   }
 
-  addLines(fileLines, expressions->lines, expressions->lineCount);
+  addLines(output, expressions->lines, expressions->lineCount);
 
   freeFileLines(expressions);
-  return fileLines;
 }

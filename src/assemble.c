@@ -6,11 +6,11 @@
 #include <string.h>
 
 int main(int argc, char **argv) {
-  symbol_table *symbolTable = malloc(sizeof(symbol_table));
-  initSymbolTable(symbolTable);
+  symbol_table *symbolTable = newSymbolTable();
+  file_lines *fileLines = newFileLines();
 
   FILE *armFile = fopen(argv[1], "r");
-  file_lines *fileLines = scanFile(armFile, symbolTable);
+  scanFile(armFile, symbolTable, fileLines);
 
   printFileLines(fileLines);
   printSymbolTable(symbolTable);
