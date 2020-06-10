@@ -1,5 +1,5 @@
-#include "emulator/emulate_util.h"
 #include "common/constants.h"
+#include "emulator/emulate_util.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

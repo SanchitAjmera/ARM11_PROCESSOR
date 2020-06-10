@@ -1,15 +1,9 @@
 #include "emulate_util.h"
+#include "../common/util.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-void validatePtr(const void *ptr, const char *error_msg) {
-  if (ptr == NULL) {
-    printf("Error: %s\n", error_msg);
-    exit(EXIT_FAILURE);
-  }
-}
 
 uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
@@ -62,7 +56,7 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE;
   // tuple for the result and the carry out bit
   operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(operation_t));
-  validatePtr(shiftedOp2, "Not enough memory!");
+  errorExit(validatePtr(shiftedOp2, "Not enough memory!"));
   word result;
   // carry out from a right shift operation
   uint carryOut = rightCarryOut(value, shiftNum);
@@ -108,7 +102,7 @@ operation_t *opImmediate(arm *state, uint op2) {
   uint rotateNum = (op2 >> GET_ROTATION_NUM) * ROTATION_FACTOR;
   // struct for the result and the carry out bit
   operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(operation_t));
-  validatePtr(shiftedOp2, "Not enough memory!");
+  errorExit(validatePtr(shiftedOp2, "Not enough memory!"));
   // result of the rotation operation
   shiftedOp2->result = rotateRight(imm, rotateNum);
   // carry out for CSPR flag
@@ -341,10 +335,10 @@ void executeBranch(arm *state, word instruction) {
 void initArm(arm *state, const char *fname) {
   // load binary file into memory
   byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
-  validatePtr(memory, "Not enough memory.\n");
+  errorExit(validatePtr(memory, "Not enough memory.\n"));
   // file handling
   FILE *binFile = fopen(fname, "rb");
-  validatePtr(binFile, "File could not be opened\n");
+  errorExit(validatePtr(binFile, "File could not be opened\n"));
   fseek(binFile, SEEK_SET, SEEK_END);
   long fileSize = ftell(binFile);
   rewind(binFile);
