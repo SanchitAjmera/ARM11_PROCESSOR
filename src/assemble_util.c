@@ -72,6 +72,28 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
+typedef struct {
+  char *key;
+  void *value;
+} pair_t;
+
+// TODO: WIP lookup tables
+// pair_t table[] = {{"LSL", &LSL}, {"LSR", &LSR}, {"ASR", &ASR}, {"ROR",
+// &ROR}};
+
+// pair_t table[] = {{"AND", &AND}, {"EOR", EOR},  {"SUB", &SUB}, {"RSB", &RSB},
+//                   {"ADD", &ADD}, {"TST", &TST}, {"TEQ", &TEQ}, {"CMP", &CMP},
+//                   {"ORR", &ORR}, {"MOV", &MOV}};
+
+void *lookup(pair_t table[], const char *key) {
+  for (int i = 0; i < 4; i++) {
+    if (!strcmp(table[i]->key, key)) {
+      return table[i]->value;
+    }
+  }
+  return NULL;
+}
+
 // opcode mnemonics
 enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 
