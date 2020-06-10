@@ -7,13 +7,15 @@
 #define INIT_S_TABLE_SIZE 32
 
 /* Takes in a pointer to an uninitialised symbol table and initialises it */
-void initSymbolTable(symbol_table *s) {
+symbol_table *newSymbolTable() {
+  symbol_table *s = malloc(sizeof(symbol_table));
   assert(s != NULL);
   symbol *symbols = malloc(INIT_S_TABLE_SIZE * sizeof(symbol));
   assert(symbols != NULL);
   s->symbols = symbols;
   s->maxSymbols = INIT_S_TABLE_SIZE;
   s->symbolCount = 0;
+  return s;
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {

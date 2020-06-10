@@ -15,19 +15,11 @@ typedef struct symbol symbol;
 
 enum SymbolType { LABEL, INSTR };
 
-typedef struct {
-  char **registers, **operand2;
-} dpi;
-
 struct instruction {
   char *opcode;  // String representing the instruction INCLUDING cond suffix
   char **fields; // Array of string fields.
   uint field_count;
   word currentAddress; // The current address of the instruction being called
-  /*
-  We can add a union of structs that represent dpi, sdri, branch, mult later
-  if this makes it easier to code
-  */
 };
 
 struct symbol_table {
@@ -47,7 +39,7 @@ struct symbol {
   symbol *left, *right; */
 };
 
-extern void initSymbolTable(symbol_table *s);
+extern symbol_table *newSymbolTable();
 extern symbol *getSymbol(const symbol_table *s, const char *name);
 extern void addSymbol(symbol_table *symbolTable, symbol entry);
 extern void freeTable(symbol_table *symbolTable);
