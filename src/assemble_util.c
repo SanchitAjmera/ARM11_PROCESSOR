@@ -1,5 +1,6 @@
 #include "assemble_util.h"
 #include "constants.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -120,6 +121,8 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
       offset = getSymbol(symbolTable, input->fields[1])->body.address;
       Rn = 15;
     }
+  default:
+    assert(false);
   }
   // immediate offsets
   word i = 1 << SDTI_I_SHIFT;
