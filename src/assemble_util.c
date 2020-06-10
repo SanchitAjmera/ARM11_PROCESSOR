@@ -116,7 +116,10 @@ word calcRotatedImm(word imm) {
     mask = mask << 1;
   }
   imm = rotateLeft(imm, rotation);
-  // TODO: check if it can be represented
+  if (imm > MAX_BYTE) {
+    fprintf(stderr, "Number cannot be represented.");
+    exit(EXIT_FAILURE);
+  }
   return (rotation << 8) | imm
 }
 
