@@ -1,18 +1,20 @@
 CC      = gcc
-CFLAGS  = -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
+CFLAGS 	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 .SUFFIXES: .c .o
 
 .PHONY: all clean test
 
-all: assemble emulate testme
+all: include assemble emulate testme
 
-assemble: assemble.o symbol_table.o assemble_util.o
-	$(CC) $(CFLAGS) assemble.o symbol_table.o assemble_util.o -o assemble
+assemble: assemble.o assemble_util.o include/file_lines.o include/symbol_table.o
+	$(CC) $(CFLAGS) assemble.o assemble_util.o include/file_lines.o include/symbol_table.o -o assemble
 emulate: emulate.o emulate_util.o
 	$(CC) $(CFLAGS) emulate.o emulate_util.o -o emulate
 testme: testme.o emulate_util.o
 	$(CC) $(CFLAGS) testme.o emulate_util.o -o testme
+include:
+	cd include; make
 
 emulate.o: emulate_util.h emulate.c
 	$(CC) $(CFLAGS) -c emulate.c
@@ -20,9 +22,7 @@ emulate_util.o: emulate_util.h emulate_util.c
 	$(CC) $(CFLAGS) -c emulate_util.c
 testme.o: emulate_util.h testme.c
 	$(CC) $(CFLAGS) -c testme.c
-symbol_table.o: symbol_table.c symbol_table.h
-	$(CC) $(CFLAGS) -c symbol_table.c
-assemble_util.o: assemble_util.c assemble_util.h symbol_table.h
+assemble_util.o: assemble_util.c assemble_util.h
 	$(CC) $(CFLAGS) -c assemble_util.c
 
 test:
@@ -34,3 +34,4 @@ clean:
 	rm -f assemble
 	rm -f emulate
 	rm -f testme
+	cd include; make clean
