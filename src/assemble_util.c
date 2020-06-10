@@ -123,12 +123,10 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   }
   // immediate offsets
   word i = 1 << SDTI_I_SHIFT;
-  // up bits
+  // up bit
   word u = 0;
-
-  word ALWAYS = 14 << 28;
-  word set = 1 << 26;
-  return ALWAYS | set | i | p | u | l | Rn | Rd | offset;
+  // returning constructed instruction
+  return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
 }
 /*
 
