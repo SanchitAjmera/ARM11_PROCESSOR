@@ -1,6 +1,10 @@
 #ifndef EMULATE_UTIL_H
 #define EMULATE_UTIL_H
 
+<<<<<<< HEAD:src/emulator/emulate_util.h
+=======
+#include "../common/constants.h"
+>>>>>>> assembler-tokens:src/emulate_util.h
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -87,8 +91,6 @@ typedef struct {
   word fetched;
   instructionState_t decoded;
 } arm_t;
-
-extern void validatePtr(const void *ptr, const char *error_msg);
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register

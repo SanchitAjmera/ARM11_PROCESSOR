@@ -1,21 +1,14 @@
 #ifndef ASSEMBLE_UTIL_H
 #define ASSEMBLE_UTIL_H
 
-#include "include/file_lines.h"
-#include "include/symbol_table.h"
+#include "file_lines.h"
+#include "symbol_table.h"
 #include <stdio.h>
-
-typedef struct {
-  char **lines;
-  uint fileLinesCount;
-} file_lines;
 
 typedef struct {
   char *key;
   int value;
 } pair_t;
-
-extern file_lines *scanFile(FILE *armFile, symbol_table *symbolTable);
 
 // Will be removed from this file in future (accessible from constants)
 enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
@@ -24,7 +17,6 @@ enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
                                    {"lt", LT}, {"gt", GT}, {"le", LE},
                                    {"al", AL}};
-extern file_lines *scanFile(FILE *armFile, symbol_table *symbolTable);
 
 // used for assemble dpi
 #define IS_IMMEDIATE(op) (op[0] == '#')
@@ -62,5 +54,9 @@ static const pair_t opcodeTable[] = {
     {"TST", TST}, {"TEQ", TEQ}, {"CMP", CMP}, {"ORR", ORR}, {"MOV", MOV}};
 
 extern word assembleSDTI(symbol_table *symbolTable, instruction *input);
+
+extern void scanFile(FILE *armFile, symbol_table *symbolTable,
+                     file_lines *output);
+extern void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out);
 
 #endif

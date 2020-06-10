@@ -5,28 +5,19 @@ CFLAGS 	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 .PHONY: all clean test
 
-all: include assemble emulate testme
+all: libs assemble emulate testme
 
-assemble: assemble.o assemble_util.o include/file_lines.o include/symbol_table.o
-	$(CC) $(CFLAGS) assemble.o assemble_util.o include/file_lines.o include/symbol_table.o -o assemble
-emulate: emulate.o emulate_util.o
-	$(CC) $(CFLAGS) emulate.o emulate_util.o -o emulate
-testme: testme.o emulate_util.o
-	$(CC) $(CFLAGS) testme.o emulate_util.o -o testme
-include:
-	cd include; make
-
-emulate.o: emulate_util.h emulate.c
-	$(CC) $(CFLAGS) -c emulate.c
-emulate_util.o: emulate_util.h emulate_util.c
-	$(CC) $(CFLAGS) -c emulate_util.c
-testme.o: emulate_util.h testme.c
-	$(CC) $(CFLAGS) -c testme.c
-assemble_util.o: assemble_util.c assemble_util.h
-	$(CC) $(CFLAGS) -c assemble_util.c
+assemble: assemble.o assembler/assemble_util.o assembler/file_lines.o assembler/symbol_table.o common/util.o
+emulate: emulate.o emulator/emulate_util.o common/util.o
+testme: testme.o emulator/emulate_util.o common/util.o
+libs:
+	cd assembler; make
+	cd emulator; make
+	cd common; make
 
 test:
 	./emulate ~/arm11_testsuite/test_cases/add01
+	./assemble ~/arm11_testsuite/test_cases/b01.s
 	./testme | grep ^T
 
 clean:
@@ -34,4 +25,6 @@ clean:
 	rm -f assemble
 	rm -f emulate
 	rm -f testme
-	cd include; make clean
+	cd emulator; make clean
+	cd assembler; make clean
+	cd common; make clean

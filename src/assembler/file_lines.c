@@ -27,12 +27,14 @@ void printFileLines(file_lines *fileLines) {
   }
 }
 
-void initFileLines(file_lines *fileLines) {
+file_lines *newFileLines() {
+  file_lines *fileLines = malloc(sizeof(file_lines));
   assert(fileLines != NULL);
   fileLines->maxLines = INIT_FILE_LINES_SIZE;
   fileLines->lineCount = 0;
   fileLines->lines = malloc(sizeof(char *) * fileLines->maxLines);
   assert(fileLines->lines != NULL);
+  return fileLines;
 }
 
 void freeFileLines(file_lines *fileLines) {

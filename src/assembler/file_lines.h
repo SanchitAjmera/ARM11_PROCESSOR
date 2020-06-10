@@ -1,7 +1,7 @@
 #ifndef FILE_LINES_H
 #define FILE_LINES_H
 
-#include "constants.h"
+#include "../common/constants.h"
 
 #define INIT_FILE_LINES_SIZE 16
 
@@ -14,7 +14,7 @@ typedef struct {
 extern void addLine(file_lines *fl, char *line);
 extern void addLines(file_lines *fl, char **lines, uint n);
 extern void printFileLines(file_lines *fileLines);
-extern void initFileLines(file_lines *fileLines);
+extern file_lines *newFileLines();
 extern void freeFileLines(file_lines *fileLines);
 
 #endif
