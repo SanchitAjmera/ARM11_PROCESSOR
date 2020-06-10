@@ -31,6 +31,12 @@ symbol *getSymbol(const symbol_table *s, const char *name) {
   return NULL;
 }
 
+void addSymbols(symbol_table *s, symbol *symbols, int symbolCount) {
+  for (int i = 0; i < symbolCount; i++) {
+    addSymbol(s, symbols[i]);
+  }
+}
+
 void addSymbol(symbol_table *s, symbol entry) {
   assert(s != NULL);
   if (getSymbol(s, entry.name) != NULL) { // Label already defined
