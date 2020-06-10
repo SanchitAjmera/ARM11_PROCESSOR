@@ -139,7 +139,7 @@ enum Shift parseShiftType(char *shift) {
 
 #define IS_IMMEDIATE(op2) (op2[0] == '#')
 
-uint parseOperand2(const char *op2) {
+word parseOperand2(const char *op2) {
   word operand2;
   // <#expression> is a numeric constant - an 8 bit immediate value
   // decimal or hexadecimal (“#0x...”)
@@ -177,38 +177,38 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // TODO: generate 32 bit word
   // TODO: figure out if symbolTable is needed
 
+  word i;
+  word opcode = parseDPIOpcode(input->opcode);
+  word s = 0;
+  word rn = 0;
+  word rd = 0;
+  word op2;
+
   // instructions: and, eor, sub, rsb, add, orr
   // syntax: <opcode> Rd, Rn, <Operand2>
   if (input->field_count == 4) {
-    uint i = IS_IMMEDIATE(input->fields[2]) ? 1 : 0;
-    uint opcode = parseDPIOpcode(input->opcode);
-    uint s = 0;
-    uint rn = rem(input->fields[1]);
-    uint rd = rem(input->fields[0]);
-    uint op2 = parseOperand2(input->fields[2]);
+    i = IS_IMMEDIATE(input->fields[2]) ? 1 : 0;
+    rn = rem(input->fields[1]);
+    rd = rem(input->fields[0]);
+    op2 = parseOperand2(input->fields[2]);
     return 0x0;
   }
 
   // instruction: mov
   // syntax: mov Rd, <Operand2>
-  if (!strcmp(input->opcode, "mov")) {
-    uint i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
-    uint opcode = MOV;
-    uint s = 0;
-    uint rn = 0;
-    uint rd = rem(input->fields[0]);
-    uint op2 = parseOperand2(input->fields[1]);
+  if (opcode == MOV) {
+    i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
+    rd = rem(input->fields[0]);
+    op2 = parseOperand2(input->fields[1]);
     return 0x0;
   }
 
   // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
 
-  uint i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
-  uint opcode = parseDPIOpcode(input->opcode);
-  uint s = 1;
-  uint rn = rem(input->fields[0]);
-  uint rd = 0;
-  uint op2 = parseOperand2(input->fields[1]);
+  i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
+  s = 1;
+  rn = rem(input->fields[0]);
+  op2 = parseOperand2(input->fields[1]);
   return 0x0;
 }
