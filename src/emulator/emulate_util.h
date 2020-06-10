@@ -1,10 +1,7 @@
 #ifndef EMULATE_UTIL_H
 #define EMULATE_UTIL_H
 
-<<<<<<< HEAD:src/emulator/emulate_util.h
-=======
 #include "../common/constants.h"
->>>>>>> assembler-tokens:src/emulate_util.h
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
