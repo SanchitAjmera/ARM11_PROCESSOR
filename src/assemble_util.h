@@ -7,4 +7,6 @@
 
 extern file_lines *scanFile(FILE *armFile, symbol_table *symbolTable);
 
+extern word assembleSDTI(symbol_table *symbolTable, instruction *input);
+
 #endif
