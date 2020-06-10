@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "constants.h"
 #include "emulate_util.h"
+#include "include/constants.h"
 
 void test_bool(bool cond, char *test_name) {
   printf("T: %s : %s\n", test_name, cond ? "OK" : "FAIL");
