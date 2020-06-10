@@ -9,6 +9,10 @@
 // Will be removed from this file in future (accessible from constants)
 enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 
+// To be used with Lookup for string to enum conversion in getCondition;
+pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE}, {"lt", LT},
+                      {"gt", GT}, {"le", LE}, {"al", AL}};
+
 /* Scans a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
@@ -46,8 +50,8 @@ int lookup(const pair_t table[], const char *key) {
   // TODO: determine size
   int size = 0;
   for (int i = 0; i < size; i++) {
-    if (!strcmp(table[i]->key, key)) {
-      return table[i]->value;
+    if (!strcmp(table[i].key, key)) {
+      return table[i].value;
     }
   }
   return -1;
