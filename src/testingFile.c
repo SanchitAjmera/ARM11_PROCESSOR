@@ -1,5 +1,3 @@
-
-
 #include "constants.h"
 #include <assert.h>
 #include <inttypes.h>
