@@ -76,7 +76,7 @@ word *remBracket(char *string) {
 }
 
 // this function decodes the address provided within the instruction struct
-SDTIOperation SDTIdecode(char **fields, uint field_count) {
+SDTIOperation SDTIparser(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
   if (field_count == 3) {
     return POST_RN_EXP;
@@ -91,7 +91,7 @@ SDTIOperation SDTIdecode(char **fields, uint field_count) {
 
 word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   // decoding address type
-  SDTIOperation operation = SDTIdecode(input->fields, input->field_count);
+  SDTIOperation operation = SDTIparser(input->fields, input->field_count);
   // Load bit
   word l = (!strcmp(input->opcode, "ldr")) ? (1 << SDTI_L_SHIFT) : 0;
   // PRE/POST-INDEXING bits
