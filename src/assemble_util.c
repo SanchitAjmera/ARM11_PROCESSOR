@@ -51,7 +51,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 word rem(char *string) { return atoi(++string); }
 
 // removes bracketing around string
-// returns unsigned int value of remain string
+// converts remaining strings into unsigned int values
 // returns array containing register address and expression address
 word *remBracket(char *string) {
   word *addresses;
@@ -92,13 +92,10 @@ SDTIOperation SDTIdecode(char **fields, uint field_count) {
 word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   // decoding address type
   SDTIOperation operation = SDTIdecode(input->fields, input->field_count);
-  char *ldr = "ldr";
   // Load bit
-  word l;
-  (strcmp(input->opcode, ldr) == 0) ? (l = 1 << SDTI_L_SHIFT) : (l = 0);
+  word l = (!strcmp(input->opcode, "ldr")) ? (1 << SDTI_L_SHIFT) : 0;
   // PRE/POST-INDEXING bits
-  word p;
-  (operation == POST_RN_EXP) ? (p = 0) : (p = 1 << SDTI_P_SHIFT);
+  word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
   // base register Rn
   word Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
   // source/ dest register Rd
@@ -117,14 +114,17 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
     // offset
     offset = remBracket(input->fields[1])[1];
   case NUMERIC_CONST:
-    (rem(input->fields[1]) <= SDTI_EXP_BOUND) ? assembleDPI(symbolTable, input):
+    if (rem(input->fields[1]) <= SDTI_EXP_BOUND) {
+      return assembleDPI(symbolTable, input);
+    } else {
+    }
   }
   // immediate offsets
   word i = 1 << SDTI_I_SHIFT;
   // up bits
-  word u = 1 << SDTI_U_SHIFT;
+  word u = 0;
 
-  word always = 1 << 31;
+  word ALWAYS = 14 << 28;
   word set = 1 << 26;
   return always | set | i | p | u | l | Rn | Rd | offset;
 }
