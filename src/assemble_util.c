@@ -100,9 +100,18 @@ uint parseImmediate(const char *op2) {
 
 enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
 
-word leftRotation(uint imm) {
-  // TODO: find lsb
-  // TODO: calculate rotation
+word calcRotatedImm(word imm) {
+  // PRE: imm can be represented by WORD_SIZE bits
+  uint mask = 1;
+  uint rotation = 0;
+  for (int i = 0; i < WORD_SIZE; i++) {
+    if (mask & imm) {
+      rotation = WORD_SIZE - i;
+    }
+    mask = mask << 1;
+  }
+  // TODO: rotate imm
+  // TODO: check if it can be represented
   // TODO: return rotation | imm
 }
 
@@ -113,7 +122,7 @@ word parseOperand2Imm(const char **op2) {
     exit(EXIT_FAILURE);
   }
   if (imm > MAX_BYTE) {
-    return leftRotation(imm);
+    return calcRotatedImm(imm);
   }
   return imm;
 }
