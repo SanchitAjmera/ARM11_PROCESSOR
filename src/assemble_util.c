@@ -74,23 +74,24 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 
 typedef struct {
   char *key;
-  void *value;
+  int value;
 } pair_t;
 
 // TODO: WIP lookup tables
-// pair_t table[] = {{"LSL", &LSL}, {"LSR", &LSR}, {"ASR", &ASR}, {"ROR",
-// &ROR}};
+pair_t table[] = {{"LSL", LSL}, {"LSR", LSR}, {"ASR", ASR}, {"ROR", ROR}};
 
-// pair_t table[] = {{"AND", &AND}, {"EOR", EOR},  {"SUB", &SUB}, {"RSB", &RSB},
-//                   {"ADD", &ADD}, {"TST", &TST}, {"TEQ", &TEQ}, {"CMP", &CMP},
-//                   {"ORR", &ORR}, {"MOV", &MOV}};
+pair_t table[] = {{"AND", AND}, {"EOR", EOR}, {"SUB", SUB}, {"RSB", RSB},
+                  {"ADD", ADD}, {"TST", TST}, {"TEQ", TEQ}, {"CMP", CMP},
+                  {"ORR", ORR}, {"MOV", MOV}};
 
-void *lookup(pair_t table[], const char *key) {
-  for (int i = 0; i < 4; i++) {
+int lookup(pair_t table[], const char *key) {
+  // TODO: determine TABLE_LENGTH
+  for (int i = 0; i < TABLE_LENGTH; i++) {
     if (!strcmp(table[i]->key, key)) {
       return table[i]->value;
     }
   }
+  // TODO: handle error for no (key, value) pair in table
   return NULL;
 }
 
