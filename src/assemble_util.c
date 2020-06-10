@@ -57,11 +57,6 @@ int lookup(const pair_t table[], const char *key) {
   return -1;
 }
 
-// returns the corresponding cond enum value based on cond string
-word getCondition(const char *condition) {
-  return lookup(condTable, condition);
-}
-
 /*Provides assembly function for 'mla' and 'mul' instructions and
 returns the corresponding ARM-binary based on the instruction arguments*/
 word assembleMultiply(symbol_table *symbolTable, instruction *input) {
@@ -91,7 +86,7 @@ word assembleBranch(symbol_table *symbolTable, instruction *input) {
   // Otherwise the condition of the branch will be the letters following 'b'
   word cond = !strcmp(input->opcode, "b")
                   ? ALWAYS
-                  : getCondition(++(input->opcode)) << COND_SHIFT;
+                  : lookup(condTable, ++(input->opcode)) << COND_SHIFT;
 
   word currentAddress = input->currentAddress;
   char *target = input->fields[0];
