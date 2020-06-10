@@ -9,9 +9,6 @@
 #define LINE_CHAR_LIM 512
 #define WORD_SIZE_BYTES 4
 
-// dummy function to allow code to compile]
-word assembleDPI(symbol_table *symbolTable, instruction *input) { return 0; }
-
 // Enum for different types of addresses in SDTI assembly instructions
 typedef enum SDTIOperation {
   NUMERIC_CONST,
@@ -86,6 +83,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
+// returns respective int value, -1 for failure
 int lookup(const pair_t table[], int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i]->key, key)) {
@@ -93,6 +91,127 @@ int lookup(const pair_t table[], int size, const char *key) {
     }
   }
   return LOOKUP_FAILURE;
+}
+
+enum Opcode parseDPIOpcode(char *mnemonic) {
+  return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic) << DPI_OPCODE_SHIFT;
+}
+
+uint parseImmediate(const char *op2) {
+  if (strlen(op2) > 2) {
+    if (op2[1] == '0' && op2[2] == 'x') {
+      return (uint)strtol(hex, NULL, HEX_BASE);
+    }
+  }
+  // TODO: check for op2 > MAX_NUM here?
+  return (uint)rem(op2);
+}
+
+enum Shift parseShiftType(char *shift) {
+  return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
+}
+
+word rotateLeft(word value, uint rotateNum) {
+  uint msbs = value & ~((1 << rotateNum) - 1);
+  return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
+}
+
+word calcRotatedImm(word imm) {
+  // PRE: imm can be represented by WORD_SIZE bits
+  uint mask = 1;
+  uint rotation = 0;
+  for (int i = 0; i < WORD_SIZE; i++) {
+    if (mask & imm) {
+      rotation = WORD_SIZE - i;
+    }
+    mask = mask << 1;
+  }
+  imm = rotateLeft(imm, rotation);
+  if (imm > MAX_BYTE) {
+    fprintf(stderr, "Number cannot be represented.");
+    exit(EXIT_FAILURE);
+  }
+  return (rotation << 8) | imm
+}
+
+word parseOperand2Imm(const char **op2) {
+  uint imm = parseImmediate(op2[0]);
+  if (OVERFLOW(imm)) {
+    fprintf(stderr, "Number cannot be represented.");
+    exit(EXIT_FAILURE);
+  }
+  if (imm > MAX_BYTE) {
+    return calcRotatedImm(imm);
+  }
+  return imm;
+}
+
+word parseOperand2Reg(const char **op2) {
+  uint rm = rem(op2[0]);
+  enum Shift shiftType = parseShiftType(op2[1]);
+  if (IS_IMMEDIATE(op2[2])) {
+    uint shiftNum = parseImmediate(op2[2]);
+    return (shiftNum << 8) | (shiftType << 5) | rm;
+  }
+  uint rs = rem(op2[2]);
+  // Rs can be any general purpose register except the PC
+  assert(rs != PC);
+  return (rs << 9) | (shiftType << 5) | (1 << 4) | rm;
+}
+
+word parseOperand2(const char **op2) {
+  word operand2;
+  // 8 bit immediate value - <#expression>
+  // decimal or hexadecimal ("#n" or “#0x...”)
+  if (IS_IMMEDIATE(op2[0])) {
+    return parseOperand2Imm(op2);
+  }
+  // shifted register - Rm <shiftname> {<register> or <#expression>}
+  return parseOperand2Reg(op2);
+}
+
+word assembleDPI(symbol_table *symbolTable, instruction *input) {
+  word opcode = parseDPIOpcode(input->opcode);
+  word s = 0;
+  word rn = 0;
+  word rd = 0;
+  char **operand2;
+  char *imm;
+
+  // instruction: mov
+  // syntax: mov Rd, <Operand2>
+  if (opcode == MOV) {
+    imm = input->fields[1];
+    rd = rem(input->fields[0]);
+    operand2 = input->fields + 1;
+  }
+
+  // instructions: tst, teq, cmp
+  // syntax: <opcode> Rn, <Operand2>
+
+  else if (opcode == TST || opcode == TEQ || opcode == CMP) {
+    imm = input->fields[1];
+    // COND flags should be updated
+    s = 1;
+    rn = rem(input->fields[0]);
+    operand2 = input->fields + 1;
+  }
+
+  // instructions: and, eor, sub, rsb, add, orr
+  // syntax: <opcode> Rd, Rn, <Operand2>
+  else {
+    imm = input->fields[2];
+    rn = rem(input->fields[1]);
+    rd = rem(input->fields[0]);
+    operand2 = input->fields + 2;
+  }
+
+  s = s << DPI_S_SHIFT;
+  rn = rn << DPI_RN_SHIFT;
+  rd = rd << DPI_RD_SHIFT;
+  i = IS_IMMEDIATE(imm) ? 1 << DPI_I_SHIFT : 0;
+  op2 = parseOperand2(operand2);
+  return DPI_COND | i | opcode | s | rn | rd | op2;
 }
 
 /*Provides assembly function for 'mla' and 'mul' instructions and
