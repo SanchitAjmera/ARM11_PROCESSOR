@@ -6,13 +6,6 @@
 
 #define INIT_FILE_SIZE 16
 
-// Will be removed from this file in future (accessible from constants)
-enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
-
-// To be used with Lookup for string to enum conversion in getCondition;
-pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE}, {"lt", LT},
-                      {"gt", GT}, {"le", LE}, {"al", AL}};
-
 /* Scans a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
