@@ -57,28 +57,9 @@ int lookup(const pair_t table[], const char *key) {
   return -1;
 }
 
-// Essentially a 'String-to-Enum' function for Cond enum
-// The enum values are defined to match their binary counterparts
+// returns the corresponding cond enum value based on cond string
 word getCondition(const char *condition) {
-  if (!strcmp(condition, "eq")) {
-    return EQ;
-  }
-  if (!strcmp(condition, "ne")) {
-    return NE;
-  }
-  if (!strcmp(condition, "ge")) {
-    return GE;
-  }
-  if (!strcmp(condition, "lt")) {
-    return LT;
-  }
-  if (!strcmp(condition, "gt")) {
-    return GT;
-  }
-  if (!strcmp(condition, "le")) {
-    return LE;
-  }
-  return ALWAYS;
+  return lookup(condTable, condition);
 }
 
 /*Provides assembly function for 'mla' and 'mul' instructions and
