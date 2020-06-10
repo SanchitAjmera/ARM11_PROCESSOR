@@ -39,15 +39,13 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
-int lookup(const pair_t table[], const char *key) {
-  // TODO: determine size
-  int size = 0;
+int lookup(const pair_t table[], int size, const char *key) {
   for (int i = 0; i < size; i++) {
-    if (!strcmp(table[i].key, key)) {
-      return table[i].value;
+    if (!strcmp(table[i]->key, key)) {
+      return table[i]->value;
     }
   }
-  return -1;
+  return LOOKUP_FAILURE;
 }
 
 /*Provides assembly function for 'mla' and 'mul' instructions and
