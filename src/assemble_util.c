@@ -72,6 +72,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
+// returns respective int value, -1 for failure
 int lookup(const pair_t table[], const char *key) {
   // TODO: determine size
   int size = 0;
@@ -80,43 +81,44 @@ int lookup(const pair_t table[], const char *key) {
       return table[i]->value;
     }
   }
-  return -1;
+  return LOOKUP_FAILURE;
 }
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, mnemonic) << DPI_OPCODE_SHIFT;
 }
 
-uint8_t parseImmediate(const char *op2) {
+uint parseImmediate(const char *op2) {
   if (strlen(op2) > 2) {
     if (op2[1] == '0' && op2[2] == 'x') {
-      return (unint8_t)strtol(hex, NULL, HEX_BASE);
+      return (uint)strtol(hex, NULL, HEX_BASE);
     }
   }
-  return (uint8_t)rem(op2);
+  // TODO: check for op2 > MAX_NUM here?
+  return (uint)rem(op2);
 }
 
 enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
 
-// TODO: (WIP) refactor with rotation use
-#define OVERFLOW(num) (num > 255)
+word leftRotation(uint imm) {
+  // TODO: find lsb
+  // TODO: calculate rotation
+  // TODO: return rotation | imm
+}
 
-word parseOperand2(const char **op2) {
-  word operand2;
-  // <#expression> - an 8 bit immediate value
-  // decimal or hexadecimal ("#n" or “#0x...”)
-  if (IS_IMMEDIATE(op2[0])) {
-    uint8_t imm = parseImmediate(op2[0]);
-    // TODO: throw error if numeric constant cannot be represented
-    if (OVERFLOW(num)) {
-      fprintf(stderr, "Number cannot be represented.");
-      exit(EXIT_FAILURE);
-    }
-    // TODO: determine 4-bit for rotation number
-    return operand2;
+word parseOperand2Imm(const char **op2) {
+  uint imm = parseImmediate(op2[0]);
+  if (OVERFLOW(imm)) {
+    fprintf(stderr, "Number cannot be represented.");
+    exit(EXIT_FAILURE);
   }
+  if (imm > MAX_BYTE) {
+    return leftRotation(imm);
+  }
+  return imm;
+}
 
-  // shifted register - Rm <shiftname> {<register> or <#expression>}
+word parseOperand2Reg(const char **op2) {
   uint rm = rem(op2[0]);
   enum Shift shiftType = parseShiftType(op2[1]);
   if (IS_IMMEDIATE(op2[2])) {
@@ -127,6 +129,17 @@ word parseOperand2(const char **op2) {
   // Rs can be any general purpose register except the PC
   assert(rs != PC);
   return (rs << 9) | (shiftType << 5) | (1 << 4) | rm;
+}
+
+word parseOperand2(const char **op2) {
+  word operand2;
+  // 8 bit immediate value - <#expression>
+  // decimal or hexadecimal ("#n" or “#0x...”)
+  if (IS_IMMEDIATE(op2[0])) {
+    return parseOperand2Imm(op2);
+  }
+  // shifted register - Rm <shiftname> {<register> or <#expression>}
+  return parseOperand2Reg(op2);
 }
 
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
