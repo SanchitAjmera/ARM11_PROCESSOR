@@ -73,14 +73,14 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 }
 
 int lookup(const pair_t table[], const char *key) {
-  // TODO: determine TABLE_LENGTH
-  for (int i = 0; i < TABLE_LENGTH; i++) {
+  // TODO: determine size
+  int size = 0;
+  for (int i = 0; i < size; i++) {
     if (!strcmp(table[i]->key, key)) {
       return table[i]->value;
     }
   }
-  // TODO: handle error for no (key, value) pair in table
-  return NULL;
+  return -1;
 }
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
@@ -88,14 +88,12 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
 }
 
 uint8_t parseImmediate(const char *op2) {
-  uint8_t imm;
-  // TODO: check length before
-  if (op2[1] == '0' && op2[2] == 'x') {
-    // TODO: parse hex value
-  } else {
-    imm = rem(op2);
+  if (strlen(op2) > 2) {
+    if (op2[1] == '0' && op2[2] == 'x') {
+      return (unint8_t)strtol(hex, NULL, HEX_BASE);
+    }
   }
-  return imm;
+  return (uint8_t)rem(op2);
 }
 
 enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
@@ -106,7 +104,7 @@ enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
 word parseOperand2(const char **op2) {
   word operand2;
   // <#expression> - an 8 bit immediate value
-  // decimal or hexadecimal (“#0x...”)
+  // decimal or hexadecimal ("#n" or “#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
     uint8_t imm = parseImmediate(op2[0]);
     // TODO: throw error if numeric constant cannot be represented
