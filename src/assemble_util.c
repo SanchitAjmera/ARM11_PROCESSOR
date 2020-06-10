@@ -1,5 +1,6 @@
 #include "assemble_util.h"
 #include "constants.h"
+#include "symbol_table.c"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,13 +116,17 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
     // offset
     offset = remBracket(input->fields[1])[1];
   case NUMERIC_CONST:
+    // check if expression can fit inside a mov function
     if (rem(input->fields[1]) <= SDTI_EXP_BOUND) {
       return assembleDPI(symbolTable, input);
     } else {
+      // offset
       offset = getSymbol(symbolTable, input->fields[1])->body.address;
+      // base register Rn
       Rn = 15;
     }
   default:
+    // this should never happen, fields were most likely parsed wrong
     assert(false);
   }
   // immediate offsets
@@ -131,19 +136,3 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   // returning constructed instruction
   return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
 }
-/*
-
-int main(void) {
-  instruction *input = malloc(sizeof(instruction));
-  input->opcode = "ldr";
-  input->fields = malloc(sizeof(input->fields));
-  input->fields[0] = "[r3]";
-  input->fields[1] = "0x10";
-  input->field_count = 3;
-  word output = assembleSDTI(input);
-  printBits(output);
-  free(input->fields);
-  free(input);
-  return 1;
-}
-*/
