@@ -72,17 +72,18 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
+// generic (key, value) struct for lookups
 typedef struct {
   char *key;
   int value;
 } pair_t;
 
-// TODO: WIP lookup tables
-pair_t table[] = {{"LSL", LSL}, {"LSR", LSR}, {"ASR", ASR}, {"ROR", ROR}};
+// TODO: (WIP) lookup tables (static and const?)
+pair_t shiftTable[] = {{"LSL", LSL}, {"LSR", LSR}, {"ASR", ASR}, {"ROR", ROR}};
 
-pair_t table[] = {{"AND", AND}, {"EOR", EOR}, {"SUB", SUB}, {"RSB", RSB},
-                  {"ADD", ADD}, {"TST", TST}, {"TEQ", TEQ}, {"CMP", CMP},
-                  {"ORR", ORR}, {"MOV", MOV}};
+pair_t opcodeTable[] = {{"AND", AND}, {"EOR", EOR}, {"SUB", SUB}, {"RSB", RSB},
+                        {"ADD", ADD}, {"TST", TST}, {"TEQ", TEQ}, {"CMP", CMP},
+                        {"ORR", ORR}, {"MOV", MOV}};
 
 int lookup(pair_t table[], const char *key) {
   // TODO: determine TABLE_LENGTH
@@ -99,33 +100,7 @@ int lookup(pair_t table[], const char *key) {
 enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
-  // TODO: check parse on mnemonic
-  switch (*mnemonic) {
-  case "and":
-    return AND;
-  case "eor":
-    return EOR;
-  case "sub":
-    return SUB;
-  case "rsb":
-    return RSB;
-  case "add":
-    return ADD;
-  case "tst":
-    return TST;
-  case "teq":
-    return TEQ;
-  case "cmp":
-    return CMP;
-  case "orr":
-    return ORR;
-  case "mov":
-    return MOV;
-  default:
-    // no other case
-    // should never happen
-    assert(false);
-  }
+  return lookup(opcodeTable, mnemonic);
 }
 
 uint8_t parseImmediate(const char *op2) {
@@ -142,23 +117,7 @@ uint8_t parseImmediate(const char *op2) {
 // shift types
 enum Shift { LSL, LSR, ASR, ROR };
 
-enum Shift parseShiftType(char *shift) {
-  // TODO: check parse on shift
-  switch (*shift) {
-  case "LSL":
-    return LSL;
-  case "LSR":
-    return LSR;
-  case "ASR":
-    return ASR;
-  case "ROR":
-    return ROR;
-  default:
-    // no other case
-    // should never happen
-    assert(false);
-  }
-}
+enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
 
 #define IS_IMMEDIATE(op) (op[0] == '#')
 
