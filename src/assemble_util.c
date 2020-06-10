@@ -117,6 +117,8 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
     if (rem(input->fields[1]) <= SDTI_EXP_BOUND) {
       return assembleDPI(symbolTable, input);
     } else {
+      offset = getSymbol(symbolTable, input->fields[1])->body.address;
+      Rn = 15;
     }
   }
   // immediate offsets
@@ -126,7 +128,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
 
   word ALWAYS = 14 << 28;
   word set = 1 << 26;
-  return always | set | i | p | u | l | Rn | Rd | offset;
+  return ALWAYS | set | i | p | u | l | Rn | Rd | offset;
 }
 /*
 
