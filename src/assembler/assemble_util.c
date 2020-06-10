@@ -1,6 +1,7 @@
 #include "assemble_util.h"
-#include "file_lines.h"
 #include "../common/constants.h"
+#include "../common/util.h"
+#include "file_lines.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,16 +29,11 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
         char *label = strtok(line, "\n");
-        // Make a new symbol for this label
-        symbol labelSymbol = {NULL, LABEL,
+        symbol labelSymbol = {strptr(label), LABEL,
                               .body.address =
                                   output->lineCount * WORD_SIZE_BYTES};
-        labelSymbol.name = malloc(sizeof(char) * strlen(label));
-        strcpy(labelSymbol.name, label);
-
         addSymbol(symbolTable, labelSymbol);
-        break; // Line contains only one label
-        /* TODO: extract label, calculate address, and store in symbol table */
+        break;                     // Line contains only one label
       } else if (line[i] == '#') { // Line contains an expression
         char *expression =
             strtok(line + i - 1, " ],\n"); // Pulls expression out
@@ -52,11 +48,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   for (int i = 0; i < expressions->lineCount; i++) {
     char *expr = expressions->lines[i];
     word address = (output->lineCount + i) * WORD_SIZE_BYTES;
-    // Make a new symbol for this expression
-    symbol exprSymbol = {NULL, LABEL, .body.address = address};
-    exprSymbol.name = malloc(sizeof(char) * strlen(expr));
-    strcpy(exprSymbol.name, expr);
-
+    symbol exprSymbol = {strptr(expr), LABEL, .body.address = address};
     addSymbol(symbolTable, exprSymbol);
   }
 

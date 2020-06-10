@@ -1,11 +1,12 @@
 #include "util.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 /* Takes in a string and returns a pointer to that string on heap */
 char *strptr(char *in) {
   char *out = malloc(sizeof(char) * (strlen(in)) + 1);
-  strcpy(in, out);
+  strcpy(out, in);
   return out;
 }
 
