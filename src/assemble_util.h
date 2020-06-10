@@ -9,6 +9,11 @@ typedef struct {
   uint fileLinesCount;
 } file_lines;
 
+typedef struct {
+  char *key;
+  int value;
+} pair_t;
+
 extern file_lines *scanFile(FILE *armFile, symbol_table *symbolTable);
 
 #endif
