@@ -24,6 +24,7 @@ typedef unsigned int uint;
 #define CPSR_V_SHIFT 28
 #define COND_SHIFT 28
 #define ALWAYS (14 << COND_SHIFT)
+#define LOOKUP_FAILURE -1
 #define GET_CPSR_N(cpsr) ((cpsr & CPSR_N_MASK) >> CPSR_N_SHIFT)
 #define GET_CPSR_Z(cpsr) ((cpsr & CPSR_Z_MASK) >> CPSR_Z_SHIFT)
 #define GET_CPSR_C(cpsr) ((cpsr & CPSR_C_MASK) >> CPSR_C_SHIFT)
