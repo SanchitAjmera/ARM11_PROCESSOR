@@ -1,11 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <stdint.h>
-
-typedef uint32_t word;
-typedef unsigned int uint;
-
 // general constants
 #define MEMORY_CAPACITY 65536
 #define NUM_REGISTERS 17
@@ -24,6 +19,7 @@ typedef unsigned int uint;
 #define CPSR_V_SHIFT 28
 #define COND_SHIFT 28
 #define ALWAYS (14 << COND_SHIFT)
+#define LOOKUP_FAILURE -1
 #define GET_CPSR_N(cpsr) ((cpsr & CPSR_N_MASK) >> CPSR_N_SHIFT)
 #define GET_CPSR_Z(cpsr) ((cpsr & CPSR_Z_MASK) >> CPSR_Z_SHIFT)
 #define GET_CPSR_C(cpsr) ((cpsr & CPSR_C_MASK) >> CPSR_C_SHIFT)
@@ -55,8 +51,6 @@ typedef unsigned int uint;
 #define SDTI_L_SHIFT 20
 #define SDTI_RN_SHIFT 16
 #define SDTI_RD_SHIFT 12
-#define SDTI_EXP_BOUND 0xFF
-#define SDTI_HARDCODE (1 << 26)
 
 // constants for Multiply instruction
 #define MULT_RDEST_MASK 0x000F0000
