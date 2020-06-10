@@ -16,7 +16,7 @@ uint shiftByConstant(uint shiftPart) {
   return shiftPart >> GET_SHIFT_CONSTANT_SHIFT;
 }
 
-uint shiftByRegister(arm *state, uint shiftPart) {
+uint shiftByRegister(arm_t *state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
   uint rs = shiftPart >> GET_RS_SHIFT;
   // bottom byte of value in Rs specifies the amount to be shifted
@@ -52,7 +52,7 @@ uint rightCarryOut(word value, uint shiftNum) {
   return (value >> (shiftNum - 1)) & LSB_MASK;
 }
 
-operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
+operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   // bit to determine what to shift by
   bool shiftByReg = shiftPart & LSB_MASK;
   // number to shift by
@@ -91,7 +91,7 @@ operation_t *barrelShifter(arm *state, word value, uint shiftPart) {
   return shiftedOp2;
 }
 
-operation_t *opRegister(arm *state, uint op2) {
+operation_t *opRegister(arm_t *state, uint op2) {
   // register that holds the value to be shifted
   uint rm = op2 & LEAST_NIBBLE_MASK;
   // value to be shifted
@@ -101,7 +101,7 @@ operation_t *opRegister(arm *state, uint op2) {
   return barrelShifter(state, value, shiftPart);
 }
 
-operation_t *opImmediate(arm *state, uint op2) {
+operation_t *opImmediate(arm_t *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = op2 & LEAST_BYTE_MASK;
   // number to rotate by
@@ -125,7 +125,7 @@ word getCarryOut(word op1, word op2, bool isAddition) {
   return op1 < op2 ? 0 : 1;
 }
 
-void setCPSR(arm *state, word result, uint carryOut) {
+void setCPSR(arm_t *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & CPSR_N_MASK;
   // set only if the result is all zeros
@@ -138,35 +138,16 @@ void setCPSR(arm *state, word result, uint carryOut) {
   state->registers[CPSR] = n | z | c | v;
 }
 
-dpi *extractDPI(arm *state, word instruction) {
-  dpi *extraction = malloc(sizeof(dpi));
-  extraction->instruction = instruction;
-  // extraction of code
-  extraction->i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
-  // instruction to execute
-  extraction->opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
-  // op1 is always the contents of register Rn
-  extraction->rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
-  // destination register
-  extraction->rd = (instruction & DPI_RD_MASK) >> DPI_RD_SHIFT;
-  // first operand
-  extraction->op1 = state->registers[extraction->rn];
-  // second operand
-  extraction->op2 = instruction & DPI_OP2_MASK;
-  return extraction;
-}
-
-void executeDPI(arm *state, word instruction) {
-  dpi *extraction = extractDPI(state, instruction);
+void executeDPI(arm_t *state, dp_t *decoded) {
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
-  operation_t *shiftedOp2 = extraction->i ? opImmediate(state, extraction->op2)
-                                          : opRegister(state, extraction->op2);
-  word op1 = extraction->op1;
+  operation_t *shiftedOp2 = decoded->i ? opImmediate(state, decoded->op2)
+                                       : opRegister(state, decoded->op2);
+  word op1 = decoded->op1;
   word op2 = shiftedOp2->result;
-  uint rd = extraction->rd;
+  uint rd = decoded->rd;
   uint carryOut = shiftedOp2->carryOut;
   word result;
-  switch (extraction->opcode) {
+  switch (decoded->opcode) {
   case AND:
     result = op1 & op2;
     state->registers[rd] = result;
@@ -214,11 +195,11 @@ void executeDPI(arm *state, word instruction) {
     assert(false);
   }
   // if s (bit 20) is set then the CPSR flags should be updated
-  if (UPDATE_CPSR(extraction->instruction)) {
+  if (decoded->s) {
     setCPSR(state, result, carryOut);
   }
   free(shiftedOp2);
-  free(extraction);
+  free(decoded);
 }
 
 // function for checking if word is within MEMORY_CAPACITY
@@ -232,7 +213,7 @@ bool checkValidAddress(word address) {
 }
 
 // function which stores address inside source register Rd into the the memory
-void store(arm *state, word sourceReg, word baseReg) {
+void store(arm_t *state, word sourceReg, word baseReg) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (!checkValidAddress(baseReg)) {
     return;
@@ -246,7 +227,7 @@ void store(arm *state, word sourceReg, word baseReg) {
 }
 
 // function which loads address inside base register Rn into the memory
-void load(arm *state, word destReg, word sourceAddr) {
+void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (checkValidAddress(sourceAddr)) {
     // value inside base register
@@ -256,34 +237,19 @@ void load(arm *state, word destReg, word sourceAddr) {
   }
 }
 
-void executeSDTI(arm *state, word instruction) {
-  // Components of the instruction
-  // immediate Offset
-  uint i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
-  // pre/Post indexing bit
-  uint p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
-  // up bit
-  uint u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
-  // load/Store bit
-  uint l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
-  // base Register
-  uint rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
-  // source/Destination register
-  uint rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
-  // offset
-  word offset = (instruction & SDTI_OFFSET_MASK);
+void executeSDTI(arm_t *state, sdt_t *decoded) {
+  uint l = decoded->l;
+  uint rd = decoded->rd;
+  word offset = decoded->offset;
   operation_t *shiftedOffset =
-      i ? opRegister(state, offset) : opImmediate(state, offset);
+      decoded->i ? opRegister(state, offset) : opImmediate(state, offset);
   // no carry out from this instruction
   offset = shiftedOffset->result;
   free(shiftedOffset);
-  if (rn == PC) {
-    // must ensure it contains the instruction’s address plus 8 bytes
-  }
-  word *baseReg = state->registers + rn;
+  word *baseReg = state->registers + decoded->rn;
   // offset if added if u is set, subtracted if not
-  offset = u ? offset : -offset;
-  if (p) {
+  offset = decoded->u ? offset : -offset;
+  if (decoded->p) {
     // pre-indexing
     l ? load(state, rd, *baseReg + offset)
       : store(state, rd, *baseReg + offset);
@@ -292,53 +258,50 @@ void executeSDTI(arm *state, word instruction) {
     l ? load(state, rd, *baseReg) : store(state, rd, *baseReg);
     *baseReg += offset;
   }
+  free(decoded);
 }
 
-void executeMultiply(arm *state, word instruction) {
-  // extraction of information from the instruction;
-  int destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
-  int regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
-  int regM = instruction & MULT_REG_M_MASK;
-
+void executeMultiply(arm_t *state, multiply_t *decoded) {
+  int regS = decoded->regS;
+  int regM = decoded->regM;
   // initial execution of instruction
   int result = state->registers[regM] * state->registers[regS];
-
-  // obtain value from Rn and add to result if Accumulate is set
-  if (instruction & ACCUMULATE_FLAG) {
-    int regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
-    result += state->registers[regN];
+  // obtain value from Rn and add to result if Accumulate (A) is set
+  if (decoded->a) {
+    result += state->registers[decoded->regN];
   }
   // update CPSR flags if S (bit 20 in instruction) is set
-  if (UPDATE_CPSR(instruction)) {
+  if (decoded->s) {
     // same as Data Processing but no carry out
     setCPSR(state, result, GET_CPSR_C(state->registers[CPSR]));
   }
-  state->registers[destination] = result;
+  state->registers[decoded->destination] = result;
+  free(decoded);
 }
 
-// Pipeline flush required for a branch instruction
-void flushPipeline(arm *state) {
+// pipeline flush required for a branch instruction
+void flushPipeline(arm_t *state) {
   state->fetched = 0;
   state->decoded.instruction = 0;
   state->decoded.isSet = false;
 }
 
-void executeBranch(arm *state, word instruction) {
+void executeBranch(arm_t *state, branch_t *decoded) {
   flushPipeline(state);
-  // extraction of information from instruction
-  int offset = instruction & BRANCH_OFFSET_MASK;
+  int offset = decoded->offset;
+  // extracting information from instruction
   int signBit = offset & BRANCH_SIGN_BIT;
-
   // shift, sign extension and addition of offset onto current address in PC
   state->registers[PC] +=
       ((offset << CURRENT_INSTRUCTION_SHIFT) |
        (signBit ? NEGATIVE_SIGN_EXTEND : POSITIVE_SIGN_EXTEND));
+  free(decoded);
 }
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEMORY_CAPACITY bytes */
-void initArm(arm *state, const char *fname) {
+void initArm(arm_t *state, const char *fname) {
   // load binary file into memory
   byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
   validatePtr(memory, "Not enough memory.\n");
@@ -369,34 +332,85 @@ word getWord(byte *startAddress, bool isBigEndian) {
   return w;
 }
 
-void fetch(arm *state) {
+void fetch(arm_t *state) {
   word memoryOffset = state->registers[PC];
   state->registers[PC] += WORD_SIZE_BYTES;
   state->fetched = getWord(state->memory + memoryOffset, NOT_BIG_ENDIAN);
 }
 
-void decode(arm *state) {
+dp_t *decodeDPI(arm_t *state, word instruction) {
+  dp_t *decoded = malloc(sizeof(dp_t));
+  // decoded of code
+  decoded->i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
+  // instruction to execute
+  decoded->opcode = (instruction & DPI_OPCODE_MASK) >> DPI_OPCODE_SHIFT;
+  // if s (bit 20) is set then the CPSR flags should be updated
+  decoded->s = UPDATE_CPSR(instruction);
+  // op1 is always the contents of register Rn
+  decoded->rn = (instruction & DPI_RN_MASK) >> DPI_RN_SHIFT;
+  // destination register
+  decoded->rd = (instruction & DPI_RD_MASK) >> DPI_RD_SHIFT;
+  // first operand
+  decoded->op1 = state->registers[decoded->rn];
+  // second operand
+  decoded->op2 = instruction & DPI_OP2_MASK;
+  return decoded;
+}
+
+multiply_t *decodeMultiply(arm_t *state, word instruction) {
+  multiply_t *decoded = malloc(sizeof(multiply_t));
+  decoded->a = instruction & ACCUMULATE_FLAG;
+  decoded->s = UPDATE_CPSR(instruction);
+  decoded->destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
+  decoded->regN = (instruction & MULT_REG_N_MASK) >> MULT_REG_N_SHIFT;
+  decoded->regS = (instruction & MULT_REG_S_MASK) >> MULT_REG_S_SHIFT;
+  decoded->regM = instruction & MULT_REG_M_MASK;
+  return decoded;
+}
+
+sdt_t *decodeSDTI(arm_t *state, word instruction) {
+  sdt_t *decoded = malloc(sizeof(sdt_t));
+  decoded->i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
+  decoded->p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
+  decoded->u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
+  decoded->l = (instruction & SDTI_L_MASK) >> SDTI_L_SHIFT;
+  decoded->rn = (instruction & SDTI_RN_MASK) >> SDTI_RN_SHIFT;
+  decoded->rd = (instruction & SDTI_RD_MASK) >> SDTI_RD_SHIFT;
+  decoded->offset = instruction & SDTI_OFFSET_MASK;
+  return decoded;
+}
+
+branch_t *decodeBranch(arm_t *state, word instruction) {
+  branch_t *decoded = malloc(sizeof(branch_t));
+  decoded->offset = instruction & BRANCH_OFFSET_MASK;
+  return decoded;
+}
+
+void decode(arm_t *state, decoded_t *decoded) {
   word instruction = state->fetched;
   state->decoded.instruction = instruction;
   // halt instruction
   if (state->fetched == 0) {
     return;
   }
-
   if (BITS_SET(instruction, DECODE_BRANCH_MASK, DECODE_BRANCH_EXPECTED)) {
     state->decoded.instructionType = BR;
+    decoded->branch = decodeBranch(state, instruction);
   } else if (BITS_SET(instruction, DECODE_SDT_MASK, DECODE_SDT_EXPECTED)) {
     state->decoded.instructionType = SDTI;
+    decoded->sdt = decodeSDTI(state, instruction);
   } else if (BITS_SET(instruction, DECODE_MULT_MASK, DECODE_MULT_EXPECTED)) {
     state->decoded.instructionType = MULT;
+    decoded->multiply = decodeMultiply(state, instruction);
   } else if (BITS_SET(instruction, DECODE_DPI_MASK, DECODE_DPI_EXPECTED)) {
     state->decoded.instructionType = DPI;
+    decoded->dp = decodeDPI(state, instruction);
   }
   state->decoded.isSet = true;
 }
 
 // checks the instruction condition with the CPSR flags
-bool checkCond(arm *state, word instruction) {
+bool checkCond(arm_t *state, word instruction) {
   // CPSR flag bits
   word cpsr = state->registers[CPSR];
   uint n = GET_CPSR_N(cpsr);
@@ -426,34 +440,31 @@ bool checkCond(arm *state, word instruction) {
   }
 }
 
-void execute(arm *state) {
-  if (state->decoded.isSet == false) {
+void execute(arm_t *state, decoded_t *decoded) {
+  word instruction = state->decoded.instruction;
+  if (!state->decoded.isSet || !checkCond(state, instruction)) {
     return;
   }
-  instructionState currInstructionState = state->decoded;
-  InstructionType instructionType = currInstructionState.instructionType;
-  word instruction = currInstructionState.instruction;
-  if (checkCond(state, instruction)) {
-    switch (instructionType) {
-    case BR:
-      executeBranch(state, instruction);
-      break;
-    case DPI:
-      executeDPI(state, instruction);
-      break;
-    case SDTI:
-      executeSDTI(state, instruction);
-      break;
-    case MULT:
-      executeMultiply(state, instruction);
-      break;
-    case IGNR:
-      // the instruction is ignored
-      break;
-    default:
-      // no other instructions
-      // should never happen
-      assert(false);
-    }
+  switch (state->decoded.instructionType) {
+  // TODO: consider removing instruction from the paramter of each execution
+  case BR:
+    executeBranch(state, decoded->branch);
+    break;
+  case DPI:
+    executeDPI(state, decoded->dp);
+    break;
+  case SDTI:
+    executeSDTI(state, decoded->sdt);
+    break;
+  case MULT:
+    executeMultiply(state, decoded->multiply);
+    break;
+  case IGNR:
+    // the instruction is ignored
+    break;
+  default:
+    // no other instructions
+    // should never happen
+    assert(false);
   }
 }

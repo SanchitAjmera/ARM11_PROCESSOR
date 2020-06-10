@@ -1,11 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <stdint.h>
-
-typedef uint32_t word;
-typedef unsigned int uint;
-
 // general constants
 #define MEMORY_CAPACITY 65536
 #define NUM_REGISTERS 17

@@ -1,7 +1,6 @@
 #ifndef EMULATE_UTIL_H
 #define EMULATE_UTIL_H
 
-#include "include/constants.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -18,7 +17,9 @@ enum Shift { LSL, LSR, ASR, ROR };
 // ARM instruction set
 typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionType;
 
+typedef uint32_t word;
 typedef uint8_t byte;
+typedef unsigned int uint;
 
 // struct for the result and carry out from shift/arithmetic operation
 typedef struct {
@@ -26,42 +27,77 @@ typedef struct {
   uint carryOut;
 } operation_t;
 
-// struct for the extraction of Data Processing instructions
+// struct for the decoding of Data Processing instructions
 typedef struct {
-  word instruction;
   uint i;
   enum Opcode opcode;
+  uint s;
   uint rn;
   uint rd;
   word op1;
   word op2;
-} dpi;
+} dp_t;
 
-// struct for instruction and InstructionType enum
+// struct for the decoding of Multiply instructions
+typedef struct {
+  uint a;
+  uint s;
+  int destination;
+  int regN;
+  int regS;
+  int regM;
+} multiply_t;
+
+// struct for the decoding of Single Data Transfer instructions
+typedef struct {
+  uint i;
+  uint p;
+  uint u;
+  uint l;
+  uint rn;
+  uint rd;
+  word offset;
+} sdt_t;
+
+// struct for the decoding of Branch instructions
+typedef struct {
+  int offset;
+} branch_t;
+
+// union for the decoded instruction types
+typedef union {
+  dp_t *dp;
+  multiply_t *multiply;
+  sdt_t *sdt;
+  branch_t *branch;
+} decoded_t;
+
+// struct for state of the instruction
 typedef struct {
   bool isSet;
   word instruction;
   InstructionType instructionType;
-} instructionState;
+} instructionState_t;
 
+// struct for the state of the ARM
 typedef struct {
   byte *memory;
-  /* 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR */
+  // 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR
   word *registers;
   word fetched;
-  instructionState decoded;
-} arm;
+  instructionState_t decoded;
+} arm_t;
 
 extern void validatePtr(const void *ptr, const char *error_msg);
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEM_LIMIT bytes */
-extern void initArm(arm *state, const char *fname);
+extern void initArm(arm_t *state, const char *fname);
 
 extern word getWord(byte *start_addr, bool isBigEndian);
-extern void fetch(arm *state);
-extern void decode(arm *state);
-extern void execute(arm *state);
+extern void fetch(arm_t *state);
+extern void decode(arm_t *state, decoded_t *decoded);
+extern void execute(arm_t *state, decoded_t *decoded);
 
 #endif

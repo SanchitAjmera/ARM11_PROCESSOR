@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void printArmState(arm *state) {
+void printArmState(arm_t *state) {
   printf("Registers:\n");
   char registerName[5];
   for (int i = 0; i < NUM_REGISTERS; i++) {
@@ -39,14 +39,15 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
-  arm *state = malloc(sizeof(arm));
+  arm_t *state = malloc(sizeof(arm_t));
   initArm(state, argv[1]);
+  decoded_t *decoded = malloc(sizeof(decoded_t));
 
   // PIPELINE
   while ((state->decoded.isSet && state->decoded.instruction) ||
          !state->decoded.isSet) {
-    execute(state);
-    decode(state);
+    execute(state, decoded);
+    decode(state, decoded);
     fetch(state);
   }
 
@@ -56,6 +57,6 @@ int main(int argc, char **argv) {
   free(state->memory);
   free(state->registers);
   free(state);
-
+  free(decoded);
   return EXIT_SUCCESS;
 }
