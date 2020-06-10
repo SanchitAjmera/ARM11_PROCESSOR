@@ -105,7 +105,7 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
   }
 }
 
-uint8_t parseImmediate(const char *imm) {
+uint8_t parseImmediate(const char *op2) {
   uint8_t imm;
   // TODO: check length before
   if (op2[1] == '0' && op2[2] == 'x') {
@@ -137,36 +137,31 @@ enum Shift parseShiftType(char *shift) {
   }
 }
 
-#define IS_IMMEDIATE(op2) (op2[0] == '#')
+#define IS_IMMEDIATE(op) (op[0] == '#')
 
-word parseOperand2(const char *op2) {
+word parseOperand2(const char **op2) {
   word operand2;
   // <#expression> is a numeric constant - an 8 bit immediate value
   // decimal or hexadecimal (“#0x...”)
-  if (IS_IMMEDIATE(op2)) {
+  if (IS_IMMEDIATE(op2[0])) {
     // TODO: throw error if numeric constant cannot be represented
     // TODO: determine 4-bit for rotation number
-    uint8_t imm = parseImmediate(op2);
+    uint8_t imm = parseImmediate(op2[0]);
     return operand2;
   }
 
-  // shifted register - Rm{,<shift>}
-  // <shift> {<shiftname> <register> or <shiftname> <#expression>}
-  // <shiftname> {enum Shift}
+  // shifted register - Rm <shiftname> {<register> or <#expression>}
 
-  // imm: r10{LSL #10}
-  // reg: r10{ROR r11}
-
-  // TODO: parse shifted immediate
-  uint rm = strtok(op2, "{") - '0';
-  enum Shift shiftType = parseShiftType(strtok(NULL, " "));
-  if (IS_IMMEDIATE(imm)) {
-    // uint shiftNum = parseImmediate(imm);
-    return (shiftNum << 3) & (shiftType << 1;
+  uint rm = rem(op2[0]);
+  enum Shift shiftType = parseShiftType(op2[1]);
+  if (IS_IMMEDIATE(op2[2])) {
+    uint shiftNum = parseImmediate(op2[2]);
+    return (shiftNum << 3) & (shiftType << 1);
   }
 
-  // TODO: parse shifted register
-  // uint rs = rem("<register>");
+  uint rs = rem(op2[2]);
+  // Rs can be any general purpose register except the PC
+  assert(rs != PC);
   return (rs << 4) & (shiftType << 1) & 1;
 }
 
@@ -186,11 +181,12 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
 
   // instructions: and, eor, sub, rsb, add, orr
   // syntax: <opcode> Rd, Rn, <Operand2>
+  // TODO: change conditional
   if (input->field_count == 4) {
     i = IS_IMMEDIATE(input->fields[2]) ? 1 : 0;
     rn = rem(input->fields[1]);
     rd = rem(input->fields[0]);
-    op2 = parseOperand2(input->fields[2]);
+    op2 = parseOperand2(input->fields + 2);
     return 0x0;
   }
 
@@ -199,7 +195,7 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   if (opcode == MOV) {
     i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
     rd = rem(input->fields[0]);
-    op2 = parseOperand2(input->fields[1]);
+    op2 = parseOperand2(input->fields + 1);
     return 0x0;
   }
 
@@ -209,6 +205,6 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
   s = 1;
   rn = rem(input->fields[0]);
-  op2 = parseOperand2(input->fields[1]);
+  op2 = parseOperand2(input->fields + 1);
   return 0x0;
 }
