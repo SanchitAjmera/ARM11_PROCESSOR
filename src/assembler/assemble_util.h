@@ -1,10 +1,12 @@
 #ifndef ASSEMBLE_UTIL_H
 #define ASSEMBLE_UTIL_H
 
+#include "../common/util.h"
 #include "file_lines.h"
 #include "symbol_table.h"
 #include <stdio.h>
 
+// generic (string, enum) struct for lookups
 typedef struct {
   char *key;
   int value;
@@ -40,11 +42,7 @@ static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
 enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 // shift types
 enum Shift { LSL, LSR, ASR, ROR };
-// generic (string, enum) struct for lookups
-typedef struct {
-  char *key;
-  int value;
-} pair_t;
+
 // TODO: (WIP) lookup tables
 static const pair_t shiftTable[] = {
     {"LSL", LSL}, {"LSR", LSR}, {"ASR", ASR}, {"ROR", ROR}};

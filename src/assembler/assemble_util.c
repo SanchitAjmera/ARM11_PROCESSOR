@@ -108,8 +108,8 @@ word rem(char *string) { return atoi(++string); }
 // returns respective int value, -1 for failure
 int lookup(const pair_t table[], int size, const char *key) {
   for (int i = 0; i < size; i++) {
-    if (!strcmp(table[i]->key, key)) {
-      return table[i]->value;
+    if (!strcmp(table[i].key, key)) {
+      return table[i].value;
     }
   }
   return LOOKUP_FAILURE;
@@ -279,88 +279,89 @@ word assembleBranch(symbol_table *symbolTable, instruction *input) {
   word offset = (targetAddress - currentAddress + 8) >> 2;
 
   return cond | BRANCH_HARDCODE | (offset | BRANCH_OFFSET_MASK);
+}
 
-  // removes bracketing around string
-  // converts remaining strings into unsigned int values
-  // returns array containing register address and expression address
-  word *remBracket(char *string) {
-    word *addresses;
-    int length = strlen(string);
-    char unbracketed[length - 2];
-    // removing brackets
-    for (int i = 1; i < length - 1; i++) {
-      unbracketed[i - 1] = string[i];
-    }
-    // separator
-    char *delim = ",";
-    // gets Rn
-    char *token = strtok(unbracketed, delim);
-    // gets address of register rn
-    addresses[0] = atoi(++token);
-    token = strtok(NULL, delim);
-    // if expression exists in address
-    if (token != NULL) {
-      addresses[1] = atoi(++token);
-    }
-    return addresses;
+// removes bracketing around string
+// converts remaining strings into unsigned int values
+// returns array containing register address and expression address
+word *remBracket(char *string) {
+  word *addresses;
+  int length = strlen(string);
+  char unbracketed[length - 2];
+  // removing brackets
+  for (int i = 1; i < length - 1; i++) {
+    unbracketed[i - 1] = string[i];
   }
+  // separator
+  char *delim = ",";
+  // gets Rn
+  char *token = strtok(unbracketed, delim);
+  // gets address of register rn
+  addresses[0] = atoi(++token);
+  token = strtok(NULL, delim);
+  // if expression exists in address
+  if (token != NULL) {
+    addresses[1] = atoi(++token);
+  }
+  return addresses;
+}
 
-  // this function decodes the address provided within the instruction struct
-  SDTIOperation SDTIparser(char **fields, uint field_count) {
-    // returns correct enum corresponding to decoded address
-    if (field_count == 3) {
-      return POST_RN_EXP;
-    } else if (strstr(fields[1], ",")) {
-      return PRE_RN_EXP;
-    } else if (strstr(fields[1], "r")) {
-      return PRE_RN;
+// this function decodes the address provided within the instruction struct
+SDTIOperation SDTIparser(char **fields, uint field_count) {
+  // returns correct enum corresponding to decoded address
+  if (field_count == 3) {
+    return POST_RN_EXP;
+  } else if (strstr(fields[1], ",")) {
+    return PRE_RN_EXP;
+  } else if (strstr(fields[1], "r")) {
+    return PRE_RN;
+  } else {
+    return NUMERIC_CONST;
+  }
+}
+
+word assembleSDTI(symbol_table *symbolTable, instruction *input) {
+  // decoding address type
+  SDTIOperation operation = SDTIparser(input->fields, input->field_count);
+  // Load bit
+  word l = (!strcmp(input->opcode, "ldr")) ? (1 << SDTI_L_SHIFT) : 0;
+  // PRE/POST-INDEXING bits
+  word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
+  // base register Rn
+  word Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
+  // source/ dest register Rd
+  word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
+  // offsets
+  word offset;
+  // switch case for different address types
+  switch (operation) {
+  case POST_RN_EXP:
+    // offset
+    offset = rem(input->fields[2]);
+  case PRE_RN:
+    // Offset is 0
+    offset = 0;
+  case PRE_RN_EXP:
+    // offset
+    offset = remBracket(input->fields[1])[1];
+  case NUMERIC_CONST:
+    // check if expression can fit inside a mov function
+    if (rem(input->fields[1]) <= SDTI_EXP_BOUND) {
+      return assembleDPI(symbolTable, input);
     } else {
-      return NUMERIC_CONST;
-    }
-  }
-
-  word assembleSDTI(symbol_table * symbolTable, instruction * input) {
-    // decoding address type
-    SDTIOperation operation = SDTIparser(input->fields, input->field_count);
-    // Load bit
-    word l = (!strcmp(input->opcode, "ldr")) ? (1 << SDTI_L_SHIFT) : 0;
-    // PRE/POST-INDEXING bits
-    word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
-    // base register Rn
-    word Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
-    // source/ dest register Rd
-    word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
-    // offsets
-    word offset;
-    // switch case for different address types
-    switch (operation) {
-    case POST_RN_EXP:
       // offset
-      offset = rem(input->fields[2]);
-    case PRE_RN:
-      // Offset is 0
-      offset = 0;
-    case PRE_RN_EXP:
-      // offset
-      offset = remBracket(input->fields[1])[1];
-    case NUMERIC_CONST:
-      // check if expression can fit inside a mov function
-      if (rem(input->fields[1]) <= SDTI_EXP_BOUND) {
-        return assembleDPI(symbolTable, input);
-      } else {
-        // offset
-        offset = getSymbol(symbolTable, input->fields[1])->body.address;
-        // base register Rn
-        Rn = 15;
-      }
-    default:
-      // this should never happen, fields were most likely parsed wrong
-      assert(false);
+      offset = getSymbol(symbolTable, input->fields[1])->body.address;
+      // base register Rn
+      Rn = 15;
     }
-    // immediate offsets
-    word i = 1 << SDTI_I_SHIFT;
-    // up bit
-    word u = 0;
-    // returning constructed instruction
-    return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
+  default:
+    // this should never happen, fields were most likely parsed wrong
+    assert(false);
   }
+  // immediate offsets
+  word i = 1 << SDTI_I_SHIFT;
+  // up bit
+  word u = 0;
+  // returning constructed instruction
+  return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
+}

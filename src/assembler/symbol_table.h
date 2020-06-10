@@ -2,12 +2,9 @@
 #define SYMBOL_TABLE_H
 
 #include "../common/constants.h"
+#include "../common/util.h"
 #include <stdbool.h>
 #include <stdint.h>
-
-struct instruction;
-struct symbol_table;
-struct symbol;
 
 typedef struct instruction instruction;
 typedef struct symbol_table symbol_table;

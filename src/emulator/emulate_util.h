@@ -2,6 +2,7 @@
 #define EMULATE_UTIL_H
 
 #include "../common/constants.h"
+#include "../common/util.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -17,10 +18,6 @@ enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 enum Shift { LSL, LSR, ASR, ROR };
 // ARM instruction set
 typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionType;
-
-typedef uint32_t word;
-typedef uint8_t byte;
-typedef unsigned int uint;
 
 // struct for the result and carry out from shift/arithmetic operation
 typedef struct {
