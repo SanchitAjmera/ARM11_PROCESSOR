@@ -42,6 +42,17 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 // removes first character and returns integer from string
 word rem(char *string) { return atoi(++string); }
 
+int lookup(const pair_t table[], const char *key) {
+  // TODO: determine size
+  int size = 0;
+  for (int i = 0; i < size; i++) {
+    if (!strcmp(table[i]->key, key)) {
+      return table[i]->value;
+    }
+  }
+  return -1;
+}
+
 // Essentially a 'String-to-Enum' function for Cond enum
 // The enum values are defined to match their binary counterparts
 word getCondition(const char *condition) {
