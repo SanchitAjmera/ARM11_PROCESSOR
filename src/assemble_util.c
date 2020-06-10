@@ -73,9 +73,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
 }
 
 // returns respective int value, -1 for failure
-int lookup(const pair_t table[], const char *key) {
-  // TODO: determine size
-  int size = 0;
+int lookup(const pair_t table[], int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i]->key, key)) {
       return table[i]->value;
@@ -85,7 +83,7 @@ int lookup(const pair_t table[], const char *key) {
 }
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
-  return lookup(opcodeTable, mnemonic) << DPI_OPCODE_SHIFT;
+  return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic) << DPI_OPCODE_SHIFT;
 }
 
 uint parseImmediate(const char *op2) {
@@ -98,7 +96,9 @@ uint parseImmediate(const char *op2) {
   return (uint)rem(op2);
 }
 
-enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
+enum Shift parseShiftType(char *shift) {
+  return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
+}
 
 word rotateLeft(word value, uint rotateNum) {
   uint msbs = value & ~((1 << rotateNum) - 1);
