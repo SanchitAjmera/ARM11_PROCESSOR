@@ -7,12 +7,13 @@ CFLAGS 	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 all: libs assemble emulate testme
 
-assemble: assemble.o assembler/assemble_util.o assembler/file_lines.o assembler/symbol_table.o
-emulate: emulate.o emulator/emulate_util.o
-testme: testme.o emulator/emulate_util.o
+assemble: assemble.o assembler/assemble_util.o assembler/file_lines.o assembler/symbol_table.o common/util.o
+emulate: emulate.o emulator/emulate_util.o common/util.o
+testme: testme.o emulator/emulate_util.o common/util.o
 libs:
 	cd assembler; make
 	cd emulator; make
+	cd common; make
 
 test:
 	./emulate ~/arm11_testsuite/test_cases/add01
@@ -26,3 +27,4 @@ clean:
 	rm -f testme
 	cd emulator; make clean
 	cd assembler; make clean
+	cd common; make clean
