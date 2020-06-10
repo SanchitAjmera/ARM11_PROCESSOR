@@ -72,19 +72,6 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
-// generic (key, value) struct for lookups
-typedef struct {
-  char *key;
-  int value;
-} pair_t;
-
-// TODO: (WIP) lookup tables (static and const?)
-pair_t shiftTable[] = {{"LSL", LSL}, {"LSR", LSR}, {"ASR", ASR}, {"ROR", ROR}};
-
-pair_t opcodeTable[] = {{"AND", AND}, {"EOR", EOR}, {"SUB", SUB}, {"RSB", RSB},
-                        {"ADD", ADD}, {"TST", TST}, {"TEQ", TEQ}, {"CMP", CMP},
-                        {"ORR", ORR}, {"MOV", MOV}};
-
 int lookup(pair_t table[], const char *key) {
   // TODO: determine TABLE_LENGTH
   for (int i = 0; i < TABLE_LENGTH; i++) {
@@ -96,11 +83,8 @@ int lookup(pair_t table[], const char *key) {
   return NULL;
 }
 
-// opcode mnemonics
-enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
-
 enum Opcode parseDPIOpcode(char *mnemonic) {
-  return lookup(opcodeTable, mnemonic);
+  return lookup(opcodeTable, mnemonic) << DPI_OPCODE_SHIFT;
 }
 
 uint8_t parseImmediate(const char *op2) {
@@ -114,12 +98,7 @@ uint8_t parseImmediate(const char *op2) {
   return imm;
 }
 
-// shift types
-enum Shift { LSL, LSR, ASR, ROR };
-
 enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
-
-#define IS_IMMEDIATE(op) (op[0] == '#')
 
 word parseOperand2(const char **op2) {
   word operand2;
@@ -147,8 +126,6 @@ word parseOperand2(const char **op2) {
   return (rs << 4) & (shiftType << 1) & 1;
 }
 
-#define DPI_COND (14 << 28) // 1110 (al)
-
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // TODO: parse instruction
   // TODO: generate 32 bit word
@@ -161,32 +138,35 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   word rd = 0;
   word op2;
 
-  // instructions: and, eor, sub, rsb, add, orr
-  // syntax: <opcode> Rd, Rn, <Operand2>
-  // TODO: change conditional
-  if (input->field_count == 4) {
-    i = IS_IMMEDIATE(input->fields[2]) ? 1 : 0;
-    rn = rem(input->fields[1]);
-    rd = rem(input->fields[0]);
-    op2 = parseOperand2(input->fields + 2);
-    return 0x0;
-  }
-
   // instruction: mov
   // syntax: mov Rd, <Operand2>
   if (opcode == MOV) {
-    i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
-    rd = rem(input->fields[0]);
+    i = IS_IMMEDIATE(input->fields[1]) ? 1 << DPI_I_SHIFT : 0;
+    rd = rem(input->fields[0]) << DPI_RD_SHIFT;
     op2 = parseOperand2(input->fields + 1);
-    return 0x0;
   }
 
   // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
 
-  i = IS_IMMEDIATE(input->fields[1]) ? 1 : 0;
-  s = 1;
-  rn = rem(input->fields[0]);
-  op2 = parseOperand2(input->fields + 1);
-  return 0x0;
+  else if (opcode == TST || opcode == TEQ || opcode == CMP) {
+    i = IS_IMMEDIATE(input->fields[1]) ? 1 << DPI_I_SHIFT : 0;
+    s = 1 << INSTRUCTION_S_MASK;
+    rn = rem(input->fields[0]) << DPI_RN_SHIFT;
+    op2 = parseOperand2(input->fields + 1);
+  }
+
+  // instructions: and, eor, sub, rsb, add, orr
+  // syntax: <opcode> Rd, Rn, <Operand2>
+  else {
+    i = IS_IMMEDIATE(input->fields[2]) ? 1 << DPI_I_SHIFT : 0;
+    rn = rem(input->fields[1]) << DPI_RN_SHIFT;
+    rd = rem(input->fields[0]) << DPI_RD_SHIFT;
+    op2 = parseOperand2(input->fields + 2);
+  }
+
+  // TODO: (WIP) remove code redundancy
+  // i = IS_IMMEDIATE() ? DPI_I_SHIFT;
+  // op2 = parseOperand2();
+  return DPI_COND | i | opcode | s | rn | rd | op2;
 }
