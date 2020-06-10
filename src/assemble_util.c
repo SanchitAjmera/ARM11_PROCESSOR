@@ -72,7 +72,7 @@ file_lines *scanFile(FILE *armFile, symbol_table *symbolTable) {
   return fileLines;
 }
 
-int lookup(pair_t table[], const char *key) {
+int lookup(const pair_t table[], const char *key) {
   // TODO: determine TABLE_LENGTH
   for (int i = 0; i < TABLE_LENGTH; i++) {
     if (!strcmp(table[i]->key, key)) {
@@ -100,73 +100,77 @@ uint8_t parseImmediate(const char *op2) {
 
 enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
 
+// TODO: (WIP) refactor with rotation use
+#define OVERFLOW(num) (num > 255)
+
 word parseOperand2(const char **op2) {
   word operand2;
-  // <#expression> is a numeric constant - an 8 bit immediate value
+  // <#expression> - an 8 bit immediate value
   // decimal or hexadecimal (“#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
-    // TODO: throw error if numeric constant cannot be represented
-    // TODO: determine 4-bit for rotation number
     uint8_t imm = parseImmediate(op2[0]);
+    // TODO: throw error if numeric constant cannot be represented
+    if (OVERFLOW(num)) {
+      fprintf(stderr, "Number cannot be represented.");
+      exit(EXIT_FAILURE);
+    }
+    // TODO: determine 4-bit for rotation number
     return operand2;
   }
 
   // shifted register - Rm <shiftname> {<register> or <#expression>}
-
   uint rm = rem(op2[0]);
   enum Shift shiftType = parseShiftType(op2[1]);
   if (IS_IMMEDIATE(op2[2])) {
     uint shiftNum = parseImmediate(op2[2]);
-    return (shiftNum << 3) & (shiftType << 1);
+    return (shiftNum << 8) | (shiftType << 5) | rm;
   }
-
   uint rs = rem(op2[2]);
   // Rs can be any general purpose register except the PC
   assert(rs != PC);
-  return (rs << 4) & (shiftType << 1) & 1;
+  return (rs << 9) | (shiftType << 5) | (1 << 4) | rm;
 }
 
 word assembleDPI(symbol_table *symbolTable, instruction *input) {
-  // TODO: parse instruction
-  // TODO: generate 32 bit word
-  // TODO: figure out if symbolTable is needed
-
-  word i;
   word opcode = parseDPIOpcode(input->opcode);
   word s = 0;
   word rn = 0;
   word rd = 0;
-  word op2;
+  char **operand2;
+  char *imm;
 
   // instruction: mov
   // syntax: mov Rd, <Operand2>
   if (opcode == MOV) {
-    i = IS_IMMEDIATE(input->fields[1]) ? 1 << DPI_I_SHIFT : 0;
-    rd = rem(input->fields[0]) << DPI_RD_SHIFT;
-    op2 = parseOperand2(input->fields + 1);
+    imm = input->fields[1];
+    rd = rem(input->fields[0]);
+    operand2 = input->fields + 1;
   }
 
   // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
 
   else if (opcode == TST || opcode == TEQ || opcode == CMP) {
-    i = IS_IMMEDIATE(input->fields[1]) ? 1 << DPI_I_SHIFT : 0;
-    s = 1 << INSTRUCTION_S_MASK;
-    rn = rem(input->fields[0]) << DPI_RN_SHIFT;
-    op2 = parseOperand2(input->fields + 1);
+    imm = input->fields[1];
+    // COND flags should be updated
+    s = 1;
+    rn = rem(input->fields[0]);
+    operand2 = input->fields + 1;
   }
 
   // instructions: and, eor, sub, rsb, add, orr
   // syntax: <opcode> Rd, Rn, <Operand2>
   else {
-    i = IS_IMMEDIATE(input->fields[2]) ? 1 << DPI_I_SHIFT : 0;
-    rn = rem(input->fields[1]) << DPI_RN_SHIFT;
-    rd = rem(input->fields[0]) << DPI_RD_SHIFT;
-    op2 = parseOperand2(input->fields + 2);
+    imm = input->fields[2];
+    rn = rem(input->fields[1]);
+    rd = rem(input->fields[0]);
+    operand2 = input->fields + 2;
   }
 
-  // TODO: (WIP) remove code redundancy
-  // i = IS_IMMEDIATE() ? DPI_I_SHIFT;
-  // op2 = parseOperand2();
+  s = s << DPI_S_SHIFT;
+  rn = rn << DPI_RN_SHIFT;
+  rd = rd << DPI_RD_SHIFT;
+  i = IS_IMMEDIATE(imm) ? 1 << DPI_I_SHIFT : 0;
+  op2 = parseOperand2(operand2);
   return DPI_COND | i | opcode | s | rn | rd | op2;
 }
