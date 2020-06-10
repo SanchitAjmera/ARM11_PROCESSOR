@@ -100,6 +100,11 @@ uint parseImmediate(const char *op2) {
 
 enum Shift parseShiftType(char *shift) { return lookup(shiftTable, shift); }
 
+word rotateLeft(word value, uint rotateNum) {
+  uint msbs = value & ~((1 << rotateNum) - 1);
+  return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
+}
+
 word calcRotatedImm(word imm) {
   // PRE: imm can be represented by WORD_SIZE bits
   uint mask = 1;
@@ -110,9 +115,9 @@ word calcRotatedImm(word imm) {
     }
     mask = mask << 1;
   }
-  // TODO: rotate imm
+  imm = rotateLeft(imm, rotation);
   // TODO: check if it can be represented
-  // TODO: return rotation | imm
+  return (rotation << 8) | imm
 }
 
 word parseOperand2Imm(const char **op2) {
