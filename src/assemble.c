@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     word = strtok(NULL, delim);
   }
 
-  FILE *binOutFile = fopen("out.bin", "wb");
+  FILE *binOutFile = fopen(argv[2], "wb");
   parseLines(fileLines, symbolTable, binOutFile);
   fclose(binOutFile);
 
