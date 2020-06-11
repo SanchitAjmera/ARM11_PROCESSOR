@@ -111,6 +111,7 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
 uint parseImmediate(const char *op2) {
   if (strlen(op2) > 2) {
     if (op2[1] == '0' && op2[2] == 'x') {
+      // TODO: check NULL end point works correctly
       return (uint)strtol(op2, NULL, HEX_BASE);
     }
   }
@@ -156,6 +157,9 @@ word parseOperand2Imm(const char **op2) {
   return imm;
 }
 
+// temp - to allow code to compile
+#define PC (16)
+
 word parseOperand2Reg(const char **op2) {
   uint rm = rem(op2[0]);
   enum Shift shiftType = parseShiftType(op2[1]);
@@ -170,7 +174,6 @@ word parseOperand2Reg(const char **op2) {
 }
 
 word parseOperand2(const char **op2) {
-  word operand2;
   // 8 bit immediate value - <#expression>
   // decimal or hexadecimal ("#n" or “#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
@@ -185,7 +188,7 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   word s = 0;
   word rn = 0;
   word rd = 0;
-  char **operand2;
+  const char **operand2;
   char *imm;
 
   // instruction: mov
@@ -220,8 +223,8 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   s = s << DPI_S_SHIFT;
   rn = rn << DPI_RN_SHIFT;
   rd = rd << DPI_RD_SHIFT;
-  i = IS_IMMEDIATE(imm) ? (1 << DPI_I_SHIFT) : 0;
-  op2 = parseOperand2(operand2);
+  word i = IS_IMMEDIATE(imm) ? (1 << DPI_I_SHIFT) : 0;
+  word op2 = parseOperand2(operand2);
   return DPI_COND | i | opcode | s | rn | rd | op2;
 }
 
@@ -254,7 +257,8 @@ word assembleBranch(symbol_table *symbolTable, instruction *input) {
   // Otherwise the condition of the branch will be the letters following 'b'
   word cond = !strcmp(input->opcode, "b")
                   ? ALWAYS
-                  : lookup(condTable, ++(input->opcode)) << COND_SHIFT;
+                  : lookup(condTable, COND_TABLE_SIZE, ++(input->opcode))
+                        << COND_SHIFT;
 
   word currentAddress = input->currentAddress;
   char *target = input->fields[0];
@@ -270,9 +274,9 @@ word assembleBranch(symbol_table *symbolTable, instruction *input) {
   return cond | BRANCH_HARDCODE | (offset | BRANCH_OFFSET_MASK);
 }
 
-// removes bracketing around string
-// converts remaining strings into unsigned int values
-// returns array containing register address and expression address
+/* removes bracketing around string
+converts remaining strings into unsigned int values
+returns array containing register address and expression address */
 word *remBracket(char *string) {
   word *addresses;
   int length = strlen(string);
