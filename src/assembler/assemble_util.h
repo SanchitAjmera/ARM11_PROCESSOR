@@ -39,11 +39,11 @@ static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
                                    {"lt", LT}, {"gt", GT}, {"le", LE},
                                    {"al", AL}};
 static const pair_t shiftTable[] = {
-    {"LSL", LSL}, {"LSR", LSR}, {"ASR", ASR}, {"ROR", ROR}};
+    {"lsl", LSL}, {"lsr", LSR}, {"asr", ASR}, {"ror", ROR}};
 
 static const pair_t opcodeTable[] = {
-    {"AND", AND}, {"EOR", EOR}, {"SUB", SUB}, {"RSB", RSB}, {"ADD", ADD},
-    {"TST", TST}, {"TEQ", TEQ}, {"CMP", CMP}, {"ORR", ORR}, {"MOV", MOV}};
+    {"and", AND}, {"eor", EOR}, {"sub", SUB}, {"rsb", RSB}, {"add", ADD},
+    {"tst", TST}, {"teq", TEQ}, {"cmp", CMP}, {"orr", ORR}, {"mov", MOV}};
 
 extern word assembleDPI(symbol_table *symbolTable, instruction input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction input);

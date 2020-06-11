@@ -26,7 +26,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
     bool isLabel = false;
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
-        char *label = strtok(line, "\n");
+        char *label = strtok(line, ":");
         symbol labelSymbol = {strptr(label), LABEL,
                               .body.address =
                                   output->lineCount * WORD_SIZE_BYTES};
@@ -84,6 +84,8 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     assert(instrSymbol->type == INSTR);
     word binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
     printf("output: %x\n", binLine);
+
+    fwrite(&binLine, sizeof(word), 1, out);
 
     for (int j = 0; j < fieldCount; j++) {
       printf("token: %s\n", fields[j]);
@@ -239,7 +241,7 @@ word assembleMultiply(symbol_table *symbolTable, instruction input) {
   word accumulate = 0;
 
   // set rn and A for an 'accumulate' input
-  if (!strcmp(input.opcode, "mla")) {
+  if (!strcmp("mla", input.opcode)) {
     rn = rem(input.fields[3]) << MULT_REG_N_SHIFT;
     accumulate = ACCUMULATE_FLAG;
   }
@@ -253,7 +255,7 @@ both conditional and unconditional, to the corresponding ARM-binary */
 word assembleBranch(symbol_table *symbolTable, instruction input) {
   // The 'b' instruction is always executed
   // Otherwise the condition of the branch will be the letters following 'b'
-  word cond = !strcmp(input.opcode, "b")
+  word cond = !strcmp("b", input.opcode)
                   ? ALWAYS
                   : lookup(condTable, COND_TABLE_SIZE, ++(input.opcode))
                         << COND_SHIFT;
@@ -267,8 +269,8 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
                            ? rem(target)
                            : getSymbol(symbolTable, target)->body.address;
   // Calculates the offset with the pipeline effect considered
-  word offset = (targetAddress - currentAddress + 8) >> 2;
-  return cond | BRANCH_HARDCODE | (offset | BRANCH_OFFSET_MASK);
+  word offset = (targetAddress - currentAddress - 8) >> 2;
+  return cond | BRANCH_HARDCODE | (offset & BRANCH_OFFSET_MASK);
 }
 
 /* removes bracketing around string
@@ -317,7 +319,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   // decoding address type
   SDTIOperation operation = SDTIparser(input.fields, input.field_count);
   // Load bit
-  word l = (!strcmp(input.opcode, "ldr")) ? (1 << SDTI_L_SHIFT) : 0;
+  word l = (!strcmp("ldr", input.opcode)) ? (1 << SDTI_L_SHIFT) : 0;
   // PRE/POST-INDEXING bits
   word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
   // base register Rn
