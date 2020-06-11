@@ -2,6 +2,7 @@
 #define EMULATE_CONSTANTS_H
 
 // general constants
+#define MAX_REGISTER_NAME (5)
 #define NOT_BIG_ENDIAN (false)
 #define IS_BIG_ENDIAN (true)
 #define CPSR_N_MASK (1 << 31)

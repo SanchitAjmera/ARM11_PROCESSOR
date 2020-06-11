@@ -7,7 +7,7 @@
 
 void printArmState(arm_t *state) {
   printf("Registers:\n");
-  char registerName[5];
+  char registerName[MAX_REGISTER_NAME];
   for (int i = 0; i < NUM_REGISTERS; i++) {
     if (i == 13 || i == 14) {
       // Not used in this exercise
