@@ -40,8 +40,11 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
         break; // Each line contains up to one expression. Remove if incorrect
       }
     }
-    if (isLabel == false) {
-      addLine(output, strtok(line, "\n")); // Adds line stripped of \n
+    if (!isLabel) {
+      char *lineStripped;
+      if ((lineStripped = strtok(line, "\n"))) {
+        addLine(output, lineStripped); // Adds line stripped of \n
+      }
     }
   }
 
@@ -114,7 +117,7 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
 
 uint parseImmediate(char *op2) {
   if (strlen(op2) > 2) {
-    if (op2[1] == '0' && op2[2] == 'x') {
+    if (op2[0] == '0' && op2[1] == 'x') {
       // TODO: check NULL end point works correctly
       return (uint)strtol(op2, NULL, HEX_BASE);
     }
@@ -138,6 +141,7 @@ word calcRotatedImm(word imm) {
   for (int i = 0; i < WORD_SIZE; i++) {
     if (mask & imm) {
       rotation = WORD_SIZE - i;
+      break;
     }
     mask = mask << 1;
   }
@@ -288,9 +292,9 @@ returns array containing register address and expression address */
 word *remBracket(char *string) {
   word *addresses = malloc(sizeof(*addresses));
   int length = strlen(string);
-  char unbracketed[length - 2];
+  char unbracketed[length - 1];
   // removing brackets
-  for (int i = 1; i < length - 1; i++) {
+  for (int i = 1; i < length; i++) {
     unbracketed[i - 1] = string[i];
   }
   // separator
@@ -342,13 +346,16 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   case POST_RN_EXP:
     // offset
     offset = rem(input.fields[2]);
+    break;
   case PRE_RN:
     // Offset is 0
     offset = 0;
+    break;
   case PRE_RN_EXP:
     // offset
     // TODO: check if this is null? - Alex
     offset = addresses[1];
+    break;
   case NUMERIC_CONST:
     // check if expression can fit inside a mov function
     if (rem(input.fields[1]) <= SDTI_EXP_BOUND) {
@@ -359,9 +366,11 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
       // base register Rn
       Rn = 15;
     }
+    break;
   default:
     // this should never happen, fields were most likely parsed wrong
     assert(false);
+    break;
   }
   // immediate offsets
   word i = 1 << SDTI_I_SHIFT;
