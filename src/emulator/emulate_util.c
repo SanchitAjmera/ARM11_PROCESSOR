@@ -55,7 +55,7 @@ operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   uint shiftNum = shiftByReg ? shiftByRegister(state, shiftPart)
                              : shiftByConstant(shiftPart);
   // bits that specify the shift operation
-  enum Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE;
+  Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE;
   // tuple for the result and the carry out bit
   operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(operation_t));
   errorExit(validatePtr(shiftedOp2, "Not enough memory!"));
@@ -412,7 +412,7 @@ bool checkCond(arm_t *state, word instruction) {
   uint n = GET_CPSR_N(cpsr);
   uint z = GET_CPSR_Z(cpsr);
   uint v = GET_CPSR_V(cpsr);
-  enum Cond cond = GET_CPSR_FLAGS(instruction);
+  Cond cond = GET_CPSR_FLAGS(instruction);
   // conditions for instruction
   switch (cond) {
   case EQ:

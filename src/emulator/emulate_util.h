@@ -19,7 +19,7 @@ typedef struct {
 // struct for the decoding of Data Processing instructions
 typedef struct {
   uint i;
-  enum Opcode opcode;
+  Opcode opcode;
   uint s;
   uint rn;
   uint rd;

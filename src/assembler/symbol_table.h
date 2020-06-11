@@ -9,7 +9,7 @@ typedef struct instruction instruction;
 typedef struct symbol_table symbol_table;
 typedef struct symbol symbol;
 
-enum SymbolType { LABEL, INSTR };
+typedef enum { LABEL, INSTR } SymbolType;
 
 struct instruction {
   char *opcode;  // String representing the instruction INCLUDING cond suffix
@@ -26,7 +26,7 @@ struct symbol_table {
 
 struct symbol {
   char *name;
-  enum SymbolType type;
+  SymbolType type;
   union {
     word address;                                      // LABEL
     word (*assembleFunc)(symbol_table *, instruction); // INSTR

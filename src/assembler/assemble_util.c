@@ -120,7 +120,7 @@ int lookup(const pair_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
-enum Opcode parseDPIOpcode(char *mnemonic) {
+Opcode parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
@@ -136,7 +136,7 @@ uint parseImmediate(char *op2) {
   return (uint)atoi(op2);
 }
 
-enum Shift parseShiftType(const char *shift) {
+Shift parseShiftType(const char *shift) {
   return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
 }
 
@@ -183,7 +183,7 @@ word parseOperand2Imm(char **op2) {
 
 word parseOperand2Reg(char **op2, uint args) {
   uint rm = rem(op2[0]);
-  enum Shift shiftType = parseShiftType(op2[1]);
+  Shift shiftType = parseShiftType(op2[1]);
   if (args == 1) {
     return rm;
   }

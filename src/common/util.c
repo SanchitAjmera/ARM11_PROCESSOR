@@ -10,7 +10,7 @@ char *strptr(char *in) {
   return out;
 }
 
-Error validatePtr(const void *ptr, const char *error_msg) {
+Error validatePtr(const void *ptr, const char *errorMsg) {
   if (ptr == NULL) {
     printf("Error: %s\n", error_msg);
     return ERR_FAIL;
