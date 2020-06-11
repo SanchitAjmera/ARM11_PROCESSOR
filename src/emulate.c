@@ -1,4 +1,5 @@
 #include "common/constants.h"
+#include "emulator/emulate_constants.h"
 #include "emulator/emulate_util.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,9 +14,9 @@ void printArmState(arm_t *state) {
       continue;
     }
 
-    if (i == 15) {
+    if (i == PC) {
       strcpy(registerName, "PC");
-    } else if (i == 16) {
+    } else if (i == CPSR) {
       strcpy(registerName, "CPSR");
     } else {
       sprintf(registerName, "$%i", i);

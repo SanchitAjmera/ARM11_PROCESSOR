@@ -1,4 +1,5 @@
 #include "file_lines.h"
+#include "assemble_constants.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

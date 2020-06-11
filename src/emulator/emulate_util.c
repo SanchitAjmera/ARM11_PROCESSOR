@@ -1,5 +1,7 @@
 #include "emulate_util.h"
+#include "../common/constants.h"
 #include "../common/util.h"
+#include "emulate_constants.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
