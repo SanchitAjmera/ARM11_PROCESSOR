@@ -1,6 +1,8 @@
 #ifndef EMULATE_UTIL_H
 #define EMULATE_UTIL_H
 
+#include "../common/constants.h"
+#include "../common/util.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -16,10 +18,6 @@ enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 enum Shift { LSL, LSR, ASR, ROR };
 // ARM instruction set
 typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionType;
-
-typedef uint32_t word;
-typedef uint8_t byte;
-typedef unsigned int uint;
 
 // struct for the result and carry out from shift/arithmetic operation
 typedef struct {
@@ -87,8 +85,6 @@ typedef struct {
   word fetched;
   instructionState_t decoded;
 } arm_t;
-
-extern void validatePtr(const void *ptr, const char *error_msg);
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register

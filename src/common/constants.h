@@ -17,6 +17,8 @@
 #define CPSR_Z_SHIFT 30
 #define CPSR_C_SHIFT 29
 #define CPSR_V_SHIFT 28
+#define COND_SHIFT 28
+#define ALWAYS (14 << COND_SHIFT)
 #define GET_CPSR_N(cpsr) ((cpsr & CPSR_N_MASK) >> CPSR_N_SHIFT)
 #define GET_CPSR_Z(cpsr) ((cpsr & CPSR_Z_MASK) >> CPSR_Z_SHIFT)
 #define GET_CPSR_C(cpsr) ((cpsr & CPSR_C_MASK) >> CPSR_C_SHIFT)
@@ -48,6 +50,8 @@
 #define SDTI_L_SHIFT 20
 #define SDTI_RN_SHIFT 16
 #define SDTI_RD_SHIFT 12
+#define SDTI_EXP_BOUND 0xFF
+#define SDTI_HARDCODE (1 << 26)
 
 // constants for Multiply instruction
 #define MULT_RDEST_MASK 0x000F0000
@@ -59,6 +63,7 @@
 #define MULT_RDEST_SHIFT 16
 #define ACCUMULATE_FLAG (1 << 21)
 #define INSTRUCTION_S_MASK (1 << 20)
+#define MULT_HARDCODE (0x90)
 #define UPDATE_CPSR(instruction) (instruction & INSTRUCTION_S_MASK)
 
 // constants for Branch instruction
@@ -67,6 +72,7 @@
 #define CURRENT_INSTRUCTION_SHIFT 2
 #define NEGATIVE_SIGN_EXTEND 0xFC000000
 #define POSITIVE_SIGN_EXTEND 0
+#define BRANCH_HARDCODE 0x0A000000
 
 // constants for Data Processing instruction
 #define SET_CPSR_C (1 << 29)

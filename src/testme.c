@@ -1,11 +1,13 @@
-#include "constants.h"
-#include "emulate_util.h"
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
-void testBool(bool cond, char *testName) {
-  printf("T: %s : %s\n", testName, cond ? "OK" : "FAIL");
+#include "common/constants.h"
+#include "emulator/emulate_util.h"
+
+void testBool(bool cond, char *test_name) {
+  printf("T: %s : %s\n", test_name, cond ? "OK" : "FAIL");
 }
 
 /* Loads a binary file fname into state memory and returns strcmp() between

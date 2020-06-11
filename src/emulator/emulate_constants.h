@@ -1,0 +1,3 @@
+#ifndef EMULATE_CONSTANTS_H
+#define EMULATE_CONSTANTS_H
+#endif
