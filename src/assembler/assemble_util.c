@@ -218,11 +218,11 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   }
 
   // lsl Rn, <#expression>
-  if (opcode == LSL) {
+  if (opcode == LSL_SPECIAL) {
     opcode = MOV;
     rn = rem(input.fields[0]);
-    operand2[0] = "lsl";
-    operand2[1] = input.fields[1];
+    char *ops[3] = {input.fields[0], "lsl", input.fields[1]};
+    operand2 = ops;
   }
 
   // instruction: mov
@@ -388,6 +388,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     } else {
       // offset
       offset = getSymbol(symbolTable, input.fields[1])->body.address - 8;
+      offset -= input.currentAddress;
       // base register Rn
       Rn = PC << SDTI_RN_SHIFT;
     }

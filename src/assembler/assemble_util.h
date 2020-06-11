@@ -26,7 +26,7 @@ enum Opcode {
   ORR = 12,
   MOV,
   ANDEQ,
-  LSL,
+  LSL_SPECIAL,
 };
 // condition suffixes
 enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
@@ -57,7 +57,7 @@ static const pair_t shiftTable[] = {
 static const pair_t opcodeTable[] = {
     {"and", AND}, {"eor", EOR}, {"sub", SUB},     {"rsb", RSB},
     {"add", ADD}, {"tst", TST}, {"teq", TEQ},     {"cmp", CMP},
-    {"orr", ORR}, {"mov", MOV}, {"andeq", ANDEQ}, {"lsl", LSL}};
+    {"orr", ORR}, {"mov", MOV}, {"andeq", ANDEQ}, {"lsl", LSL_SPECIAL}};
 
 extern word assembleDPI(symbol_table *symbolTable, instruction input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction input);
