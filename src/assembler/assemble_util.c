@@ -145,7 +145,7 @@ word calcRotatedImm(word imm) {
   return (rotation << 8) | imm;
 }
 
-word parseOperand2Imm(const char **op2) {
+word parseOperand2Imm(char **op2) {
   uint imm = parseImmediate(op2[0]);
   if (OVERFLOW(imm)) {
     fprintf(stderr, "Number cannot be represented.");
@@ -160,7 +160,7 @@ word parseOperand2Imm(const char **op2) {
 // temp - to allow code to compile
 #define PC (16)
 
-word parseOperand2Reg(const char **op2) {
+word parseOperand2Reg(char **op2) {
   uint rm = rem(op2[0]);
   enum Shift shiftType = parseShiftType(op2[1]);
   if (IS_IMMEDIATE(op2[2])) {
@@ -173,7 +173,7 @@ word parseOperand2Reg(const char **op2) {
   return (rs << 9) | (shiftType << 5) | (1 << 4) | rm;
 }
 
-word parseOperand2(const char **op2) {
+word parseOperand2(char **op2) {
   // 8 bit immediate value - <#expression>
   // decimal or hexadecimal ("#n" or “#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
@@ -188,7 +188,7 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   word s = 0;
   word rn = 0;
   word rd = 0;
-  const char **operand2;
+  char **operand2;
   char *imm;
 
   // instruction: mov
