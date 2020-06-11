@@ -8,6 +8,7 @@
 
 #define LINE_CHAR_LIM 512
 #define WORD_SIZE_BYTES 4
+#define ROTATION_FACTOR 2
 
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
