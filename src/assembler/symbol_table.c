@@ -46,7 +46,7 @@ void addSymbol(symbol_table *s, symbol entry) {
   if (s->symbolCount == s->maxSymbols) { // Resize symbol table
     s->maxSymbols *= 2;
     s->symbols = realloc(s->symbols, s->maxSymbols);
-    validatePtr(s->symbols);
+    validatePtr(s->symbols, "Null pointer.");
   }
 
   s->symbols[s->symbolCount] = entry;

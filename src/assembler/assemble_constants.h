@@ -12,7 +12,6 @@
 // constants for Data Processing Instructions
 #define MAX_BYTE (0xFF)
 #define HEX_BASE (16)
-#define DPI_COND (14 << 28)
 #define DPI_I_SHIFT 25
 #define DPI_OPCODE_SHIFT 21
 #define DPI_RN_SHIFT 16

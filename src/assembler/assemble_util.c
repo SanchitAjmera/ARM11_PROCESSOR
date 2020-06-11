@@ -223,7 +223,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   rd = rd << DPI_RD_SHIFT;
   word i = IS_IMMEDIATE(imm) ? (1 << DPI_I_SHIFT) : 0;
   word op2 = parseOperand2(operand2);
-  return DPI_COND | i | opcode | s | rn | rd | op2;
+  return ALWAYS | i | opcode | s | rn | rd | op2;
 }
 
 /*Provides assembly function for 'mla' and 'mul' instructions and
@@ -263,12 +263,11 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
 
   // A hashtag denotes a constant address, otherwise the address needs
   // found from the symbol table
-  word targetAddress = (target[0] == '#')
+  word targetAddress = IS_IMMEDIATE(target)
                            ? rem(target)
                            : getSymbol(symbolTable, target)->body.address;
   // Calculates the offset with the pipeline effect considered
   word offset = (targetAddress - currentAddress + 8) >> 2;
-
   return cond | BRANCH_HARDCODE | (offset | BRANCH_OFFSET_MASK);
 }
 

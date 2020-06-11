@@ -9,6 +9,16 @@
 #define LINE_CHAR_LIM 512
 #define WORD_SIZE_BYTES 4
 
+/*registers 0-12 will be used by their value so for reg0 we can just use 0
+but these will make it easier to address in memory*/
+enum Register { PC = 15, CPSR = 16 };
+// opcode mnemonics
+enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
+// condition suffixes
+enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
+// shift types
+enum Shift { LSL, LSR, ASR, ROR };
+
 // generic (string, enum) struct for lookups
 typedef struct {
   char *key;
@@ -22,14 +32,6 @@ typedef enum SDTIOperation {
   PRE_RN_EXP,
   POST_RN_EXP
 } SDTIOperation;
-
-// Will be removed from this file in future (accessible from constants)
-enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
-
-// opcode mnemonics
-enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
-// shift types
-enum Shift { LSL, LSR, ASR, ROR };
 
 // TODO: (WIP) lookup tables
 // To be used with Lookup for string to enum conversion in getCondition;
