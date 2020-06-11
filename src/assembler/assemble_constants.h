@@ -18,7 +18,7 @@
 #define DPI_RD_SHIFT 12
 #define DPI_S_SHIFT 20
 #define SHIFT_TABLE_SIZE (4)
-#define OPCODE_TABLE_SIZE (10)
+#define OPCODE_TABLE_SIZE (12)
 
 // constants for Single Data Transfer Instructions
 
