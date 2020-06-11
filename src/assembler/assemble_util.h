@@ -44,6 +44,7 @@ enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 #define DPI_S_SHIFT 20
 #define SHIFT_TABLE_SIZE (4)
 #define OPCODE_TABLE_SIZE (10)
+#define COND_TABLE_SIZE (7)
 // opcode mnemonics
 enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 // shift types
