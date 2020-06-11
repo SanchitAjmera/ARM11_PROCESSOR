@@ -76,6 +76,9 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     char *token = strtok_r(line, " ,", &rest);
     while (token != NULL) {
       fields[fieldCount++] = token;
+      if (rest[0] == ' ') {
+        rest++;
+      }
       if (rest[0] == '[') { // If the next token starts with a [
         token = strtok_r(rest, "]", &rest);
       } else {
@@ -122,9 +125,11 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
 }
 
 uint parseImmediate(char *op2) {
+  if (op2[0] == '-') {
+    op2++;
+  }
   if (strlen(op2) > 2) {
     if (op2[0] == '0' && op2[1] == 'x') {
-      // TODO: check NULL end point works correctly
       return (uint)strtol(op2, NULL, HEX_BASE);
     }
   }
@@ -184,8 +189,8 @@ word parseOperand2Reg(char **op2, uint args) {
   }
   assert(args == 3);
   if (IS_IMMEDIATE(op2[2])) {
-    uint shiftNum = parseImmediate(op2[2]);
-    return (shiftNum << 8) | (shiftType << 5) | rm;
+    uint shiftNum = parseImmediate(++(op2[2]));
+    return (shiftNum << 7) | (shiftType << 5) | rm;
   }
   uint rs = rem(op2[2]);
   // Rs can be any general purpose register except the PC
@@ -217,14 +222,6 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     return 0x00000000;
   }
 
-  // lsl Rn, <#expression>
-  if (opcode == LSL_SPECIAL) {
-    opcode = MOV;
-    rn = rem(input.fields[0]);
-    char *ops[3] = {input.fields[0], "lsl", input.fields[1]};
-    operand2 = ops;
-  }
-
   // instruction: mov
   // syntax: mov Rd, <Operand2>
   if (opcode == MOV) {
@@ -232,6 +229,15 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     rd = rem(input.fields[0]);
     operand2 = input.fields + 1;
     args = input.field_count - 1;
+  }
+  // lsl Rn, <#expression>
+  else if (opcode == LSL_SPECIAL) {
+    opcode = MOV;
+    imm = "rn";
+    rd = rem(input.fields[0]);
+    char *ops[3] = {input.fields[0], "lsl", input.fields[1]};
+    args = 3;
+    operand2 = ops;
   }
 
   // instructions: tst, teq, cmp
@@ -314,15 +320,15 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
 converts remaining strings into unsigned int values
 returns array containing register address and expression address */
 word *remBracket(char *string) {
-  word *addresses = malloc(sizeof(*addresses));
+  word *addresses = malloc(sizeof(word) * 4);
   int length = strlen(string);
   char unbracketed[length - 1];
   // removing brackets
-  for (int i = 1; i < length; i++) {
+  for (int i = 1; i < length; i++) { // TODO ++string
     unbracketed[i - 1] = string[i];
   }
   // separator
-  char *delim = ",";
+  char *delim = ", ";
   // gets Rn
   char *token = strtok(unbracketed, delim);
   // gets address of register rn
@@ -330,7 +336,11 @@ word *remBracket(char *string) {
   token = strtok(NULL, delim);
   // if expression exists in address
   if (token != NULL) {
-    addresses[1] = atoi(++token);
+    char firstLetter = token[0];
+    char secondLetter = (++token)[0];
+    addresses[3] = firstLetter == 'r' ? 1 : 0;
+    addresses[2] = secondLetter == '-' ? 0 : 1;
+    addresses[1] = parseImmediate(token);
   }
   return addresses;
 }
@@ -365,10 +375,15 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   word Rd = rem(input.fields[0]) << SDTI_RD_SHIFT;
   // offsets
   word offset;
+  // up bit
+  word u = 1 << SDTI_U_SHIFT;
+  // immediate offsets
+  word i = 0;
   // switch case for different address types
   switch (operation) {
   case POST_RN_EXP:
     // offset
+    i = IS_IMMEDIATE(input.fields[2]) ? 0 : 1 << SDTI_I_SHIFT;
     offset = rem(input.fields[2]);
     break;
   case PRE_RN:
@@ -379,6 +394,8 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     // offset
     // TODO: check if this is null? - Alex
     offset = addresses[1];
+    u = addresses[2] << SDTI_U_SHIFT;
+    i = addresses[3] << SDTI_I_SHIFT;
     break;
   case NUMERIC_CONST:
     // check if expression can fit inside a mov function
@@ -398,10 +415,6 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     assert(false);
     break;
   }
-  // immediate offsets
-  word i = 0;
-  // up bit
-  word u = 1 << SDTI_U_SHIFT;
   // freeing memory for the register address and expression address
   free(addresses);
   // returning constructed instruction
