@@ -2,7 +2,7 @@
 #define ASSEMBLE_CONSTANTS_H
 
 // general constants & pre-processor functions
-#define IS_IMMEDIATE(op) (op[0] == '#')
+#define IS_IMMEDIATE(op) (op[0] == '#' || op[0] == '=')
 #define MAX_NUM (4294967295)
 // TODO: MAX_NUM (pow(2, WORD_SIZE) - 1)
 #define OVERFLOW(num) (num > MAX_NUM)

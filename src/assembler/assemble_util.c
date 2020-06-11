@@ -36,7 +36,9 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
       } else if (line[i] == '=') { // Line contains an =0x expression
         char *expression =
             strtok(line + i - 1, " ],\n"); // Pulls expression out
-        addLine(expressions, expression);
+        if (parseImmediate(expression + 1) > MAX_BYTE) {
+          addLine(expressions, expression);
+        }
         break; // Each line contains up to one expression. Remove if incorrect
       }
     }
@@ -85,8 +87,12 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
                          i * WORD_SIZE_BYTES};
     symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
     assert(instrSymbol != NULL);
-    assert(instrSymbol->type == INSTR);
-    word binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
+    word binLine;
+    if (instrSymbol->type == INSTR) {
+      binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
+    } else {
+      binLine = parseImmediate(in->lines[i]);
+    }
     printf("output: %x\n", binLine);
 
     fwrite(&binLine, sizeof(word), 1, out);
@@ -130,7 +136,7 @@ enum Shift parseShiftType(const char *shift) {
 }
 
 word rotateLeft(word value, uint rotateNum) {
-  uint msbs = value & ~((1 << rotateNum) - 1);
+  uint msbs = value & ~((1 << (WORD_SIZE - rotateNum)) - 1);
   return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
 }
 
@@ -149,10 +155,10 @@ word calcRotatedImm(word imm) {
   if (rotation % ROTATION_FACTOR != 0) {
     rotation++;
   }
-  rotation = rotation / ROTATION_FACTOR;
   imm = rotateLeft(imm, rotation);
+  rotation = rotation / ROTATION_FACTOR;
   if (imm > MAX_BYTE) {
-    fprintf(stderr, "Number cannot be represented.");
+    fprintf(stderr, "Number cannot be represented.\n");
     exit(EXIT_FAILURE);
   }
   return (rotation << 8) | imm;
@@ -161,7 +167,7 @@ word calcRotatedImm(word imm) {
 word parseOperand2Imm(char **op2) {
   uint imm = parseImmediate(++op2[0]);
   if (OVERFLOW(imm)) {
-    fprintf(stderr, "Number cannot be represented.");
+    fprintf(stderr, "Number cannot be represented.\n");
     exit(EXIT_FAILURE);
   }
   if (imm > MAX_BYTE) {
@@ -363,13 +369,14 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     break;
   case NUMERIC_CONST:
     // check if expression can fit inside a mov function
-    if (rem(input.fields[1]) <= SDTI_EXP_BOUND) {
+    if (parseImmediate(input.fields[1] + 1) <= SDTI_EXP_BOUND) {
+      input.opcode = "mov";
       return assembleDPI(symbolTable, input);
     } else {
       // offset
-      offset = getSymbol(symbolTable, input.fields[1])->body.address;
+      offset = getSymbol(symbolTable, input.fields[1])->body.address - 8;
       // base register Rn
-      Rn = 15;
+      Rn = PC << SDTI_RN_SHIFT;
     }
     break;
   default:
@@ -378,9 +385,9 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     break;
   }
   // immediate offsets
-  word i = 1 << SDTI_I_SHIFT;
+  word i = 0;
   // up bit
-  word u = 0;
+  word u = 1 << SDTI_U_SHIFT;
   // freeing memory for the register address and expression address
   free(addresses);
   // returning constructed instruction

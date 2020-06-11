@@ -50,6 +50,7 @@ extern word assembleDPI(symbol_table *symbolTable, instruction input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction input);
 extern word assembleMultiply(symbol_table *symbolTable, instruction input);
 extern word assembleBranch(symbol_table *symbolTable, instruction input);
+extern uint parseImmediate(char *op2);
 
 extern void scanFile(FILE *armFile, symbol_table *symbolTable,
                      file_lines *output);
