@@ -1,6 +1,7 @@
 #include "assemble_util.h"
 #include "../common/constants.h"
 #include "../common/util.h"
+#include "assemble_constants.h"
 #include "file_lines.h"
 #include <assert.h>
 #include <stdbool.h>
@@ -183,8 +184,8 @@ word parseOperand2(char **op2) {
   return parseOperand2Reg(op2);
 }
 
-word assembleDPI(symbol_table *symbolTable, instruction *input) {
-  word opcode = parseDPIOpcode(input->opcode);
+word assembleDPI(symbol_table *symbolTable, instruction input) {
+  word opcode = parseDPIOpcode(input.opcode);
   word s = 0;
   word rn = 0;
   word rd = 0;
@@ -194,29 +195,29 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
   // instruction: mov
   // syntax: mov Rd, <Operand2>
   if (opcode == MOV) {
-    imm = input->fields[1];
-    rd = rem(input->fields[0]);
-    operand2 = input->fields + 1;
+    imm = input.fields[1];
+    rd = rem(input.fields[0]);
+    operand2 = input.fields + 1;
   }
 
   // instructions: tst, teq, cmp
   // syntax: <opcode> Rn, <Operand2>
 
   else if (opcode == TST || opcode == TEQ || opcode == CMP) {
-    imm = input->fields[1];
-    // COND flags should be updated
+    imm = input.fields[1];
+    // COND flags should be updated (s bit is set)
     s = 1;
-    rn = rem(input->fields[0]);
-    operand2 = input->fields + 1;
+    rn = rem(input.fields[0]);
+    operand2 = input.fields + 1;
   }
 
   // instructions: and, eor, sub, rsb, add, orr
   // syntax: <opcode> Rd, Rn, <Operand2>
   else {
-    imm = input->fields[2];
-    rn = rem(input->fields[1]);
-    rd = rem(input->fields[0]);
-    operand2 = input->fields + 2;
+    imm = input.fields[2];
+    rn = rem(input.fields[1]);
+    rd = rem(input.fields[0]);
+    operand2 = input.fields + 2;
   }
 
   opcode = opcode << DPI_OPCODE_SHIFT;
@@ -230,19 +231,19 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
 
 /*Provides assembly function for 'mla' and 'mul' instructions and
 returns the corresponding ARM-binary based on the instruction arguments*/
-word assembleMultiply(symbol_table *symbolTable, instruction *input) {
+word assembleMultiply(symbol_table *symbolTable, instruction input) {
   // Defining the components of the instruction
-  word rd = rem(input->fields[0]) << MULT_RDEST_SHIFT;
-  word rm = rem(input->fields[1]);
-  word rs = rem(input->fields[2]) << MULT_REG_S_SHIFT;
+  word rd = rem(input.fields[0]) << MULT_RDEST_SHIFT;
+  word rm = rem(input.fields[1]);
+  word rs = rem(input.fields[2]) << MULT_REG_S_SHIFT;
 
   // Initialising for 'mul', may be updated if 'mla'
   word rn = 0;
   word accumulate = 0;
 
   // set rn and A for an 'accumulate' input
-  if (!strcmp(input->opcode, "mla")) {
-    rn = rem(input->fields[3]) << MULT_REG_N_SHIFT;
+  if (!strcmp(input.opcode, "mla")) {
+    rn = rem(input.fields[3]) << MULT_REG_N_SHIFT;
     accumulate = ACCUMULATE_FLAG;
   }
   // S is set to 0 so no need to explicitly write it
@@ -252,16 +253,16 @@ word assembleMultiply(symbol_table *symbolTable, instruction *input) {
 
 /* Converts all intructions related to a branch instruction, including
 both conditional and unconditional, to the corresponding ARM-binary */
-word assembleBranch(symbol_table *symbolTable, instruction *input) {
+word assembleBranch(symbol_table *symbolTable, instruction input) {
   // The 'b' instruction is always executed
   // Otherwise the condition of the branch will be the letters following 'b'
-  word cond = !strcmp(input->opcode, "b")
+  word cond = !strcmp(input.opcode, "b")
                   ? ALWAYS
-                  : lookup(condTable, COND_TABLE_SIZE, ++(input->opcode))
+                  : lookup(condTable, COND_TABLE_SIZE, ++(input.opcode))
                         << COND_SHIFT;
 
-  word currentAddress = input->currentAddress;
-  char *target = input->fields[0];
+  word currentAddress = input.currentAddress;
+  char *target = input.fields[0];
 
   // A hashtag denotes a constant address, otherwise the address needs
   // found from the symbol table
@@ -313,27 +314,27 @@ SDTIOperation SDTIparser(char **fields, uint field_count) {
   }
 }
 
-word assembleSDTI(symbol_table *symbolTable, instruction *input) {
+word assembleSDTI(symbol_table *symbolTable, instruction input) {
   // TODO: (WIP) I refactored your `remBracket` & added var `addresses` - Alex
-  word *addresses = remBracket(input->fields[1]);
+  word *addresses = remBracket(input.fields[1]);
 
   // decoding address type
-  SDTIOperation operation = SDTIparser(input->fields, input->field_count);
+  SDTIOperation operation = SDTIparser(input.fields, input.field_count);
   // Load bit
-  word l = (!strcmp(input->opcode, "ldr")) ? (1 << SDTI_L_SHIFT) : 0;
+  word l = (!strcmp(input.opcode, "ldr")) ? (1 << SDTI_L_SHIFT) : 0;
   // PRE/POST-INDEXING bits
   word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
   // base register Rn
   word Rn = addresses[0] << SDTI_RN_SHIFT;
   // source/ dest register Rd
-  word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
+  word Rd = rem(input.fields[0]) << SDTI_RD_SHIFT;
   // offsets
   word offset;
   // switch case for different address types
   switch (operation) {
   case POST_RN_EXP:
     // offset
-    offset = rem(input->fields[2]);
+    offset = rem(input.fields[2]);
   case PRE_RN:
     // Offset is 0
     offset = 0;
@@ -343,11 +344,11 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
     offset = addresses[1];
   case NUMERIC_CONST:
     // check if expression can fit inside a mov function
-    if (rem(input->fields[1]) <= SDTI_EXP_BOUND) {
+    if (rem(input.fields[1]) <= SDTI_EXP_BOUND) {
       return assembleDPI(symbolTable, input);
     } else {
       // offset
-      offset = getSymbol(symbolTable, input->fields[1])->body.address;
+      offset = getSymbol(symbolTable, input.fields[1])->body.address;
       // base register Rn
       Rn = 15;
     }
