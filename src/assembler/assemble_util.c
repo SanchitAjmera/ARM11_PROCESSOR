@@ -77,7 +77,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     while (token != NULL) {
       fields[fieldCount++] = token;
       if (rest[0] == ' ') {
-        rest++;
+        REMOVE_FIRST_CHAR(rest);
       }
       if (rest[0] == '[') { // If the next token starts with a [
         token = strtok_r(rest, "]", &rest);
@@ -108,7 +108,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
 }
 
 // removes first character and returns integer from string
-word rem(const char *string) { return atoi(++string); }
+word rem(const char *string) { return atoi(REMOVE_FIRST_CHAR(string)); }
 
 // returns respective int value; -1 for failure
 int lookup(const pair_t table[], const int size, const char *key) {
@@ -125,8 +125,9 @@ Opcode parseDPIOpcode(char *mnemonic) {
 }
 
 uint parseImmediate(char *op2) {
+  // PRE: # has been removed from <#expression> (op2)
   if (op2[0] == '-') {
-    op2++;
+    REMOVE_FIRST_CHAR(op2);
   }
   if (strlen(op2) > 2) {
     if (op2[0] == '0' && op2[1] == 'x') {
@@ -170,7 +171,7 @@ word calcRotatedImm(word imm) {
 }
 
 word parseOperand2Imm(char **op2) {
-  uint imm = parseImmediate(++op2[0]);
+  uint imm = parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
   if (OVERFLOW(imm)) {
     fprintf(stderr, "Number cannot be represented.\n");
     exit(EXIT_FAILURE);
@@ -189,7 +190,7 @@ word parseOperand2Reg(char **op2, uint args) {
   }
   assert(args == 3);
   if (IS_IMMEDIATE(op2[2])) {
-    uint shiftNum = parseImmediate(++(op2[2]));
+    uint shiftNum = parseImmediate(REMOVE_FIRST_CHAR(op2[2]));
     return (shiftNum << 7) | (shiftType << 5) | rm;
   }
   uint rs = rem(op2[2]);
@@ -224,17 +225,19 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
 
   // instruction: mov
   // syntax: mov Rd, <Operand2>
-  if (opcode == MOV) {
+  else if (opcode == MOV) {
     imm = input.fields[1];
     rd = rem(input.fields[0]);
     operand2 = input.fields + 1;
     args = input.field_count - 1;
   }
+
   // lsl Rn, <#expression>
   else if (opcode == LSL_SPECIAL) {
     opcode = MOV;
-    imm = "rn";
+    imm = input.fields[0];
     rd = rem(input.fields[0]);
+    // TODO: remove magic number (3)
     char *ops[3] = {input.fields[0], "lsl", input.fields[1]};
     args = 3;
     operand2 = ops;
@@ -298,10 +301,11 @@ both conditional and unconditional, to the corresponding ARM-binary */
 word assembleBranch(symbol_table *symbolTable, instruction input) {
   // The 'b' instruction is always executed
   // Otherwise the condition of the branch will be the letters following 'b'
-  word cond = !strcmp("b", input.opcode)
-                  ? ALWAYS
-                  : lookup(condTable, COND_TABLE_SIZE, ++(input.opcode))
-                        << COND_SHIFT;
+  word cond =
+      !strcmp("b", input.opcode)
+          ? ALWAYS
+          : lookup(condTable, COND_TABLE_SIZE, REMOVE_FIRST_CHAR(input.opcode))
+                << COND_SHIFT;
 
   word currentAddress = input.currentAddress;
   char *target = input.fields[0];
@@ -324,7 +328,8 @@ word *remBracket(char *string) {
   int length = strlen(string);
   char unbracketed[length - 1];
   // removing brackets
-  for (int i = 1; i < length; i++) { // TODO ++string
+  // TODO ++string
+  for (int i = 1; i < length; i++) {
     unbracketed[i - 1] = string[i];
   }
   // separator
@@ -332,12 +337,12 @@ word *remBracket(char *string) {
   // gets Rn
   char *token = strtok(unbracketed, delim);
   // gets address of register rn
-  addresses[0] = atoi(++token);
+  addresses[0] = atoi(REMOVE_FIRST_CHAR(token));
   token = strtok(NULL, delim);
   // if expression exists in address
   if (token != NULL) {
     char firstLetter = token[0];
-    char secondLetter = (++token)[0];
+    char secondLetter = (REMOVE_FIRST_CHAR(token))[0];
     addresses[3] = firstLetter == 'r' ? 1 : 0;
     addresses[2] = secondLetter == '-' ? 0 : 1;
     addresses[1] = parseImmediate(token);

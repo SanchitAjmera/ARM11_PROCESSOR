@@ -3,6 +3,7 @@
 
 // general constants & pre-processor functions
 #define IS_IMMEDIATE(op) (op[0] == '#' || op[0] == '=')
+#define REMOVE_FIRST_CHAR(string) (++string)
 #define MAX_NUM (4294967295)
 // TODO: MAX_NUM (pow(2, WORD_SIZE) - 1)
 #define OVERFLOW(num) (num > MAX_NUM)
