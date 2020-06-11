@@ -14,7 +14,20 @@
 but these will make it easier to address in memory*/
 enum Register { PC = 15, CPSR = 16 };
 // opcode mnemonics
-enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
+enum Opcode {
+  AND,
+  EOR,
+  SUB,
+  RSB,
+  ADD,
+  TST = 8,
+  TEQ,
+  CMP,
+  ORR = 12,
+  MOV,
+  ANDEQ,
+  LSL,
+};
 // condition suffixes
 enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
 // shift types
@@ -34,7 +47,6 @@ typedef enum SDTIOperation {
   POST_RN_EXP
 } SDTIOperation;
 
-// TODO: (WIP) lookup tables
 // To be used with Lookup for string to enum conversion in getCondition;
 static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
                                    {"lt", LT}, {"gt", GT}, {"le", LE},
@@ -43,8 +55,9 @@ static const pair_t shiftTable[] = {
     {"lsl", LSL}, {"lsr", LSR}, {"asr", ASR}, {"ror", ROR}};
 
 static const pair_t opcodeTable[] = {
-    {"and", AND}, {"eor", EOR}, {"sub", SUB}, {"rsb", RSB}, {"add", ADD},
-    {"tst", TST}, {"teq", TEQ}, {"cmp", CMP}, {"orr", ORR}, {"mov", MOV}};
+    {"and", AND}, {"eor", EOR}, {"sub", SUB},     {"rsb", RSB},
+    {"add", ADD}, {"tst", TST}, {"teq", TEQ},     {"cmp", CMP},
+    {"orr", ORR}, {"mov", MOV}, {"andeq", ANDEQ}, {"lsl", LSL}};
 
 extern word assembleDPI(symbol_table *symbolTable, instruction input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction input);

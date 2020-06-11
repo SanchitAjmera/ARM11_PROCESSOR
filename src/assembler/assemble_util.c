@@ -91,7 +91,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     if (instrSymbol->type == INSTR) {
       binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
     } else {
-      binLine = parseImmediate(in->lines[i]);
+      binLine = parseImmediate(in->lines[i] + 1);
     }
     printf("output: %x\n", binLine);
 
@@ -211,6 +211,19 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   char **operand2;
   uint args;
   char *imm;
+
+  // andeq r0, r0, r0
+  if (opcode == ANDEQ) {
+    return 0x00000000;
+  }
+
+  // lsl Rn, <#expression>
+  if (opcode == LSL) {
+    opcode = MOV;
+    rn = rem(input.fields[0]);
+    operand2[0] = "lsl";
+    operand2[1] = input.fields[1];
+  }
 
   // instruction: mov
   // syntax: mov Rd, <Operand2>
