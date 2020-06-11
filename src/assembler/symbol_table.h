@@ -1,7 +1,6 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#include "../common/constants.h"
 #include "../common/util.h"
 #include <stdbool.h>
 #include <stdint.h>
