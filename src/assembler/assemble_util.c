@@ -8,17 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define LINE_CHAR_LIM 512
-#define WORD_SIZE_BYTES 4
-
-// Enum for different types of addresses in SDTI assembly instructions
-typedef enum SDTIOperation {
-  NUMERIC_CONST,
-  PRE_RN,
-  PRE_RN_EXP,
-  POST_RN_EXP
-} SDTIOperation;
-
 /* Performs the first scan on a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
@@ -103,10 +92,10 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
 }
 
 // removes first character and returns integer from string
-word rem(char *string) { return atoi(++string); }
+word rem(const char *string) { return atoi(++string); }
 
-// returns respective int value, -1 for failure
-int lookup(const pair_t table[], int size, const char *key) {
+// returns respective int value; -1 for failure
+int lookup(const pair_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
       return table[i].value;
@@ -116,20 +105,19 @@ int lookup(const pair_t table[], int size, const char *key) {
 }
 
 enum Opcode parseDPIOpcode(char *mnemonic) {
-  return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic) << DPI_OPCODE_SHIFT;
+  return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
 uint parseImmediate(const char *op2) {
   if (strlen(op2) > 2) {
     if (op2[1] == '0' && op2[2] == 'x') {
-      return (uint)strtol(hex, NULL, HEX_BASE);
+      return (uint)strtol(op2, NULL, HEX_BASE);
     }
   }
-  // TODO: check for op2 > MAX_NUM here?
   return (uint)rem(op2);
 }
 
-enum Shift parseShiftType(char *shift) {
+enum Shift parseShiftType(const char *shift) {
   return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
 }
 
@@ -153,7 +141,7 @@ word calcRotatedImm(word imm) {
     fprintf(stderr, "Number cannot be represented.");
     exit(EXIT_FAILURE);
   }
-  return (rotation << 8) | imm
+  return (rotation << 8) | imm;
 }
 
 word parseOperand2Imm(const char **op2) {
@@ -228,10 +216,11 @@ word assembleDPI(symbol_table *symbolTable, instruction *input) {
     operand2 = input->fields + 2;
   }
 
+  opcode = opcode << DPI_OPCODE_SHIFT;
   s = s << DPI_S_SHIFT;
   rn = rn << DPI_RN_SHIFT;
   rd = rd << DPI_RD_SHIFT;
-  i = IS_IMMEDIATE(imm) ? 1 << DPI_I_SHIFT : 0;
+  i = IS_IMMEDIATE(imm) ? (1 << DPI_I_SHIFT) : 0;
   op2 = parseOperand2(operand2);
   return DPI_COND | i | opcode | s | rn | rd | op2;
 }
