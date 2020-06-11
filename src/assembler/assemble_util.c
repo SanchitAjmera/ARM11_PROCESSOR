@@ -278,7 +278,7 @@ word assembleBranch(symbol_table *symbolTable, instruction *input) {
 converts remaining strings into unsigned int values
 returns array containing register address and expression address */
 word *remBracket(char *string) {
-  word *addresses;
+  word *addresses = malloc(sizeof(*addresses));
   int length = strlen(string);
   char unbracketed[length - 2];
   // removing brackets
@@ -314,6 +314,9 @@ SDTIOperation SDTIparser(char **fields, uint field_count) {
 }
 
 word assembleSDTI(symbol_table *symbolTable, instruction *input) {
+  // TODO: (WIP) I refactored your `remBracket` & added var `addresses` - Alex
+  word *addresses = remBracket(input->fields[1]);
+
   // decoding address type
   SDTIOperation operation = SDTIparser(input->fields, input->field_count);
   // Load bit
@@ -321,7 +324,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   // PRE/POST-INDEXING bits
   word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
   // base register Rn
-  word Rn = remBracket(input->fields[1])[0] << SDTI_RN_SHIFT;
+  word Rn = addresses[0] << SDTI_RN_SHIFT;
   // source/ dest register Rd
   word Rd = rem(input->fields[0]) << SDTI_RD_SHIFT;
   // offsets
@@ -336,7 +339,8 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
     offset = 0;
   case PRE_RN_EXP:
     // offset
-    offset = remBracket(input->fields[1])[1];
+    // TODO: check if this is null? - Alex
+    offset = addresses[1];
   case NUMERIC_CONST:
     // check if expression can fit inside a mov function
     if (rem(input->fields[1]) <= SDTI_EXP_BOUND) {
@@ -355,6 +359,8 @@ word assembleSDTI(symbol_table *symbolTable, instruction *input) {
   word i = 1 << SDTI_I_SHIFT;
   // up bit
   word u = 0;
+  // freeing memory for the register address and expression address
+  free(addresses);
   // returning constructed instruction
   return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
 }
