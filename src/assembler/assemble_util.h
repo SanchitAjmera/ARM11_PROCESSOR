@@ -62,7 +62,10 @@ static const pair_t opcodeTable[] = {
     {"AND", AND}, {"EOR", EOR}, {"SUB", SUB}, {"RSB", RSB}, {"ADD", ADD},
     {"TST", TST}, {"TEQ", TEQ}, {"CMP", CMP}, {"ORR", ORR}, {"MOV", MOV}};
 
+extern word assembleDPI(symbol_table *symbolTable, instruction *input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction *input);
+extern word assembleMultiply(symbol_table *symbolTable, instruction *input);
+extern word assembleBranch(symbol_table *symbolTable, instruction *input);
 
 extern void scanFile(FILE *armFile, symbol_table *symbolTable,
                      file_lines *output);
