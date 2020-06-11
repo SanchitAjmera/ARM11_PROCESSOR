@@ -45,9 +45,8 @@ void addSymbol(symbol_table *s, symbol entry) {
 
   if (s->symbolCount == s->maxSymbols) { // Resize symbol table
     s->maxSymbols *= 2;
-    if ((s->symbols = realloc(s->symbols, s->maxSymbols)) == NULL) {
-      printf("error!");
-    }
+    s->symbols = realloc(s->symbols, s->maxSymbols);
+    validatePtr(s->symbols);
   }
 
   s->symbols[s->symbolCount] = entry;
