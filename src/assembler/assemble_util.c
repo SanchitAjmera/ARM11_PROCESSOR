@@ -145,6 +145,11 @@ word calcRotatedImm(word imm) {
     }
     mask = mask << 1;
   }
+  // rotation must be even
+  if (rotation % ROTATION_FACTOR != 0) {
+    rotation++;
+  }
+  rotation = rotation / ROTATION_FACTOR;
   imm = rotateLeft(imm, rotation);
   if (imm > MAX_BYTE) {
     fprintf(stderr, "Number cannot be represented.");
