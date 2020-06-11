@@ -158,9 +158,6 @@ word parseOperand2Imm(char **op2) {
   return imm;
 }
 
-// temp - to allow code to compile
-#define PC (16)
-
 word parseOperand2Reg(char **op2) {
   uint rm = rem(op2[0]);
   enum Shift shiftType = parseShiftType(op2[1]);
