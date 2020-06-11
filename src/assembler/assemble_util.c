@@ -61,6 +61,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
 
 /*  Performs the second pass on fileLines */
 void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
+  assert(out);
   for (int i = 0; i < in->lineCount; i++) {
     char *line = in->lines[i];
     char *rest = NULL;
@@ -111,14 +112,14 @@ enum Opcode parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
-uint parseImmediate(const char *op2) {
+uint parseImmediate(char *op2) {
   if (strlen(op2) > 2) {
     if (op2[1] == '0' && op2[2] == 'x') {
       // TODO: check NULL end point works correctly
       return (uint)strtol(op2, NULL, HEX_BASE);
     }
   }
-  return (uint)rem(op2);
+  return (uint)atoi(op2);
 }
 
 enum Shift parseShiftType(const char *shift) {
@@ -149,7 +150,7 @@ word calcRotatedImm(word imm) {
 }
 
 word parseOperand2Imm(char **op2) {
-  uint imm = parseImmediate(op2[0]);
+  uint imm = parseImmediate(++op2[0]);
   if (OVERFLOW(imm)) {
     fprintf(stderr, "Number cannot be represented.");
     exit(EXIT_FAILURE);
@@ -160,9 +161,13 @@ word parseOperand2Imm(char **op2) {
   return imm;
 }
 
-word parseOperand2Reg(char **op2) {
+word parseOperand2Reg(char **op2, uint args) {
   uint rm = rem(op2[0]);
   enum Shift shiftType = parseShiftType(op2[1]);
+  if (args == 1) {
+    return rm;
+  }
+  assert(args == 3);
   if (IS_IMMEDIATE(op2[2])) {
     uint shiftNum = parseImmediate(op2[2]);
     return (shiftNum << 8) | (shiftType << 5) | rm;
@@ -173,14 +178,14 @@ word parseOperand2Reg(char **op2) {
   return (rs << 9) | (shiftType << 5) | (1 << 4) | rm;
 }
 
-word parseOperand2(char **op2) {
+word parseOperand2(char **op2, uint args) {
   // 8 bit immediate value - <#expression>
   // decimal or hexadecimal ("#n" or “#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
     return parseOperand2Imm(op2);
   }
   // shifted register - Rm <shiftname> {<register> or <#expression>}
-  return parseOperand2Reg(op2);
+  return parseOperand2Reg(op2, args);
 }
 
 word assembleDPI(symbol_table *symbolTable, instruction input) {
@@ -189,6 +194,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   word rn = 0;
   word rd = 0;
   char **operand2;
+  uint args;
   char *imm;
 
   // instruction: mov
@@ -197,6 +203,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     imm = input.fields[1];
     rd = rem(input.fields[0]);
     operand2 = input.fields + 1;
+    args = input.field_count - 1;
   }
 
   // instructions: tst, teq, cmp
@@ -208,6 +215,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     s = 1;
     rn = rem(input.fields[0]);
     operand2 = input.fields + 1;
+    args = input.field_count - 1;
   }
 
   // instructions: and, eor, sub, rsb, add, orr
@@ -217,6 +225,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     rn = rem(input.fields[1]);
     rd = rem(input.fields[0]);
     operand2 = input.fields + 2;
+    args = input.field_count - 2;
   }
 
   opcode = opcode << DPI_OPCODE_SHIFT;
@@ -224,7 +233,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   rn = rn << DPI_RN_SHIFT;
   rd = rd << DPI_RD_SHIFT;
   word i = IS_IMMEDIATE(imm) ? (1 << DPI_I_SHIFT) : 0;
-  word op2 = parseOperand2(operand2);
+  word op2 = parseOperand2(operand2, args);
   return ALWAYS | i | opcode | s | rn | rd | op2;
 }
 
