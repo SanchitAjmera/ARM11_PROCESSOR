@@ -6,19 +6,25 @@
 #include "symbol_table.h"
 #include <stdio.h>
 
+#define LINE_CHAR_LIM 512
+#define WORD_SIZE_BYTES 4
+
 // generic (string, enum) struct for lookups
 typedef struct {
   char *key;
   int value;
 } pair_t;
 
+// Enum for different types of addresses in SDTI assembly instructions
+typedef enum SDTIOperation {
+  NUMERIC_CONST,
+  PRE_RN,
+  PRE_RN_EXP,
+  POST_RN_EXP
+} SDTIOperation;
+
 // Will be removed from this file in future (accessible from constants)
 enum Cond { EQ, NE, GE = 10, LT, GT, LE, AL };
-
-// To be used with Lookup for string to enum conversion in getCondition;
-static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
-                                   {"lt", LT}, {"gt", GT}, {"le", LE},
-                                   {"al", AL}};
 
 // used for assemble dpi
 #define IS_IMMEDIATE(op) (op[0] == '#')
@@ -44,6 +50,10 @@ enum Opcode { AND, EOR, SUB, RSB, ADD, TST = 8, TEQ, CMP, ORR = 12, MOV };
 enum Shift { LSL, LSR, ASR, ROR };
 
 // TODO: (WIP) lookup tables
+// To be used with Lookup for string to enum conversion in getCondition;
+static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
+                                   {"lt", LT}, {"gt", GT}, {"le", LE},
+                                   {"al", AL}};
 static const pair_t shiftTable[] = {
     {"LSL", LSL}, {"LSR", LSR}, {"ASR", ASR}, {"ROR", ROR}};
 
