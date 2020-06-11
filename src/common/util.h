@@ -18,7 +18,7 @@ typedef uint8_t byte;
 typedef unsigned int uint;
 
 extern char *strptr(char *in);
-extern int validatePtr(const void *ptr, const char *error_msg);
+extern Error validatePtr(const void *ptr, const char *error_msg);
 extern void errorExit(Error error);
 
 #endif
