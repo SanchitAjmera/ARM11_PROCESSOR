@@ -46,7 +46,7 @@
 
 // constants for Branch instruction
 #define BRANCH_SIGN_BIT (1 << 23)
-#define CURRENT_INSTRUCTION_SHIFT (2
+#define CURRENT_INSTRUCTION_SHIFT (2)
 #define NEGATIVE_SIGN_EXTEND (0xFC000000)
 #define POSITIVE_SIGN_EXTEND (0)
 
@@ -64,7 +64,7 @@
 #define GET_SHIFT_TYPE (1)
 #define LEAST_NIBBLE_MASK (0xF)
 #define GET_SHIFT_INSTRUCTION (4)
-#define GET_SHIFT_CONSTANT_SHIFT ()
+#define GET_SHIFT_CONSTANT (3)
 #define MSB_MASK (1 << 31)
 #define LSB_MASK (0x1)
 #define NO_ROTATION (0)

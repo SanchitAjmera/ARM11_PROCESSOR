@@ -9,7 +9,7 @@
 
 uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
-  return shiftPart >> GET_SHIFT_CONSTANT_SHIFT;
+  return shiftPart >> GET_SHIFT_CONSTANT;
 }
 
 uint shiftByRegister(arm_t *state, uint shiftPart) {
