@@ -12,7 +12,7 @@ char *strptr(char *in) {
 
 Error validatePtr(const void *ptr, const char *errorMsg) {
   if (ptr == NULL) {
-    printf("Error: %s\n", error_msg);
+    printf("Error: %s\n", errorMsg);
     return ERR_FAIL;
   }
   return ERR_PASS;
