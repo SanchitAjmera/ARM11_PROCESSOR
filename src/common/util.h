@@ -6,9 +6,9 @@
 typedef enum { ERR_PASS = 0, ERR_FAIL = 1 } Error;
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
-typedef enum Register { PC = 15, CPSR = 16 };
+typedef enum { PC = 15, CPSR = 16 } Register;
 // opcode mnemonics
-typedef enum Opcode {
+typedef enum {
   AND,
   EOR,
   SUB,
