@@ -343,12 +343,12 @@ static word *remBracket(char *string) {
   // Gets Rn
   char *token = strtok(unbracketed, delim);
   // Gets address of register rn
-  addresses[0] = atoi(REMOVE_FIRST_CHAR(token));
+  addresses[0] = REM_INT(token);
   token = strtok(NULL, delim);
   // If expression exists in address
   if (token != NULL) {
     char firstLetter = token[0];
-    char secondLetter = (REMOVE_FIRST_CHAR(token))[0];
+    char secondLetter = REMOVE_FIRST_CHAR(token)[0];
     addresses[3] = firstLetter == 'r' ? 1 : 0;
     addresses[2] = secondLetter == '-' ? 0 : 1;
     addresses[1] = parseImmediate(token);
