@@ -8,6 +8,7 @@
 #define PREDEFINED_SYMBOLS_COUNT (23)
 #define PIPELINE_OFFSET (8)
 #define LOOKUP_FAILURE (-1)
+#define ALWAYS (14 << COND_SHIFT)
 #define LOOKUP_FAILED(num) (num == LOOKUP_FAILURE)
 #define IS_IMMEDIATE(exp) (exp[0] == '#' || exp[0] == '=')
 #define REMOVE_FIRST_CHAR(string) (++string)

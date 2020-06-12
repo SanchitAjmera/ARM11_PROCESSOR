@@ -9,7 +9,6 @@
 #define WORD_SIZE_BYTES (4)
 #define BYTE (8)
 #define COND_SHIFT (28)
-#define ALWAYS (14 << COND_SHIFT)
 
 // Constants for Data Processing Instructions
 #define ROTATION_FACTOR (2)
