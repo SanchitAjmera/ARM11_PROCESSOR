@@ -2,16 +2,16 @@
 #define ASSEMBLE_CONSTANTS_H
 
 // General constants & pre-processor functions
-#define IS_IMMEDIATE(exp) (exp[0] == '#' || exp[0] == '=')
-#define REMOVE_FIRST_CHAR(string) (++string)
-#define REM_INT(string) (atoi(REMOVE_FIRST_CHAR(string)))
 #define MAX_NUM (4294967295)
 #define MAX_BYTE (0xFF)
-#define LOOKUP_FAILURE (-1)
-#define LOOKUP_FAILED(num) (num == LOOKUP_FAILURE)
 #define LINE_CHAR_LIM (512)
 #define PREDEFINED_SYMBOLS_COUNT (23)
 #define PIPELINE_OFFSET (8)
+#define LOOKUP_FAILURE (-1)
+#define LOOKUP_FAILED(num) (num == LOOKUP_FAILURE)
+#define IS_IMMEDIATE(exp) (exp[0] == '#' || exp[0] == '=')
+#define REMOVE_FIRST_CHAR(string) (++string)
+#define REM_INT(string) (atoi(REMOVE_FIRST_CHAR(string)))
 
 // Constants for File Lines
 #define INIT_FILE_LINES_SIZE (16)
