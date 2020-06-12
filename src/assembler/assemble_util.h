@@ -6,7 +6,7 @@
 #include "symbol_table.h"
 #include <stdio.h>
 
-// generic (string, enum) struct for lookups
+// Generic (string, enum) struct for lookups
 typedef struct {
   char *key;
   word value;
@@ -15,7 +15,7 @@ typedef struct {
 // Enum for different types of addresses in SDTI assembly instructions
 typedef enum { NUMERIC_CONST, PRE_RN, PRE_RN_EXP, POST_RN_EXP } SDTIOperation;
 
-// To be used with Lookup for string to enum conversion in getCondition;
+// Tables to be used with Lookup for string to enum conversions
 static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
                                    {"lt", LT}, {"gt", GT}, {"le", LE},
                                    {"al", AL}};
@@ -27,7 +27,7 @@ static const pair_t opcodeTable[] = {
     {"add", ADD}, {"tst", TST}, {"teq", TEQ},     {"cmp", CMP},
     {"orr", ORR}, {"mov", MOV}, {"andeq", ANDEQ}, {"lsl", LSL_SPECIAL}};
 
-// assemble functions for all instruction types
+// Assemble functions for all instruction types
 extern word assembleDPI(symbol_table *symbolTable, instruction input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction input);
 extern word assembleMultiply(symbol_table *symbolTable, instruction input);
