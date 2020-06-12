@@ -38,5 +38,6 @@
 
 // Constants for Branch Instructions
 #define BRANCH_OFFSET_MASK (0x00FFFFFF)
+#define CURRENT_INSTRUCTION_SHIFT (2)
 
 #endif

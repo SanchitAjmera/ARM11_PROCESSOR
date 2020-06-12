@@ -13,6 +13,7 @@
 #define CPSR_Z_SHIFT (30)
 #define CPSR_C_SHIFT (29)
 #define CPSR_V_SHIFT (28)
+#define PIPELINE_OFFSET (8)
 #define GET_CPSR_N(cpsr) ((cpsr & CPSR_N_MASK) >> CPSR_N_SHIFT)
 #define GET_CPSR_Z(cpsr) ((cpsr & CPSR_Z_MASK) >> CPSR_Z_SHIFT)
 #define GET_CPSR_C(cpsr) ((cpsr & CPSR_C_MASK) >> CPSR_C_SHIFT)
@@ -46,7 +47,6 @@
 
 // Constants for Branch instructions
 #define BRANCH_SIGN_BIT (1 << 23)
-#define CURRENT_INSTRUCTION_SHIFT (2)
 #define NEGATIVE_SIGN_EXTEND (0xFC000000)
 #define POSITIVE_SIGN_EXTEND (0)
 
