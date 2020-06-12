@@ -22,7 +22,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   // Scan file for labels and expressions
   char line[LINE_CHAR_LIM];
   while (fgets(line, LINE_CHAR_LIM, armFile) != NULL) {
-    // iterate through chars in line
+    // Iterate through chars in line
     bool isLabel = false;
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
@@ -64,7 +64,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   freeFileLines(expressions);
 }
 
-/*  Performs the second pass on fileLines */
+/* Performs the second pass on fileLines */
 void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   assert(out);
   for (int i = 0; i < in->lineCount; i++) {
@@ -123,7 +123,7 @@ word parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
-/* Converts string to integer for both denary and hex constants  */
+/* Converts string to integer for both denary and hex constants */
 uint parseImmediate(char *op2) {
   // TODO: change it to remove # here?
   // PRE: # has been removed from <#expression> (op2)
@@ -138,12 +138,12 @@ uint parseImmediate(char *op2) {
   return (uint)atoi(op2);
 }
 
-/* Calculates shift type enum from string*/
+/* Calculates shift type enum from string */
 Shift parseShiftType(const char *shift) {
   return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
 }
 
-/* Returns circular bitwise left rotation of input num by rotateNum*/
+/* Returns circular bitwise left rotation of input num by rotateNum */
 word rotateLeft(word value, uint rotateNum) {
   uint msbs = value & ~((1 << (WORD_SIZE - rotateNum)) - 1);
   return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
@@ -181,7 +181,7 @@ word calcRotatedImm(word imm) {
 }
 
 /* Calculates immediate value, including any rotation required to
-fit number into 8 bits*/
+fit number into 8 bits */
 word parseOperand2Imm(char **op2) {
   uint imm = parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
   exitOverflow(imm, MAX_NUM);
@@ -197,7 +197,7 @@ word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
   Shift shiftType = parseShiftType(op2[1]);
   if (args < SHIFT_NO_ARGS) {
-    // no shift type/ shift of 0
+    // No shift type/ shift of 0
     return rm;
   }
   if (IS_IMMEDIATE(op2[2])) {
@@ -211,7 +211,7 @@ word parseOperand2Reg(char **op2, uint args) {
          SHIFT_BY_REG_HARDCODE | rm;
 }
 
-/* Checks type of operand 2 (imm/reg) and calls corresponding parser*/
+/* Checks type of operand 2 (imm/reg) and calls corresponding parser */
 word parseOperand2(char **op2, uint args) {
   // 8 bit immediate value - <#expression>
   // Decimal or hexadecimal ("#n" or “#0x...”)
@@ -288,8 +288,8 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   return ALWAYS | i | opcode | s | rn | rd | op2;
 }
 
-/*Provides assembly function for 'mla' and 'mul' instructions and
-returns the corresponding ARM-binary based on the instruction arguments*/
+/* Provides assembly function for 'mla' and 'mul' instructions and
+returns the corresponding ARM-binary based on the instruction arguments */
 word assembleMultiply(symbol_table *symbolTable, instruction input) {
   // Defining the components of the instruction
   word rd = REM_INT(input.fields[0]) << MULT_RDEST_SHIFT;
@@ -364,7 +364,7 @@ word *remBracket(char *string) {
   return addresses;
 }
 
-/* decodes the address provided within the instruction struct */
+/* Decodes the address provided within the instruction struct */
 SDTIOperation SDTIparser(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
   if (field_count == 3) {
@@ -378,6 +378,7 @@ SDTIOperation SDTIparser(char **fields, uint field_count) {
   }
 }
 
+/* Assembly function for all store and load instructions */
 word assembleSDTI(symbol_table *symbolTable, instruction input) {
   // TODO: (WIP) I refactored your `remBracket` & added var `addresses` - Alex
   word *addresses = remBracket(input.fields[1]);
