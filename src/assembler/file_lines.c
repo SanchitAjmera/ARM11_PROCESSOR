@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Adding new line into file line structure */
 void addLine(file_lines *fl, char *line) {
   printf("new line: %s\n", line);
   if (fl->lineCount == fl->maxLines) {
@@ -16,18 +17,21 @@ void addLine(file_lines *fl, char *line) {
   fl->lineCount++;
 }
 
+/* Adds each line into file line structure from string array */
 void addLines(file_lines *fl, char **lines, uint n) {
   for (int i = 0; i < n; i++) {
     addLine(fl, lines[i]);
   }
 }
 
+/* Outputs each line stored in the file lines structure */
 void printFileLines(file_lines *fileLines) {
   for (int i = 0; i < fileLines->lineCount; i++) {
     printf("%i: %s\n", i, fileLines->lines[i]);
   }
 }
 
+/* Initialising the structure to store each line of instruction file */
 file_lines *newFileLines() {
   file_lines *fileLines = malloc(sizeof(file_lines));
   assert(fileLines != NULL);
@@ -38,6 +42,7 @@ file_lines *newFileLines() {
   return fileLines;
 }
 
+/* Free resources used for storing program file lines */
 void freeFileLines(file_lines *fileLines) {
   for (int i = 0; i < fileLines->lineCount; i++) {
     free(fileLines->lines[i]);
