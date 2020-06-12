@@ -1,3 +1,4 @@
+#include "assembler/assemble_constants.h"
 #include "assembler/assemble_util.h"
 #include "assembler/file_lines.h"
 #include "assembler/symbol_table.h"
