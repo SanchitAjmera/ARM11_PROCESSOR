@@ -6,7 +6,6 @@
 #include <string.h>
 
 void addLine(file_lines *fl, char *line) {
-  printf("new line: %s\n", line);
   if (fl->lineCount == fl->maxLines) {
     fl->lines = realloc(fl->lines, fl->maxLines *= 2);
   }

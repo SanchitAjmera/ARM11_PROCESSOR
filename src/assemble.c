@@ -40,21 +40,6 @@ int main(int argc, char **argv) {
   scanFile(armFile, symbolTable, fileLines);
   fclose(armFile);
 
-  printFileLines(fileLines);
-  printSymbolTable(symbolTable);
-
-  printf("\n");
-
-  char buffer[512];
-  strcpy(buffer, "mov r1,#1\nadd r2,r1,#2\nfoo:\nldr r0,[r1,r2,lsl #2]\n");
-  char *delim = "[]";
-
-  char *word = strtok(buffer, delim);
-  while (word != NULL) {
-    printf("%s\n", word);
-    word = strtok(NULL, delim);
-  }
-
   FILE *binOutFile = fopen(argv[2], "wb");
   parseLines(fileLines, symbolTable, binOutFile);
   fclose(binOutFile);

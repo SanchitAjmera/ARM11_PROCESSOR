@@ -96,14 +96,8 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     } else {
       binLine = parseImmediate(in->lines[i] + 1);
     }
-    printf("output: %x\n", binLine);
 
     fwrite(&binLine, sizeof(word), 1, out);
-
-    for (int j = 0; j < fieldCount; j++) {
-      printf("token: %s\n", fields[j]);
-    }
-    printf("\n");
   }
 }
 
