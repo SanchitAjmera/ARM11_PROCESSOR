@@ -146,6 +146,13 @@ word rotateLeft(word value, uint rotateNum) {
   return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
 }
 
+void exitOverflow(uint num, const uint max) {
+  if (num > max) {
+    fprintf(stderr, "Number cannot be represented.\n");
+    exit(EXIT_FAILURE);
+  }
+}
+
 word calcRotatedImm(word imm) {
   // PRE: imm can be represented by WORD_SIZE bits
   uint mask = 1;
@@ -162,20 +169,14 @@ word calcRotatedImm(word imm) {
     rotation++;
   }
   imm = rotateLeft(imm, rotation);
+  exitOverflow(imm, MAX_BYTE);
   rotation = rotation / ROTATION_FACTOR;
-  if (imm > MAX_BYTE) {
-    fprintf(stderr, "Number cannot be represented.\n");
-    exit(EXIT_FAILURE);
-  }
   return (rotation << 8) | imm;
 }
 
 word parseOperand2Imm(char **op2) {
   uint imm = parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
-  if (OVERFLOW(imm)) {
-    fprintf(stderr, "Number cannot be represented.\n");
-    exit(EXIT_FAILURE);
-  }
+  exitOverflow(imm, MAX_NUM);
   if (imm > MAX_BYTE) {
     return calcRotatedImm(imm);
   }
