@@ -21,11 +21,13 @@ static const pair_t condTable[] = {{"eq", EQ}, {"ne", NE}, {"ge", GE},
                                    {"al", AL}};
 static const pair_t shiftTable[] = {
     {"lsl", LSL}, {"lsr", LSR}, {"asr", ASR}, {"ror", ROR}};
-
 static const pair_t opcodeTable[] = {
     {"and", AND}, {"eor", EOR}, {"sub", SUB},     {"rsb", RSB},
     {"add", ADD}, {"tst", TST}, {"teq", TEQ},     {"cmp", CMP},
-    {"orr", ORR}, {"mov", MOV}, {"andeq", ANDEQ}, {"lsl", LSL_SPECIAL}};
+    {"orr", ORR}, {"mov", MOV}, {"andeq", ANDEQ}, {"lsl", LSL_SPECIAL},
+    {"ldr", LDR}, {"str", STR}, {"mul", MUL},     {"mla", MLA},
+    {"beq", BEQ}, {"bne", BNE}, {"bge", BGE},     {"blt", BLT},
+    {"bgt", BGT}, {"ble" BLE},  {"b", B}};
 
 // Assemble functions for all instruction types
 extern word assembleDPI(symbol_table *symbolTable, instruction input);
