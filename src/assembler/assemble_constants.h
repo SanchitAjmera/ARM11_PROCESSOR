@@ -1,7 +1,7 @@
 #ifndef ASSEMBLE_CONSTANTS_H
 #define ASSEMBLE_CONSTANTS_H
 
-// General constants & pre-processor functions
+// Universal constants & pre-processor functions
 #define MAX_NUM (4294967295)
 #define MAX_BYTE (0xFF)
 #define LINE_CHAR_LIM (512)

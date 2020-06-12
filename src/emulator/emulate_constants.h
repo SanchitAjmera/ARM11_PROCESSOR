@@ -1,7 +1,7 @@
 #ifndef EMULATE_CONSTANTS_H
 #define EMULATE_CONSTANTS_H
 
-// General constants
+// Universal constants and pre-processor functions
 #define MAX_REGISTER_NAME_LENGTH (5)
 #define NOT_BIG_ENDIAN (false)
 #define IS_BIG_ENDIAN (true)
