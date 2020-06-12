@@ -10,7 +10,7 @@ void addLine(file_lines *fl, char *line) {
     fl->lines = realloc(fl->lines, fl->maxLines *= 2);
   }
   // Have to allocate memory on heap for each string
-  fl->lines[fl->lineCount] = malloc(sizeof(char) * (strlen(line) + 1));
+  fl->lines[fl->lineCount] = calloc((strlen(line) + 1), sizeof(char));
   strncpy(fl->lines[fl->lineCount], line, strlen(line));
   fl->lineCount++;
 }
