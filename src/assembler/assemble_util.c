@@ -98,8 +98,8 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
 
     // Stores the current instruction's information in struct
     instruction instr = {
-        lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]), fields + 1,
-        fieldCount - 1, i * WORD_SIZE_BYTES};
+        fields[0], lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]),
+        fields + 1, fieldCount - 1, i * WORD_SIZE_BYTES};
     symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
     assert(instrSymbol != NULL);
     word binLine;
