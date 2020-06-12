@@ -325,7 +325,9 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
                            ? REM_INT(target)
                            : getSymbol(symbolTable, target)->body.address;
   // Calculates the offset with the pipeline effect considered
-  word offset = (targetAddress - currentAddress - 8) >> 2;
+  word offset = (targetAddress - currentAddress - PIPELINE_OFFSET) >>
+                CURRENT_INSTRUCTION_SHIFT;
+
   return cond | BRANCH_HARDCODE | (offset & BRANCH_OFFSET_MASK);
 }
 
@@ -349,6 +351,7 @@ static word *remBracket(char *string) {
   if (token != NULL) {
     char firstLetter = token[0];
     char secondLetter = REMOVE_FIRST_CHAR(token)[0];
+    // Set U and I bits
     addresses[3] = firstLetter == 'r' ? 1 : 0;
     addresses[2] = secondLetter == '-' ? 0 : 1;
     addresses[1] = parseImmediate(token);
@@ -417,7 +420,8 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
       return assembleDPI(symbolTable, input);
     } else {
       // offset
-      offset = getSymbol(symbolTable, input.fields[1])->body.address - 8;
+      offset = getSymbol(symbolTable, input.fields[1])->body.address -
+               PIPELINE_OFFSET;
       offset -= input.currentAddress;
       // Base register Rn
       Rn = PC << SDTI_RN_SHIFT;
