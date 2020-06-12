@@ -1,7 +1,7 @@
 #ifndef EMULATE_CONSTANTS_H
 #define EMULATE_CONSTANTS_H
 
-// general constants
+// General constants
 #define MAX_REGISTER_NAME_LENGTH (5)
 #define NOT_BIG_ENDIAN (false)
 #define IS_BIG_ENDIAN (true)
@@ -21,7 +21,7 @@
 #define UPDATE_CPSR(instruction) (instruction & INSTRUCTION_S_MASK)
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
-// constants for decode function
+// Constants for decode function
 #define DECODE_DPI_MASK (0x0C000000)
 #define DECODE_DPI_EXPECTED (0x00000000)
 #define DECODE_MULT_MASK (0x0FC000F0)
@@ -31,7 +31,7 @@
 #define DECODE_BRANCH_MASK (0x0F000000)
 #define DECODE_BRANCH_EXPECTED (0x0A000000)
 
-// constants for single data transfer
+// Constants for Single Data Transfer instructions
 #define SDTI_I_MASK (0x02000000)
 #define SDTI_P_MASK (0x01000000)
 #define SDTI_U_MASK (0x00800000)
@@ -40,17 +40,17 @@
 #define SDTI_RD_MASK (0x0000F000)
 #define SDTI_OFFSET_MASK (0x00000FFF)
 
-// constants for Multiply instruction
+// Constants for Multiply instructions
 #define MULT_REG_M_MASK (0x0000000F)
 #define INSTRUCTION_S_MASK (1 << 20)
 
-// constants for Branch instruction
+// Constants for Branch instructions
 #define BRANCH_SIGN_BIT (1 << 23)
 #define CURRENT_INSTRUCTION_SHIFT (2)
 #define NEGATIVE_SIGN_EXTEND (0xFC000000)
 #define POSITIVE_SIGN_EXTEND (0)
 
-// constants for Data Processing instruction
+// Constants for Data Processing instructions
 #define SET_CPSR_C (1 << 29)
 #define DPI_I_MASK (0x02000000)
 #define DPI_OPCODE_MASK (0x01E00000)
