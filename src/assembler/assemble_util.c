@@ -119,11 +119,6 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   }
 }
 
-/* Converts DPI mnemonic to corresponding enum */
-static int parseDPIOpcode(char *mnemonic) {
-  return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
-}
-
 /* Converts string to integer for both denary and hex constants */
 uint parseImmediate(char *op2) {
   // PRE: # has been removed from <#expression> (op2)
@@ -224,8 +219,7 @@ static word parseOperand2(char **op2, uint args) {
 
 /* Provides assembly conversion for supported data processing instructions */
 word assembleDPI(symbol_table *symbolTable, instruction input) {
-  word opcode = parseDPIOpcode(input.opcode);
-  // TODO: check for lookup failure
+  word opcode = input.mnemonic;
   word s = 0;
   word rn = 0;
   word rd = 0;
@@ -302,7 +296,7 @@ word assembleMultiply(symbol_table *symbolTable, instruction input) {
   word accumulate = 0;
 
   // Set rn and A for an 'accumulate' input
-  if (!strcmp("mla", input.opcode)) {
+  if (input.mnemonic == MLA) {
     rn = REM_INT(input.fields[3]) << MULT_REG_N_SHIFT;
     accumulate = ACCUMULATE_FLAG;
   }
@@ -317,7 +311,7 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
   // The 'b' instruction is always executed
   // Otherwise the condition of the branch will be the letters following 'b'
   word cond =
-      !strcmp("b", input.opcode)
+      input.mnemonic == B
           ? ALWAYS
           : lookup(condTable, COND_TABLE_SIZE, REMOVE_FIRST_CHAR(input.opcode))
                 << COND_SHIFT;
@@ -387,7 +381,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   // Decoding address type
   SDTIOperation operation = SDTIparser(input.fields, input.field_count);
   // Load bit
-  word l = (!strcmp("ldr", input.opcode)) ? (1 << SDTI_L_SHIFT) : 0;
+  word l = (input.mnemonic == LDR) ? (1 << SDTI_L_SHIFT) : 0;
   // PRE/POST-INDEXING bits
   word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
   // Base register Rn
@@ -422,6 +416,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     // Check if expression can fit inside a mov function
     if (parseImmediate(input.fields[1] + 1) <= SDTI_EXP_BOUND) {
       input.opcode = "mov";
+      input.mnemonic = MOV;
       return assembleDPI(symbolTable, input);
     } else {
       // offset
