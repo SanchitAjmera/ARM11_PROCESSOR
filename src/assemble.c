@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PREDEFINED_SYMBOLS_COUNT 23
-
 int main(int argc, char **argv) {
   symbol_table *symbolTable = newSymbolTable();
   symbol predefinedSymbols[PREDEFINED_SYMBOLS_COUNT] = {
