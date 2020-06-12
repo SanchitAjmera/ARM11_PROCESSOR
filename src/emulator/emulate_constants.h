@@ -58,7 +58,6 @@
 #define DPI_RD_MASK (0xF000)
 #define DPI_OP2_MASK (0x00000FFF)
 #define LEAST_BYTE_MASK (0xFF)
-#define GET_ROTATION_NUM (8)
 #define GET_RS_SHIFT (4)
 #define SHIFT_TYPE_MASK (0x06)
 #define GET_SHIFT_TYPE (1)

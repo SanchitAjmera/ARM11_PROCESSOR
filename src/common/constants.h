@@ -17,6 +17,7 @@
 #define DPI_OPCODE_SHIFT (21)
 #define DPI_RN_SHIFT (16)
 #define DPI_RD_SHIFT (12)
+#define GET_ROTATION_NUM (8)
 
 // constants for Single Data Transfer Instructions
 #define SDTI_I_SHIFT (25)
