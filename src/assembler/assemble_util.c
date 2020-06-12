@@ -251,8 +251,9 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   else if (opcode == LSL_SPECIAL) {
     opcode = MOV;
     imm = input.fields[0];
+    char *rdCopy = input.fields[0];
     rd = REM_INT(input.fields[0]);
-    char *ops[SHIFT_NO_ARGS] = {--input.fields[0], "lsl", input.fields[1]};
+    char *ops[SHIFT_NO_ARGS] = {rdCopy, "lsl", input.fields[1]};
     args = SHIFT_NO_ARGS;
     operand2 = ops;
   }
