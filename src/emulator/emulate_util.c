@@ -234,7 +234,7 @@ static void store(arm_t *state, word sourceReg, word baseReg) {
   }
 }
 
-// function which loads address inside base register Rn into the memory
+/* Function which loads address inside base register Rn into the memory */
 static void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (checkValidAddress(sourceAddr)) {
@@ -245,6 +245,7 @@ static void load(arm_t *state, word destReg, word sourceAddr) {
   }
 }
 
+/* Executes all supported Single Data Transfer instructions */
 void executeSDTI(arm_t *state, sdt_t *decoded) {
   uint l = decoded->l;
   uint rd = decoded->rd;
@@ -269,6 +270,7 @@ void executeSDTI(arm_t *state, sdt_t *decoded) {
   free(decoded);
 }
 
+/* Executes all supported Multiply instructions */
 void executeMultiply(arm_t *state, multiply_t *decoded) {
   int regS = decoded->regS;
   int regM = decoded->regM;
@@ -287,13 +289,14 @@ void executeMultiply(arm_t *state, multiply_t *decoded) {
   free(decoded);
 }
 
-// pipeline flush required for a branch instruction
+/* Pipeline flush required for a branch instruction */
 void flushPipeline(arm_t *state) {
   state->fetched = 0;
   state->decoded.instruction = 0;
   state->decoded.isSet = false;
 }
 
+/* Execution of a branch instruction */
 void executeBranch(arm_t *state, branch_t *decoded) {
   flushPipeline(state);
   int offset = decoded->offset;
