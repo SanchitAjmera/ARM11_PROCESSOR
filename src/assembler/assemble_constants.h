@@ -10,7 +10,7 @@
 #define LOOKUP_FAILURE (-1)
 #define LOOKUP_FAILED(num) (num == LOOKUP_FAILURE)
 #define LINE_CHAR_LIM (512)
-#define PREDEFINED_SYMBOLS_COUNT 23
+#define PREDEFINED_SYMBOLS_COUNT (23)
 
 // Constants for File Lines
 #define INIT_FILE_LINES_SIZE (16)
