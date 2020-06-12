@@ -120,11 +120,12 @@ int lookup(const pair_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
-Opcode parseDPIOpcode(char *mnemonic) {
+OpcodeDP parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
 uint parseImmediate(char *op2) {
+  // TODO: change it to remove # here?
   // PRE: # has been removed from <#expression> (op2)
   if (op2[0] == '-') {
     REMOVE_FIRST_CHAR(op2);
@@ -149,6 +150,7 @@ word rotateLeft(word value, uint rotateNum) {
 void exitOverflow(uint num, const uint max) {
   if (num > max) {
     fprintf(stderr, "Number cannot be represented.\n");
+    // TODO: change to errorExit();
     exit(EXIT_FAILURE);
   }
 }
@@ -171,7 +173,7 @@ word calcRotatedImm(word imm) {
   imm = rotateLeft(imm, rotation);
   exitOverflow(imm, MAX_BYTE);
   rotation = rotation / ROTATION_FACTOR;
-  return (rotation << 8) | imm;
+  return (rotation << GET_ROTATION_NUM) | imm;
 }
 
 word parseOperand2Imm(char **op2) {
@@ -186,10 +188,10 @@ word parseOperand2Imm(char **op2) {
 word parseOperand2Reg(char **op2, uint args) {
   uint rm = rem(op2[0]);
   Shift shiftType = parseShiftType(op2[1]);
-  if (args == 1) {
+  if (args < SHIFT_NO_ARGS) {
+    // no shift type/ shift of 0
     return rm;
   }
-  assert(args == 3);
   if (IS_IMMEDIATE(op2[2])) {
     uint shiftNum = parseImmediate(REMOVE_FIRST_CHAR(op2[2]));
     return (shiftNum << 7) | (shiftType << 5) | rm;
@@ -197,7 +199,8 @@ word parseOperand2Reg(char **op2, uint args) {
   uint rs = rem(op2[2]);
   // Rs can be any general purpose register except the PC
   assert(rs != PC);
-  return (rs << 9) | (shiftType << 5) | (1 << 4) | rm;
+  return (rs << RS_SHIFT) | (shiftType << SHIFT_TYPE_SHIFT) |
+         SHIFT_BY_REG_HARDCODE | rm;
 }
 
 word parseOperand2(char **op2, uint args) {
@@ -238,9 +241,8 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     opcode = MOV;
     imm = input.fields[0];
     rd = rem(input.fields[0]);
-    // TODO: remove magic number (3)
-    char *ops[3] = {input.fields[0], "lsl", input.fields[1]};
-    args = 3;
+    char *ops[SHIFT_NO_ARGS] = {input.fields[0], "lsl", input.fields[1]};
+    args = SHIFT_NO_ARGS;
     operand2 = ops;
   }
 
