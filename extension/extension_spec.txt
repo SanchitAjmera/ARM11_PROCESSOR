@@ -5,9 +5,12 @@ name: -
 Aim:
 	- create a text-based game
 	- prints prompts to players
-
+	- description of the rooms
+	- inventory
+	- store
+	
 		- these are problems for player to solve
-		- also prints players score and level
+		- also prints players score and rooms
 
 	- takes inputs from player
 
@@ -17,5 +20,20 @@ Aim:
 	- assigns some sort of point system
 
 		- point system relays to the next level
-		- problems get increasing difficult		
+		- problems get increasing difficult
+	
+	- prints konstantinos		
+
+
+functions:
+	
+	initialiseGame()
+	saveGame()
+		- writes to some file
+	loadGame()	
+		- 
+	
+
+
+
 	
