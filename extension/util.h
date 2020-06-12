@@ -11,19 +11,26 @@
 typedef enum { ITEM1, ITEM2, ETC } item;
 
 // enum for room
-typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room;
+typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
 
 // enum for character type
 typedef enum { BATMAN, TONY, UTA } character;
+
+typedef struct room {
+  room_name current_room;
+  struct room *adjacent_rooms;
+} room;
 
 typedef struct {
   item *inventory;
   int cash;
   int health;
-  room current_room;
-  room room_history[MAX_ROOM_HISTORY];
+  room curr_room_node; // struct for room structure
+
   struct {
     char *username;
     character character;
   } profile;
+
+  room_name room_history[MAX_ROOM_HISTORY];
 } state;
