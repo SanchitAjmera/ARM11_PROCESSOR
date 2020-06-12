@@ -336,7 +336,7 @@ converts remaining strings into unsigned int values
 returns array containing register address and expression address
 along with bits set (U and I) based on those values */
 static word *remBracket(char *string) {
-  word *addresses = malloc(sizeof(word) * 4);
+  word *addresses = malloc(sizeof(*addresses));
 
   // Removing preceding brackets
   char unbracketed[strlen(string) - 1];
