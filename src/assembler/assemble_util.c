@@ -118,10 +118,12 @@ int lookup(const pair_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
+/*converts DPI mnemonic to corresponding enum */
 word parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
+/* converts string to integer for both denary and hex constants  */
 uint parseImmediate(char *op2) {
   // TODO: change it to remove # here?
   // PRE: # has been removed from <#expression> (op2)
@@ -136,15 +138,18 @@ uint parseImmediate(char *op2) {
   return (uint)atoi(op2);
 }
 
+/* calculates shift type enum from string*/
 Shift parseShiftType(const char *shift) {
   return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
 }
 
+/* returns circular bitwise left rotation of input num by rotateNum*/
 word rotateLeft(word value, uint rotateNum) {
   uint msbs = value & ~((1 << (WORD_SIZE - rotateNum)) - 1);
   return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
 }
 
+/* Exits program if num exceeds the highest representable value */
 void exitOverflow(uint num, const uint max) {
   if (num > max) {
     fprintf(stderr, "Number cannot be represented.\n");
@@ -153,6 +158,7 @@ void exitOverflow(uint num, const uint max) {
   }
 }
 
+/* calculates the rotation amount to fit an immediate constant in 8 bits */
 word calcRotatedImm(word imm) {
   // PRE: imm can be represented by WORD_SIZE bits
   uint mask = 1;
@@ -174,6 +180,8 @@ word calcRotatedImm(word imm) {
   return (rotation << GET_ROTATION_NUM) | imm;
 }
 
+/* calculates immediate value, including any rotation required to
+fit number into 8 bits*/
 word parseOperand2Imm(char **op2) {
   uint imm = parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
   exitOverflow(imm, MAX_NUM);
@@ -183,6 +191,8 @@ word parseOperand2Imm(char **op2) {
   return imm;
 }
 
+/* calculates binary representation of a register operand2
+including registers with shifts attached */
 word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
   Shift shiftType = parseShiftType(op2[1]);
@@ -201,6 +211,7 @@ word parseOperand2Reg(char **op2, uint args) {
          SHIFT_BY_REG_HARDCODE | rm;
 }
 
+/* checks type of operand 2 (imm/reg) and calls corresponding parser*/
 word parseOperand2(char **op2, uint args) {
   // 8 bit immediate value - <#expression>
   // decimal or hexadecimal ("#n" or “#0x...”)
@@ -211,6 +222,7 @@ word parseOperand2(char **op2, uint args) {
   return parseOperand2Reg(op2, args);
 }
 
+/* Provides assembly conversion for supported data processing instructions */
 word assembleDPI(symbol_table *symbolTable, instruction input) {
   word opcode = parseDPIOpcode(input.opcode);
   // TODO: check for lookup failure
