@@ -19,6 +19,7 @@ typedef enum { BATMAN, TONY, UTA } character;
 typedef struct room {
   room_name current_room;
   struct room *adjacent_rooms;
+  int adjacent_room_count;
 } room;
 
 typedef struct {
@@ -34,3 +35,7 @@ typedef struct {
 
   room_name room_history[MAX_ROOM_HISTORY];
 } state;
+
+extern room *initialiseRoom(room_name current_room);
+extern void connectRoom(room *first, room second);
+extern void printRoom(room_name name);
