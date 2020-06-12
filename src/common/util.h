@@ -30,7 +30,7 @@ typedef enum { LDR, STR } OpcodeSDT;
 // Opcode mnemonics for Branch Instructions
 typedef enum { BEQ, BNE, BGE, BLT, BGT, BLE, B } OpcodeBranch;
 // Opcode mnemonics for Special Instructions
-typedef enum { LSL_SPECIAL, ANDEQ } OpcodeSpecial;
+typedef enum { LSL_SPECIAL = 15, ANDEQ } OpcodeSpecial;
 // Condition suffixes
 typedef enum { EQ, NE, GE = 10, LT, GT, LE, AL } Cond;
 // Shift types

@@ -4,7 +4,7 @@
 // General constants & pre-processor functions
 #define IS_IMMEDIATE(exp) (exp[0] == '#' || exp[0] == '=')
 #define REMOVE_FIRST_CHAR(string) (++string)
-#define REM_INT(string) (atoi(REMOVE_FIRST_CHAR(string)))
+//#define REM_INT(string) (atoi(REMOVE_FIRST_CHAR(string)))
 #define MAX_NUM (4294967295)
 #define MAX_BYTE (0xFF)
 #define LOOKUP_FAILURE (-1)
@@ -35,7 +35,7 @@
 // Constants for Multiply Instructions
 #define MULT_HARDCODE (0x90)
 
-// constants for Branch Instructions
+// Constants for Branch Instructions
 #define BRANCH_HARDCODE (0x0A000000)
 #define COND_TABLE_SIZE (7)
 
