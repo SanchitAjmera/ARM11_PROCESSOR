@@ -196,11 +196,11 @@ word parseOperand2Imm(char **op2) {
 including registers with shifts attached */
 word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
-  Shift shiftType = parseShiftType(op2[1]);
   if (args < SHIFT_NO_ARGS) {
     // No shift type/ shift of 0
     return rm;
   }
+  Shift shiftType = parseShiftType(op2[1]);
   if (IS_IMMEDIATE(op2[2])) {
     uint shiftNum = parseImmediate(REMOVE_FIRST_CHAR(op2[2]));
     return (shiftNum << 7) | (shiftType << 5) | rm;
