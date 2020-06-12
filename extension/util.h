@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_ROOM_HISTORY
+#define MAX_ROOM_HISTORY (5)
 
 // enum for items stored by person in inventory
 typedef enum { ITEM1, ITEM2, ETC } item;
@@ -39,3 +39,4 @@ typedef struct {
 extern room *initialiseRoom(room_name current_room);
 extern void connectRoom(room *first, room second);
 extern void printRoom(room_name name);
+extern void freeRoom(room *room1);

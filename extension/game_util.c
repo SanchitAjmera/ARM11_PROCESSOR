@@ -30,6 +30,7 @@ room *initialiseRoom(room_name current_room) {
   struct room *this_room = malloc(sizeof(room));
   this_room->current_room = current_room;
   this_room->adjacent_rooms = NULL;
+  this_room->adjacent_room_count = 0;
   return this_room;
 }
 
@@ -54,7 +55,15 @@ void printRoom(room_name name) {
     printf("LECTURE_HALL\n");
   }
 }
+
+void freeRoom(room *room1) {
+  if (room1 != NULL) {
+    return;
+  }
+  if (room1->adjacent_rooms != NULL) {
+    freeRoom(room1->adjacent_rooms);
+  }
+  free(room1);
+}
 // changes room of person and pushes current room into room histroy of player
 void changeRoom(state *person, room dest_room) {}
-
-int main(void) { exit(EXIT_SUCCESS); }
