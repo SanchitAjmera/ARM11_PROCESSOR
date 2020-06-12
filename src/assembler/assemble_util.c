@@ -183,10 +183,10 @@ word parseOperand2Imm(char **op2) {
 
 word parseOperand2Reg(char **op2, uint args) {
   uint rm = rem(op2[0]);
-  enum Shift shiftType = parseShiftType(op2[1]);
   if (args == 1) {
     return rm;
   }
+  enum Shift shiftType = parseShiftType(op2[1]);
   assert(args == 3);
   if (IS_IMMEDIATE(op2[2])) {
     uint shiftNum = parseImmediate(++(op2[2]));
