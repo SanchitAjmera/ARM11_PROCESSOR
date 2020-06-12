@@ -27,7 +27,7 @@ static const pair_t opcodeTable[] = {
     {"orr", ORR}, {"mov", MOV}, {"andeq", ANDEQ}, {"lsl", LSL_SPECIAL},
     {"ldr", LDR}, {"str", STR}, {"mul", MUL},     {"mla", MLA},
     {"beq", BEQ}, {"bne", BNE}, {"bge", BGE},     {"blt", BLT},
-    {"bgt", BGT}, {"ble" BLE},  {"b", B}};
+    {"bgt", BGT}, {"ble", BLE}, {"b", B}};
 
 // Assemble functions for all instruction types
 extern word assembleDPI(symbol_table *symbolTable, instruction input);
