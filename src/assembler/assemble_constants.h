@@ -4,7 +4,7 @@
 // general constants & pre-processor functions
 #define IS_IMMEDIATE(exp) (exp[0] == '#' || exp[0] == '=')
 #define REMOVE_FIRST_CHAR(string) (++string)
-#define REM_INT(string) (atoi(REMOVE_FIRST_CHAR(string))
+#define REM_INT(string) (atoi(REMOVE_FIRST_CHAR(string)))
 #define MAX_NUM (4294967295)
 #define MAX_BYTE (0xFF)
 #define LOOKUP_FAILURE (-1)
