@@ -12,7 +12,7 @@ typedef struct symbol symbol;
 typedef enum { LABEL, INSTR } SymbolType;
 
 struct instruction {
-  char *opcode;  // String representing the instruction INCLUDING cond suffix
+  int opcode;    // String representing the instruction INCLUDING cond suffix
   char **fields; // Array of string fields.
   uint field_count;
   word currentAddress; // The current address of the instruction being called
