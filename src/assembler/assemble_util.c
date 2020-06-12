@@ -108,7 +108,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   }
 }
 
-/* returns respective int value; -1 for failure */
+/* Returns respective int value; -1 for failure */
 int lookup(const pair_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
@@ -118,12 +118,12 @@ int lookup(const pair_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
-/*converts DPI mnemonic to corresponding enum */
+/* Converts DPI mnemonic to corresponding enum */
 word parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
-/* converts string to integer for both denary and hex constants  */
+/* Converts string to integer for both denary and hex constants  */
 uint parseImmediate(char *op2) {
   // TODO: change it to remove # here?
   // PRE: # has been removed from <#expression> (op2)
@@ -138,12 +138,12 @@ uint parseImmediate(char *op2) {
   return (uint)atoi(op2);
 }
 
-/* calculates shift type enum from string*/
+/* Calculates shift type enum from string*/
 Shift parseShiftType(const char *shift) {
   return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
 }
 
-/* returns circular bitwise left rotation of input num by rotateNum*/
+/* Returns circular bitwise left rotation of input num by rotateNum*/
 word rotateLeft(word value, uint rotateNum) {
   uint msbs = value & ~((1 << (WORD_SIZE - rotateNum)) - 1);
   return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
@@ -158,7 +158,7 @@ void exitOverflow(uint num, const uint max) {
   }
 }
 
-/* calculates the rotation amount to fit an immediate constant in 8 bits */
+/* Calculates the rotation amount to fit an immediate constant in 8 bits */
 word calcRotatedImm(word imm) {
   // PRE: imm can be represented by WORD_SIZE bits
   uint mask = 1;
@@ -170,7 +170,7 @@ word calcRotatedImm(word imm) {
     }
     mask = mask << 1;
   }
-  // rotation must be even
+  // Rotation must be even
   if (rotation % ROTATION_FACTOR != 0) {
     rotation++;
   }
@@ -180,7 +180,7 @@ word calcRotatedImm(word imm) {
   return (rotation << GET_ROTATION_NUM) | imm;
 }
 
-/* calculates immediate value, including any rotation required to
+/* Calculates immediate value, including any rotation required to
 fit number into 8 bits*/
 word parseOperand2Imm(char **op2) {
   uint imm = parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
@@ -191,7 +191,7 @@ word parseOperand2Imm(char **op2) {
   return imm;
 }
 
-/* calculates binary representation of a register operand2
+/* Calculates binary representation of a register operand2
 including registers with shifts attached */
 word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
@@ -211,14 +211,14 @@ word parseOperand2Reg(char **op2, uint args) {
          SHIFT_BY_REG_HARDCODE | rm;
 }
 
-/* checks type of operand 2 (imm/reg) and calls corresponding parser*/
+/* Checks type of operand 2 (imm/reg) and calls corresponding parser*/
 word parseOperand2(char **op2, uint args) {
   // 8 bit immediate value - <#expression>
-  // decimal or hexadecimal ("#n" or “#0x...”)
+  // Decimal or hexadecimal ("#n" or “#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
     return parseOperand2Imm(op2);
   }
-  // shifted register - Rm <shiftname> {<register> or <#expression>}
+  // Shifted register - Rm <shiftname> {<register> or <#expression>}
   return parseOperand2Reg(op2, args);
 }
 
@@ -300,7 +300,7 @@ word assembleMultiply(symbol_table *symbolTable, instruction input) {
   word rn = 0;
   word accumulate = 0;
 
-  // set rn and A for an 'accumulate' input
+  // Set rn and A for an 'accumulate' input
   if (!strcmp("mla", input.opcode)) {
     rn = REM_INT(input.fields[3]) << MULT_REG_N_SHIFT;
     accumulate = ACCUMULATE_FLAG;
@@ -334,26 +334,26 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
   return cond | BRANCH_HARDCODE | (offset & BRANCH_OFFSET_MASK);
 }
 
-/* removes bracketing around string
+/* Removes bracketing around string
 converts remaining strings into unsigned int values
 returns array containing register address and expression address */
 word *remBracket(char *string) {
   word *addresses = malloc(sizeof(word) * 4);
   int length = strlen(string);
   char unbracketed[length - 1];
-  // removing brackets
+  // Removing brackets
   // TODO ++string
   for (int i = 1; i < length; i++) {
     unbracketed[i - 1] = string[i];
   }
-  // separator
+  // Separator
   char *delim = ", ";
-  // gets Rn
+  // Gets Rn
   char *token = strtok(unbracketed, delim);
-  // gets address of register rn
+  // Gets address of register rn
   addresses[0] = atoi(REMOVE_FIRST_CHAR(token));
   token = strtok(NULL, delim);
-  // if expression exists in address
+  // If expression exists in address
   if (token != NULL) {
     char firstLetter = token[0];
     char secondLetter = (REMOVE_FIRST_CHAR(token))[0];
@@ -364,7 +364,7 @@ word *remBracket(char *string) {
   return addresses;
 }
 
-// this function decodes the address provided within the instruction struct
+/* decodes the address provided within the instruction struct */
 SDTIOperation SDTIparser(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
   if (field_count == 3) {
@@ -382,26 +382,26 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   // TODO: (WIP) I refactored your `remBracket` & added var `addresses` - Alex
   word *addresses = remBracket(input.fields[1]);
 
-  // decoding address type
+  // Decoding address type
   SDTIOperation operation = SDTIparser(input.fields, input.field_count);
   // Load bit
   word l = (!strcmp("ldr", input.opcode)) ? (1 << SDTI_L_SHIFT) : 0;
   // PRE/POST-INDEXING bits
   word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
-  // base register Rn
+  // Base register Rn
   word Rn = addresses[0] << SDTI_RN_SHIFT;
-  // source/ dest register Rd
+  // Source/ dest register Rd
   word Rd = REM_INT(input.fields[0]) << SDTI_RD_SHIFT;
-  // offsets
+  // Offsets
   word offset;
-  // up bit
+  // Up bit
   word u = 1 << SDTI_U_SHIFT;
-  // immediate offsets
+  // Immediate offsets
   word i = 0;
-  // switch case for different address types
+  // Switch case for different address types
   switch (operation) {
   case POST_RN_EXP:
-    // offset
+    // Offset
     i = IS_IMMEDIATE(input.fields[2]) ? 0 : 1 << SDTI_I_SHIFT;
     offset = REM_INT(input.fields[2]);
     break;
@@ -410,14 +410,14 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     offset = 0;
     break;
   case PRE_RN_EXP:
-    // offset
+    // Offset
     // TODO: check if this is null? - Alex
     offset = addresses[1];
     u = addresses[2] << SDTI_U_SHIFT;
     i = addresses[3] << SDTI_I_SHIFT;
     break;
   case NUMERIC_CONST:
-    // check if expression can fit inside a mov function
+    // Check if expression can fit inside a mov function
     if (parseImmediate(input.fields[1] + 1) <= SDTI_EXP_BOUND) {
       input.opcode = "mov";
       return assembleDPI(symbolTable, input);
@@ -425,17 +425,17 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
       // offset
       offset = getSymbol(symbolTable, input.fields[1])->body.address - 8;
       offset -= input.currentAddress;
-      // base register Rn
+      // Base register Rn
       Rn = PC << SDTI_RN_SHIFT;
     }
     break;
   default:
-    // this should never happen, fields were most likely parsed wrong
+    // This should never happen, fields were most likely parsed wrong
     assert(false);
     break;
   }
-  // freeing memory for the register address and expression address
+  // Freeing memory for the register address and expression address
   free(addresses);
-  // returning constructed instruction
+  // Returning constructed instruction
   return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
 }
