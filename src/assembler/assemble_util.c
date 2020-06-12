@@ -1,4 +1,4 @@
-REM_INT #include "assemble_util.h"
+#include "assemble_util.h"
 #include "../common/constants.h"
 #include "../common/util.h"
 #include "assemble_constants.h"
@@ -9,12 +9,11 @@ REM_INT #include "assemble_util.h"
 #include <stdlib.h>
 #include <string.h>
 
-    /* Performs the first scan on a file adding labels to the symbol table,
-        as well as expressions. Returns an array of strings that
-        represent each line, stripped of the newline \n,
-        and stores expressions in their string form at the end of the array. */
-    void
-    scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
+/* Performs the first scan on a file adding labels to the symbol table,
+    as well as expressions. Returns an array of strings that
+    represent each line, stripped of the newline \n,
+    and stores expressions in their string form at the end of the array. */
+void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   assert(armFile != NULL && symbolTable != NULL && output != NULL);
 
   // Will be used to store expressions found during the scan
@@ -253,7 +252,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     opcode = MOV;
     imm = input.fields[0];
     rd = REM_INT(input.fields[0]);
-    char *ops[SHIFT_NO_ARGS] = {input.fields[0], "lsl", input.fields[1]};
+    char *ops[SHIFT_NO_ARGS] = {--input.fields[0], "lsl", input.fields[1]};
     args = SHIFT_NO_ARGS;
     operand2 = ops;
   }
