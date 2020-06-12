@@ -138,7 +138,7 @@ static void setCPSR(arm_t *state, word result, uint carryOut) {
   // set only if the result is all zeros
   word z = result ? 0 : CPSR_Z_MASK;
   // carry out from the instruction
-  word c = carryOut ? SET_CPSR_C : 0;
+  word c = carryOut ? CPSR_C_SHIFT : 0;
   // v is unaffected
   word v = state->registers[CPSR] & CPSR_V_MASK;
   // updated flag bits

@@ -17,7 +17,7 @@
 #define GET_CPSR_Z(cpsr) ((cpsr & CPSR_Z_MASK) >> CPSR_Z_SHIFT)
 #define GET_CPSR_C(cpsr) ((cpsr & CPSR_C_MASK) >> CPSR_C_SHIFT)
 #define GET_CPSR_V(cpsr) ((cpsr & CPSR_V_MASK) >> CPSR_V_SHIFT)
-#define GET_CPSR_FLAGS(cpsr) (cpsr >> CPSR_V_SHIFT)
+#define GET_CPSR_FLAGS(cpsr) (cpsr >> COND_SHIFT)
 #define UPDATE_CPSR(instruction) (instruction & INSTRUCTION_S_MASK)
 #define BITS_SET(value, mask, bits) ((value & mask) == bits)
 
@@ -50,7 +50,6 @@
 #define POSITIVE_SIGN_EXTEND (0)
 
 // Constants for Data Processing instructions
-#define SET_CPSR_C (1 << 29)
 #define DPI_I_MASK (0x02000000)
 #define DPI_OPCODE_MASK (0x01E00000)
 #define DPI_RN_MASK (0xF0000)
