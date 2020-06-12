@@ -1,4 +1,4 @@
-#include "assemble_util.h"
+REM_INT #include "assemble_util.h"
 #include "../common/constants.h"
 #include "../common/util.h"
 #include "assemble_constants.h"
@@ -9,14 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-// removes first character and returns integer from string
-word rem(const char *string) { return atoi(REMOVE_FIRST_CHAR(string)); }
-
-/* Performs the first scan on a file adding labels to the symbol table,
-    as well as expressions. Returns an array of strings that
-    represent each line, stripped of the newline \n,
-    and stores expressions in their string form at the end of the array. */
-void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
+    /* Performs the first scan on a file adding labels to the symbol table,
+        as well as expressions. Returns an array of strings that
+        represent each line, stripped of the newline \n,
+        and stores expressions in their string form at the end of the array. */
+    void
+    scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   assert(armFile != NULL && symbolTable != NULL && output != NULL);
 
   // Will be used to store expressions found during the scan
@@ -197,7 +195,7 @@ word parseOperand2Imm(char **op2) {
 /* Calculates binary representation of a register operand2
 including registers with shifts attached */
 word parseOperand2Reg(char **op2, uint args) {
-  uint rm = rem(op2[0]);
+  uint rm = REM_INT(op2[0]);
   Shift shiftType = parseShiftType(op2[1]);
   if (args < SHIFT_NO_ARGS) {
     // No shift type/ shift of 0
@@ -207,7 +205,7 @@ word parseOperand2Reg(char **op2, uint args) {
     uint shiftNum = parseImmediate(REMOVE_FIRST_CHAR(op2[2]));
     return (shiftNum << 7) | (shiftType << 5) | rm;
   }
-  uint rs = rem(op2[2]);
+  uint rs = REM_INT(op2[2]);
   // Rs can be any general purpose register except the PC
   assert(rs != PC);
   return (rs << RS_SHIFT) | (shiftType << SHIFT_TYPE_SHIFT) |
@@ -245,7 +243,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   // syntax: mov Rd, <Operand2>
   else if (opcode == MOV) {
     imm = input.fields[1];
-    rd = rem(input.fields[0]);
+    rd = REM_INT(input.fields[0]);
     operand2 = input.fields + 1;
     args = input.field_count - 1;
   }
@@ -254,7 +252,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   else if (opcode == LSL_SPECIAL) {
     opcode = MOV;
     imm = input.fields[0];
-    rd = rem(input.fields[0]);
+    rd = REM_INT(input.fields[0]);
     char *ops[SHIFT_NO_ARGS] = {input.fields[0], "lsl", input.fields[1]};
     args = SHIFT_NO_ARGS;
     operand2 = ops;
@@ -267,7 +265,7 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
     imm = input.fields[1];
     // COND flags should be updated (s bit is set)
     s = 1;
-    rn = rem(input.fields[0]);
+    rn = REM_INT(input.fields[0]);
     operand2 = input.fields + 1;
     args = input.field_count - 1;
   }
@@ -276,8 +274,8 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
   // syntax: <opcode> Rd, Rn, <Operand2>
   else {
     imm = input.fields[2];
-    rn = rem(input.fields[1]);
-    rd = rem(input.fields[0]);
+    rn = REM_INT(input.fields[1]);
+    rd = REM_INT(input.fields[0]);
     operand2 = input.fields + 2;
     args = input.field_count - 2;
   }
@@ -295,9 +293,9 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
 returns the corresponding ARM-binary based on the instruction arguments */
 word assembleMultiply(symbol_table *symbolTable, instruction input) {
   // Defining the components of the instruction
-  word rd = rem(input.fields[0]) << MULT_RDEST_SHIFT;
-  word rm = rem(input.fields[1]);
-  word rs = rem(input.fields[2]) << MULT_REG_S_SHIFT;
+  word rd = REM_INT(input.fields[0]) << MULT_RDEST_SHIFT;
+  word rm = REM_INT(input.fields[1]);
+  word rs = REM_INT(input.fields[2]) << MULT_REG_S_SHIFT;
 
   // Initialising for 'mul', may be updated if 'mla'
   word rn = 0;
@@ -305,7 +303,7 @@ word assembleMultiply(symbol_table *symbolTable, instruction input) {
 
   // Set rn and A for an 'accumulate' input
   if (!strcmp("mla", input.opcode)) {
-    rn = rem(input.fields[3]) << MULT_REG_N_SHIFT;
+    rn = REM_INT(input.fields[3]) << MULT_REG_N_SHIFT;
     accumulate = ACCUMULATE_FLAG;
   }
   // S is set to 0 so no need to explicitly write it
@@ -330,7 +328,7 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
   // A hashtag denotes a constant address, otherwise the address needs
   // found from the symbol table
   word targetAddress = IS_IMMEDIATE(target)
-                           ? rem(target)
+                           ? REM_INT(target)
                            : getSymbol(symbolTable, target)->body.address;
   // Calculates the offset with the pipeline effect considered
   word offset = (targetAddress - currentAddress - 8) >> 2;
@@ -395,7 +393,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   // Base register Rn
   word Rn = addresses[0] << SDTI_RN_SHIFT;
   // Source/ dest register Rd
-  word Rd = rem(input.fields[0]) << SDTI_RD_SHIFT;
+  word Rd = REM_INT(input.fields[0]) << SDTI_RD_SHIFT;
   // Offsets
   word offset;
   // Up bit
@@ -407,7 +405,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   case POST_RN_EXP:
     // Offset
     i = IS_IMMEDIATE(input.fields[2]) ? 0 : 1 << SDTI_I_SHIFT;
-    offset = rem(input.fields[2]);
+    offset = REM_INT(input.fields[2]);
     break;
   case PRE_RN:
     // Offset is 0
