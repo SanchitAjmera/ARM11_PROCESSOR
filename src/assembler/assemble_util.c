@@ -16,13 +16,13 @@
 void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   assert(armFile != NULL && symbolTable != NULL && output != NULL);
 
-  /* Will be used to store expressions found during the scan */
+  // Will be used to store expressions found during the scan
   file_lines *expressions = newFileLines();
 
-  /* Scan file for labels and expressions */
+  // Scan file for labels and expressions
   char line[LINE_CHAR_LIM];
   while (fgets(line, LINE_CHAR_LIM, armFile) != NULL) {
-    /* iterate through chars in line */
+    // iterate through chars in line
     bool isLabel = false;
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
@@ -86,6 +86,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
       }
     }
 
+    // Stores the current instruction's information in struct
     instruction instr = {fields[0], fields + 1, fieldCount - 1,
                          i * WORD_SIZE_BYTES};
     symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
@@ -110,7 +111,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
 // removes first character and returns integer from string
 word rem(const char *string) { return atoi(REMOVE_FIRST_CHAR(string)); }
 
-// returns respective int value; -1 for failure
+/* returns respective int value; -1 for failure */
 int lookup(const pair_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
