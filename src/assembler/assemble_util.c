@@ -9,6 +9,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Returns respective int value; -1 for failure */
+int lookup(const pair_t table[], const int size, const char *key) {
+  for (int i = 0; i < size; i++) {
+    if (!strcmp(table[i].key, key)) {
+      return table[i].value;
+    }
+  }
+  return LOOKUP_FAILURE;
+}
+
 /* Performs the first scan on a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
@@ -87,8 +97,9 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     }
 
     // Stores the current instruction's information in struct
-    instruction instr = {fields[0], fields + 1, fieldCount - 1,
-                         i * WORD_SIZE_BYTES};
+    instruction instr = {
+        lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]), fields + 1,
+        fieldCount - 1, i * WORD_SIZE_BYTES};
     symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
     assert(instrSymbol != NULL);
     word binLine;
@@ -108,16 +119,6 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   }
 }
 
-/* Returns respective int value; -1 for failure */
-int lookup(const pair_t table[], const int size, const char *key) {
-  for (int i = 0; i < size; i++) {
-    if (!strcmp(table[i].key, key)) {
-      return table[i].value;
-    }
-  }
-  return LOOKUP_FAILURE;
-}
-
 /* Converts DPI mnemonic to corresponding enum */
 static int parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
@@ -125,7 +126,6 @@ static int parseDPIOpcode(char *mnemonic) {
 
 /* Converts string to integer for both denary and hex constants */
 uint parseImmediate(char *op2) {
-  // TODO: change it to remove # here?
   // PRE: # has been removed from <#expression> (op2)
   if (op2[0] == '-') {
     REMOVE_FIRST_CHAR(op2);
