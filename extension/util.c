@@ -11,12 +11,18 @@ typedef enum { ITEM1, ITEM2, ETC } item;
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION } room;
 
+// enum for character type
+typedef enum { BATMAN, TONY, UTA } character;
+
 typedef struct {
-  char *username;
   item *inventory;
   int cash;
   int health;
-
+  room current_room;
+  struct {
+    char *username;
+    character character;
+  } profile;
 } person;
 
 int main(void) { return 1; }
