@@ -119,7 +119,7 @@ int lookup(const pair_t table[], const int size, const char *key) {
 }
 
 /* Converts DPI mnemonic to corresponding enum */
-int parseDPIOpcode(char *mnemonic) {
+static int parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
@@ -139,12 +139,12 @@ uint parseImmediate(char *op2) {
 }
 
 /* Calculates shift type enum from string */
-Shift parseShiftType(const char *shift) {
+static Shift parseShiftType(const char *shift) {
   return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
 }
 
 /* Returns circular bitwise left rotation of input num by rotateNum */
-word rotateLeft(word value, uint rotateNum) {
+static word rotateLeft(word value, uint rotateNum) {
   uint msbs = value & ~((1 << (WORD_SIZE - rotateNum)) - 1);
   return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
 }
@@ -159,7 +159,7 @@ void exitOverflow(uint num, const uint max) {
 }
 
 /* Calculates the rotation amount to fit an immediate constant in 8 bits */
-word calcRotatedImm(word imm) {
+static word calcRotatedImm(word imm) {
   // PRE: imm can be represented by WORD_SIZE bits
   uint mask = 1;
   uint rotation = 0;
@@ -182,7 +182,7 @@ word calcRotatedImm(word imm) {
 
 /* Calculates immediate value, including any rotation required to
 fit number into 8 bits */
-word parseOperand2Imm(char **op2) {
+static word parseOperand2Imm(char **op2) {
   uint imm = parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
   exitOverflow(imm, MAX_NUM);
   if (imm > MAX_BYTE) {
@@ -193,7 +193,7 @@ word parseOperand2Imm(char **op2) {
 
 /* Calculates binary representation of a register operand2
 including registers with shifts attached */
-word parseOperand2Reg(char **op2, uint args) {
+static word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
   if (args < SHIFT_NO_ARGS) {
     // No shift type/ shift of 0
@@ -212,7 +212,7 @@ word parseOperand2Reg(char **op2, uint args) {
 }
 
 /* Checks type of operand 2 (imm/reg) and calls corresponding parser */
-word parseOperand2(char **op2, uint args) {
+static word parseOperand2(char **op2, uint args) {
   // 8 bit immediate value - <#expression>
   // Decimal or hexadecimal ("#n" or “#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
@@ -337,7 +337,7 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
 /* Removes bracketing around string
 converts remaining strings into unsigned int values
 returns array containing register address and expression address */
-word *remBracket(char *string) {
+static word *remBracket(char *string) {
   word *addresses = malloc(sizeof(word) * 4);
   int length = strlen(string);
   char unbracketed[length - 1];
@@ -365,7 +365,7 @@ word *remBracket(char *string) {
 }
 
 /* Decodes the address provided within the instruction struct */
-SDTIOperation SDTIparser(char **fields, uint field_count) {
+static SDTIOperation SDTIparser(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
   if (field_count == 3) {
     return POST_RN_EXP;
