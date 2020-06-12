@@ -13,13 +13,13 @@ char *strptr(char *in) {
 Error validatePtr(const void *ptr, const char *errorMsg) {
   if (ptr == NULL) {
     printf("Error: %s\n", errorMsg);
-    return ERR_FAIL;
+    return ERROR_FAIL;
   }
-  return ERR_PASS;
+  return ERROR_SUCC;
 }
 
 void errorExit(Error error) {
-  if (error == ERR_FAIL) {
+  if (error == ERROR_FAIL) {
     exit(EXIT_FAILURE);
   }
 }

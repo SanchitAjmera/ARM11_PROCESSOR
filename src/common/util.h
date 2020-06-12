@@ -7,7 +7,7 @@ typedef uint32_t word;
 typedef uint8_t byte;
 typedef unsigned int uint;
 
-typedef enum { ERROR_SUCC = 0, ERR_FAIL = 1 } Error;
+typedef enum { ERROR_SUCC = 0, ERROR_FAIL = 1 } Error;
 /*registers 0-12 will be used by their value so for reg0 we can just use 0
 but these will make it easier to address in memory*/
 typedef enum { PC = 15, CPSR = 16 } Register;
@@ -31,7 +31,7 @@ typedef enum { LDR, STR } OpcodeSDT;
 // opcode mnemonics for Branch Instructions
 typedef enum { BEQ, BNE, BGE, BLT, BGT, BLE, B } OpcodeBranch;
 // opcode mnemonics for Special Instructions
-typedef enum { LSL_SPECIAL, ANDEQ } OpcodeSpecial;
+typedef enum { LSL_SPECIAL = 14, ANDEQ } OpcodeSpecial;
 // condition suffixes
 typedef enum { EQ, NE, GE = 10, LT, GT, LE, AL } Cond;
 // shift types
