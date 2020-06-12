@@ -334,13 +334,10 @@ converts remaining strings into unsigned int values
 returns array containing register address and expression address */
 static word *remBracket(char *string) {
   word *addresses = malloc(sizeof(word) * 4);
-  int length = strlen(string);
-  char unbracketed[length - 1];
-  // Removing brackets
-  // TODO ++string
-  for (int i = 1; i < length; i++) {
-    unbracketed[i - 1] = string[i];
-  }
+
+  char unbracketed[strlen(string) - 1];
+  strcpy(unbracketed, ++string);
+
   // Separator
   char *delim = ", ";
   // Gets Rn
