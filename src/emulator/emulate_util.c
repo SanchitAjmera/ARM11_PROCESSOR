@@ -7,19 +7,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-uint shiftByConstant(uint shiftPart) {
+static uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
   return shiftPart >> GET_SHIFT_CONSTANT;
 }
 
-uint shiftByRegister(arm_t *state, uint shiftPart) {
+static uint shiftByRegister(arm_t *state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
   uint rs = shiftPart >> GET_RS_SHIFT;
   // bottom byte of value in Rs specifies the amount to be shifted
   return state->registers[rs] & LEAST_BYTE_MASK;
 }
 
-word arithShift(word value, uint shiftNum) {
+static word arithShift(word value, uint shiftNum) {
   word msb = value & MSB_MASK;
   word msbs = msb;
   for (int i = 0; i < shiftNum; i++) {
@@ -29,26 +29,26 @@ word arithShift(word value, uint shiftNum) {
   return msbs | (value >> shiftNum);
 }
 
-word rotateRight(word value, uint rotateNum) {
+static word rotateRight(word value, uint rotateNum) {
   uint lsbs = value & ((1 << rotateNum) - 1);
   return (value >> rotateNum) | (lsbs << (WORD_SIZE - rotateNum));
 }
 
-uint leftCarryOut(word value, uint shiftNum) {
+static uint leftCarryOut(word value, uint shiftNum) {
   if (shiftNum == 0) {
     return NO_ROTATION;
   }
   return (value << (shiftNum - 1)) >> (WORD_SIZE - 1);
 }
 
-uint rightCarryOut(word value, uint shiftNum) {
+static uint rightCarryOut(word value, uint shiftNum) {
   if (shiftNum == 0) {
     return NO_ROTATION;
   }
   return (value >> (shiftNum - 1)) & LSB_MASK;
 }
 
-operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
+static operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   // bit to determine what to shift by
   bool shiftByReg = shiftPart & LSB_MASK;
   // number to shift by
@@ -87,7 +87,7 @@ operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   return shiftedOp2;
 }
 
-operation_t *opRegister(arm_t *state, uint op2) {
+static operation_t *opRegister(arm_t *state, uint op2) {
   // register that holds the value to be shifted
   uint rm = op2 & LEAST_NIBBLE_MASK;
   // value to be shifted
@@ -97,7 +97,7 @@ operation_t *opRegister(arm_t *state, uint op2) {
   return barrelShifter(state, value, shiftPart);
 }
 
-operation_t *opImmediate(arm_t *state, uint op2) {
+static operation_t *opImmediate(arm_t *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = op2 & LEAST_BYTE_MASK;
   // number to rotate by
@@ -113,7 +113,7 @@ operation_t *opImmediate(arm_t *state, uint op2) {
 }
 
 // carry out from arithmetic opertaion
-word getCarryOut(word op1, word op2, bool isAddition) {
+static word getCarryOut(word op1, word op2, bool isAddition) {
   if (isAddition) {
     return (op1 <= UINT32_MAX - op2) ? 0 : 1;
   }
@@ -121,7 +121,7 @@ word getCarryOut(word op1, word op2, bool isAddition) {
   return op1 < op2 ? 0 : 1;
 }
 
-void setCPSR(arm_t *state, word result, uint carryOut) {
+static void setCPSR(arm_t *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & CPSR_N_MASK;
   // set only if the result is all zeros
@@ -200,7 +200,7 @@ void executeDPI(arm_t *state, dp_t *decoded) {
 
 // function for checking if word is within MEMORY_CAPACITY
 // prints error if memory is out of bounds
-bool checkValidAddress(word address) {
+static bool checkValidAddress(word address) {
   if (address > MEMORY_CAPACITY) {
     printf("Error: Out of bounds memory access at address 0x%08x\n", address);
     return false;
@@ -209,7 +209,7 @@ bool checkValidAddress(word address) {
 }
 
 // function which stores address inside source register Rd into the the memory
-void store(arm_t *state, word sourceReg, word baseReg) {
+static void store(arm_t *state, word sourceReg, word baseReg) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (!checkValidAddress(baseReg)) {
     return;
@@ -223,7 +223,7 @@ void store(arm_t *state, word sourceReg, word baseReg) {
 }
 
 // function which loads address inside base register Rn into the memory
-void load(arm_t *state, word destReg, word sourceAddr) {
+static void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (checkValidAddress(sourceAddr)) {
     // value inside base register
