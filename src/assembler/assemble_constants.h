@@ -11,6 +11,7 @@
 #define LOOKUP_FAILED(num) (num == LOOKUP_FAILURE)
 #define LINE_CHAR_LIM (512)
 #define PREDEFINED_SYMBOLS_COUNT (23)
+#define PIPELINE_OFFSET (8)
 
 // Constants for File Lines
 #define INIT_FILE_LINES_SIZE (16)
@@ -31,6 +32,7 @@
 // Constants for Single Data Transfer Instructions
 #define SDTI_HARDCODE (1 << 26)
 #define SDTI_EXP_BOUND (0xFF)
+#define POST_COUNT (3)
 
 // Constants for Multiply Instructions
 #define MULT_HARDCODE (0x90)

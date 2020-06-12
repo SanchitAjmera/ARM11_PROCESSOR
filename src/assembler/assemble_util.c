@@ -362,7 +362,7 @@ static word *remBracket(char *string) {
 /* Decodes the address provided within the instruction struct */
 static SDTIOperation SDTIparser(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
-  if (field_count == 3) {
+  if (field_count == POST_COUNT) {
     return POST_RN_EXP;
   } else if (strstr(fields[1], ",")) {
     return PRE_RN_EXP;
