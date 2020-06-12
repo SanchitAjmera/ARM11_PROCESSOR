@@ -33,13 +33,12 @@ room initialiseRoom(room_name current_room) {
 }
 
 // connects first room to second room
-void connectRoom(room *first, room *second) {
-  room *adjacent_rooms = first->adjacent_rooms;
+void connectRoom(room *first, room second) {
+  first->adjacent_rooms[first->adjacent_room_count] = second;
+  first->adjacent_room_count++;
 }
 
 // changes room of person and pushes current room into room histroy of player
-void changeRoom(state *person, room dest_room) {
-  room current_room = person->current_room;
-}
+void changeRoom(state *person, room dest_room) {}
 
 int main(void) { return 1; }
