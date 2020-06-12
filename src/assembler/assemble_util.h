@@ -9,7 +9,7 @@
 // generic (string, enum) struct for lookups
 typedef struct {
   char *key;
-  int value;
+  word value;
 } pair_t;
 
 // Enum for different types of addresses in SDTI assembly instructions

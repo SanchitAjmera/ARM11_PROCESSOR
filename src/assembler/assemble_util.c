@@ -120,7 +120,7 @@ int lookup(const pair_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
-OpcodeDP parseDPIOpcode(char *mnemonic) {
+word parseDPIOpcode(char *mnemonic) {
   return lookup(opcodeTable, OPCODE_TABLE_SIZE, mnemonic);
 }
 
@@ -215,6 +215,7 @@ word parseOperand2(char **op2, uint args) {
 
 word assembleDPI(symbol_table *symbolTable, instruction input) {
   word opcode = parseDPIOpcode(input.opcode);
+  // TODO: check for lookup failure
   word s = 0;
   word rn = 0;
   word rd = 0;
