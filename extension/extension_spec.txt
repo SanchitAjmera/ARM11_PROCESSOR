@@ -8,7 +8,7 @@ Aim:
 	- description of the rooms
 	- inventory
 	- store
-	
+
 		- these are problems for player to solve
 		- also prints players score and rooms
 
@@ -21,8 +21,8 @@ Aim:
 
 		- point system relays to the next level
 		- problems get increasing difficult
-	
-	- prints konstantinos		
+
+	- prints konstantinos
 
 
 functions:
@@ -33,7 +33,7 @@ functions:
 	cheatcode
 
 	PLAYER:
-		
+
 		- dropItem()
 		- pickUpItem()
 		- move(north, south, east, west)
@@ -47,23 +47,26 @@ functions:
 		Optional(ONLINE DATABASE)
 
 	BOSSES:
-		
+
 		- initialiseBoss()
-		- 
+		-
 
 	ROOM:
-		
+
 		- left/right/down/up
 		- desciptions
 		- examineRoom()
+		- items/ objects
+		- bosses
+		- visits
 
 	CODING:
-		
+
 		- giveQuestion()
-		- takeAnswer()	
-		- 
-	
-	printState()	
+		- takeAnswer()
+		-
+
+	printState()
 	load game or new game
 	chooseRoom()
 	showMap()
@@ -72,13 +75,8 @@ functions:
 	intialiseRoom()
 	initialiseGame()
 	saveGame() - MORKUS
-	
+
 		- writes to some file
 		- state
-	loadGame()	
-		- 
-	
-
-
-
-	
+	loadGame()
+		-
