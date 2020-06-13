@@ -6,73 +6,68 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define LOAD_FACTOR (0.75)
+
+static symbol **createSymbols(int num, size_t size) {
+  s->symbols = malloc(num * size);
+  validatePtr(s->symbols, "Not enough memory.");
+  for (int i = 0; i < num; i++) {
+    s->symbols[i] = malloc(sizeof(*s->symbols[i]));
+    validatePtr(s->symbols[i], "Not enough memory.");
+  }
+}
+
 /* Takes in a pointer to an uninitialised symbol table and initialises it */
-symbol_table *newSymbolTable() {
-  symbol_table *s = malloc(sizeof(symbol_table));
-  assert(s != NULL);
-  symbol *symbols = malloc(INIT_S_TABLE_SIZE * sizeof(symbol));
-  assert(symbols != NULL);
-  s->symbols = symbols;
-  s->maxSymbols = INIT_S_TABLE_SIZE;
+symbol_table *newSymbolTable(void) {
+  symbol_table *s = malloc(sizeof(*s));
+  validatePtr(s, "Not enough memory.");
+  s->size = INIT_S_TABLE_SIZE;
   s->symbolCount = 0;
+  s->symbols = createSymbols(s->size, sizeof(*s->symbols));
   return s;
 }
 
-symbol *getSymbol(const symbol_table *s, const char *name) {
-  assert(s != NULL);
-  /* simple linear search by name */
-  for (int i = 0; i < s->symbolCount; i++) {
-    if (strcmp(s->symbols[i].name, name) == 0) {
-      return s->symbols + i;
-    }
+static int hash(symbol_table *s, const char *key) { return 0; }
+
+static void rehash(symbol_table *s) {
+  if (s->symbolCount / s->size < LOAD_FACTOR) {
+    return;
   }
-  return NULL;
+  // TODO: resize hash table & rehash all entries
 }
 
-void addSymbols(symbol_table *s, symbol *symbols, int symbolCount) {
+symbol *getSymbol(const symbol_table *s, const char *name) {
+  return h->symbols[hash(s, name)][0];
+}
+
+void addSymbol(symbol_table *s, symbol *entry) {
+  if (getSymbol(s, entry.name) != NULL) {
+    // Label already defined
+    return;
+  }
+  // TODO: collision code to be implemented
+  s->symbols[hash(s, entry->name)][0] = entry;
+}
+
+void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
   for (int i = 0; i < symbolCount; i++) {
     addSymbol(s, symbols[i]);
   }
 }
 
-void addSymbol(symbol_table *s, symbol entry) {
-  assert(s != NULL);
-  if (getSymbol(s, entry.name) != NULL) { // Label already defined
-    return;
-  }
-
-  if (s->symbolCount == s->maxSymbols) { // Resize symbol table
-    s->maxSymbols *= 2;
-    s->symbols = realloc(s->symbols, s->maxSymbols);
-    validatePtr(s->symbols, "Null pointer.");
-  }
-
-  s->symbols[s->symbolCount] = entry;
-  s->symbolCount += 1;
-}
-
 void freeTable(symbol_table *s) {
-  for (int i = 0; i < s->maxSymbols; i++) {
-    free(s->symbols[i].name);
+  for (int i = 0; i < s->size; i++) {
+    if (s->symbols[i] != NULL) {
+      free(s->symbols[i].name);
+      free(s->symbols[i]);
+    }
   }
   free(s->symbols);
   free(s);
 }
 
-void printSymbol(symbol s) {
-  printf("[name: %s, type: %i, ", s.name, s.type);
-  switch (s.type) {
-  case LABEL:
-    printf("addr: %x", s.body.address);
-    break;
-  default:
-    break;
-  }
-  printf("]\n");
-}
+// dummy functions for compilation
 
-void printSymbolTable(symbol_table *s) {
-  for (int i = 0; i < s->symbolCount; i++) {
-    printSymbol(s->symbols[i]);
-  }
-}
+void printSymbol(symbol s) {}
+
+void printSymbolTable(symbol_table *s) {}
