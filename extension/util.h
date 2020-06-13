@@ -40,5 +40,5 @@ typedef struct {
 
 extern room *initialiseRoom(room_name current_room);
 extern void connectRoom(room *first, room *second);
-extern void printRoom(room_name name);
+extern void printRoomDetails(room *room1);
 extern void freeRoom(room *room1);
