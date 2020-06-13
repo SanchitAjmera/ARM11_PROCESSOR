@@ -57,12 +57,10 @@ void printBuildingDetails(building_t *huxley) {
   int size = 1;
   room_t *room = huxley->start_room;
   printedRooms[0] = room;
-  While(size < ROOM_COUNT) {
-    for (int i = 0; i < room->adjacent_room_count; i++) {
-      if (!containsRoom(printedRooms, size, room->adjacent_rooms[i])) {
-        printedRooms[size] = (room->adjacent_rooms[i]);
-        size++;
-      }
+  for (int i = 0; i < room->adjacent_room_count; i++) {
+    if (!containsRoom(printedRooms, size, room->adjacent_rooms[i])) {
+      printedRooms[size] = (room->adjacent_rooms[i]);
+      size++;
     }
   }
 
