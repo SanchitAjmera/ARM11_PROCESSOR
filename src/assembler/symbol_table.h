@@ -20,9 +20,9 @@ struct instruction {
 };
 
 struct symbol_table {
-  symbol *symbols;  // currently implemented as array of symbols
+  symbol **symbols; // currently implemented as array of symbols
   uint symbolCount; // number of entries in the symbol table
-  uint maxSymbols;  // size of the array storing the symbol table
+  uint size;        // size of the array storing the symbol table
 };
 
 struct symbol {
@@ -32,8 +32,6 @@ struct symbol {
     word address;                                      // LABEL
     word (*assembleFunc)(symbol_table *, instruction); // INSTR
   } body;
-  /* TODO: make symbol_table an abstract binary search tree?
-  symbol *left, *right; */
 };
 
 extern symbol_table *newSymbolTable();
