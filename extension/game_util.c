@@ -44,27 +44,6 @@ void connectRoom(room *first, room *second) {
   first->adjacent_room_count++;
 }
 
-// function purely for testing ouptut of connect room_name
-void printRoom(room_name name) {
-  switch (name) {
-  case LOBBY:
-    printf("LOBBY\n");
-    break;
-  case LAB:
-    printf("LAB\n");
-    break;
-  case HARRODS:
-    printf("HARRODS\n");
-    break;
-  case FUSION:
-    printf("FUSION\n");
-    break;
-  case LECTURE_HALL:
-    printf("LECTURE_HALL\n");
-    break;
-  }
-}
-
 void freeRoom(room *room1) {
 
   if (room1 == NULL) {
