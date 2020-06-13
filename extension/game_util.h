@@ -11,11 +11,22 @@
 // enum for items stored by person in inventory
 typedef enum { ITEM1, ITEM2, ETC } item;
 
+// enum for properties of products
+typedef enum { PROP1, PROP2, PROP3 } property;
+
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
 
 // enum for character type
 typedef enum { BATMAN, TONY, UTA } character;
+
+// struct for items and their properties
+typedef struct item_t {
+  
+  item name;
+  properties
+
+} item_t;
 
 // structure for rooms
 // valid for no cyclical room structure
@@ -24,6 +35,7 @@ typedef struct room_t {
   struct room_t **adjacent_rooms;
   int adjacent_room_count;
   char *description;
+
 } room_t;
 
 // structure for building consisting of room_history
