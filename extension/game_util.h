@@ -22,9 +22,9 @@ typedef enum { BATMAN, TONY, UTA } character;
 
 // struct for items and their properties
 typedef struct item_t {
-  
+
   item name;
-  properties
+  property *properties;
 
 } item_t;
 
@@ -44,7 +44,7 @@ typedef struct building_t {
 } building_t;
 
 typedef struct {
-  item *inventory;
+  item_t *inventory;
   int cash;
   int health;
   room_t curr_room_node; // struct for room_t structure
