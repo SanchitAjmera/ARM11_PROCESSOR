@@ -20,6 +20,9 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
 // enum for character type
 typedef enum { BATMAN, TONY, UTA } character;
 
+// enum for bosses
+typedef enum { KONSTANTINOS, LANCASTER, TONY } bosses;
+
 // struct for items and their properties
 typedef struct item_t {
 
@@ -32,9 +35,10 @@ typedef struct item_t {
 // valid for no cyclical room structure
 typedef struct room_t {
   room_name current_room;
-  struct room_t **adjacent_rooms;
+  room_t **adjacent_rooms;
   int adjacent_room_count;
   char *description;
+  item_t **items;
 
 } room_t;
 
