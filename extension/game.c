@@ -16,7 +16,7 @@ int main(void) {
   connectRoom(lobby, lab);
   connectRoom(lobby, fusion);
 
-  printRoom(lobby->current_room);
+  printRoomDetails(lobby);
   freeRoom(lobby);
 
   exit(EXIT_SUCCESS);
