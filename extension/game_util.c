@@ -29,8 +29,8 @@ void introduction() {}
 // connects first room to second room
 void connectRoom(room_t *first, room_t *second) {
   first->adjacent_rooms[first->adjacent_room_count] = second;
-  // second->adjacent_rooms[second->adjacent_room_count] = first;
-  // second->adjacent_room_count++;
+  second->adjacent_rooms[second->adjacent_room_count] = first;
+  second->adjacent_room_count++;
   first->adjacent_room_count++;
 }
 
@@ -63,14 +63,16 @@ building_t *initialiseBuilding() {
   return huxley;
 }
 
-void freeRoom(room_t *room1) {
+void freeRoom(room_t *entranceRoom, room_t *room1) {
 
   if (room1 == NULL) {
     return;
   }
   if (room1->adjacent_rooms != NULL) {
     for (int i = 0; i < room1->adjacent_room_count; i++) {
-      freeRoom((room1->adjacent_rooms[i]));
+      if (room1->adjacent_rooms[i] != entranceRoom) {
+        freeRoom(room1, room1->adjacent_rooms[i]);
+      }
     }
     free(room1->adjacent_rooms);
   }
@@ -82,7 +84,7 @@ void freeBuilding(building_t *huxley) {
   if (huxley == NULL) {
     return;
   }
-  freeRoom(huxley->start_room);
+  freeRoom(NULL, huxley->start_room);
   free(huxley);
 }
 // changes room of person and pushes current room into room histroy of player

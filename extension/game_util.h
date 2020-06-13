@@ -12,12 +12,13 @@
 typedef enum { ITEM1, ITEM2, ETC } item;
 
 // enum for room
-typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION } room_name;
+typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
 
 // enum for character type
 typedef enum { BATMAN, TONY, UTA } character;
 
 // structure for rooms
+// valid for no cyclical room structure
 typedef struct room_t {
   room_name current_room;
   struct room_t **adjacent_rooms;
