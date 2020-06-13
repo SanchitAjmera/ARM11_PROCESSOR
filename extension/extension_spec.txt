@@ -1,6 +1,6 @@
 Extension specification
 
-name: - 
+name: computing bizzare
 
 Aim:
 	- create a text-based game
@@ -26,10 +26,55 @@ Aim:
 
 
 functions:
+
+	GAME:
+		- music
+
+	cheatcode
+
+	PLAYER:
+		
+		- dropItem()
+		- pickUpItem()
+		- move(north, south, east, west)
+		- playArm()
+		- buy()
+		- eat()
+		- viewProfile/Inventory/healthPoint()
+		- changeUsername()
+		- changeCharacter()
+		- updateSkins()
+		Optional(ONLINE DATABASE)
+
+	BOSSES:
+		
+		- initialiseBoss()
+		- 
+
+	ROOM:
+		
+		- left/right/down/up
+		- desciptions
+		- examineRoom()
+
+	CODING:
+		
+		- giveQuestion()
+		- takeAnswer()	
+		- 
 	
+	printState()	
+	load game or new game
+	chooseRoom()
+	showMap()
+	randomlocation()
+	connectRoom()
+	intialiseRoom()
 	initialiseGame()
-	saveGame()
+	saveGame() - MORKUS
+	
 		- writes to some file
+		- state
 	loadGame()	
 		- 
 	
