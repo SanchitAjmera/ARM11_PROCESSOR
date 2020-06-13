@@ -27,15 +27,15 @@ void introduction(){};
 
 // initialises room
 room *initialiseRoom(room_name current_room) {
-  struct room *this_room = malloc(sizeof(room));
+  room *this_room = malloc(sizeof(*this_room));
   this_room->current_room = current_room;
-  this_room->adjacent_rooms = NULL;
+  this_room->adjacent_rooms = malloc(sizeof(*this_room->adjacent_rooms));
   this_room->adjacent_room_count = 0;
   return this_room;
 }
 
 // connects first room to second room
-void connectRoom(room *first, room second) {
+void connectRoom(room *first, room *second) {
   first->adjacent_rooms[first->adjacent_room_count] = second;
   first->adjacent_room_count++;
 }
@@ -57,11 +57,14 @@ void printRoom(room_name name) {
 }
 
 void freeRoom(room *room1) {
-  if (room1 != NULL) {
+  if (room1 == NULL) {
     return;
   }
-  if (room1->adjacent_rooms != NULL) {
-    freeRoom(room1->adjacent_rooms);
+  if (room1->adjacent_rooms == NULL) {
+    free(room1);
+  }
+  for (int i = 0; i < room1->adjacent_room_count; i++) {
+    freeRoom((room1->adjacent_rooms[i]));
   }
   free(room1);
 }

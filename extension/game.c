@@ -7,18 +7,18 @@
 #include <string.h>
 
 int main(void) {
-
+  printf("hello");
   room *lobby = initialiseRoom(LOBBY);
   room *lecture_hall = initialiseRoom(LECTURE_HALL);
   room *fusion = initialiseRoom(FUSION);
   room *lab = initialiseRoom(LAB);
 
-  connectRoom(lobby, *lecture_hall);
-  connectRoom(lobby, *lab);
-  connectRoom(lobby, *fusion);
-  connectRoom(fusion, *lobby);
-  connectRoom(lecture_hall, *lobby);
-  connectRoom(lab, *lobby);
+  connectRoom(lobby, lecture_hall);
+  connectRoom(lobby, lab);
+  connectRoom(lobby, fusion);
+  connectRoom(fusion, lobby);
+  connectRoom(lecture_hall, lobby);
+  connectRoom(lab, lobby);
 
   printRoom(lobby->current_room);
   freeRoom(lobby);

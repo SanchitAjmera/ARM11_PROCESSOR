@@ -16,10 +16,12 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
 // enum for character type
 typedef enum { BATMAN, TONY, UTA } character;
 
+// structure for rooms
 typedef struct room {
   room_name current_room;
-  struct room *adjacent_rooms;
+  struct room **adjacent_rooms;
   int adjacent_room_count;
+  char *description;
 } room;
 
 typedef struct {
@@ -37,6 +39,6 @@ typedef struct {
 } state;
 
 extern room *initialiseRoom(room_name current_room);
-extern void connectRoom(room *first, room second);
+extern void connectRoom(room *first, room *second);
 extern void printRoom(room_name name);
 extern void freeRoom(room *room1);
