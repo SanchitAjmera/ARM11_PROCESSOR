@@ -26,6 +26,14 @@ void quit(){};
 // displays introduction to player
 void introduction(){};
 
+// connects first room to second room
+void connectRoom(room *first, room *second) {
+  first->adjacent_rooms[first->adjacent_room_count] = second;
+  // second->adjacent_rooms[second->adjacent_room_count] = first;
+  // second->adjacent_room_count++;
+  first->adjacent_room_count++;
+}
+
 // initialises room
 room *initialiseRoom(room_name current_room) {
   room *this_room = malloc(sizeof(*this_room));
@@ -38,10 +46,21 @@ room *initialiseRoom(room_name current_room) {
   return this_room;
 }
 
-// connects first room to second room
-void connectRoom(room *first, room *second) {
-  first->adjacent_rooms[first->adjacent_room_count] = second;
-  first->adjacent_room_count++;
+building *initialiseBuilding() {
+  building *huxley = malloc(sizeof(*huxley));
+  huxley->start_room = malloc(sizeof(room));
+  room *lobby = initialiseRoom(LOBBY);
+  room *lecture_hall = initialiseRoom(LECTURE_HALL);
+  room *fusion = initialiseRoom(FUSION);
+  room *lab = initialiseRoom(LAB);
+
+  connectRoom(lobby, lecture_hall);
+  connectRoom(lobby, lab);
+  connectRoom(lobby, fusion);
+
+  huxley->start_room = lobby;
+
+  return huxley;
 }
 
 void freeRoom(room *room1) {
@@ -56,6 +75,15 @@ void freeRoom(room *room1) {
     free(room1->adjacent_rooms);
   }
   free(room1);
+}
+
+void freeBuilding(building *huxley) {
+
+  if (huxley == NULL) {
+    return;
+  }
+  freeRoom(huxley->start_room);
+  free(huxley);
 }
 // changes room of person and pushes current room into room histroy of player
 void changeRoom(state *person, room dest_room) {}
