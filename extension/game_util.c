@@ -1,4 +1,4 @@
-#include "util.h"
+#include "game_util.h"
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
@@ -8,23 +8,23 @@
 #include <string.h>
 
 // shows player their inventory of items
-void view_inventory(){};
+void view_inventory() {}
 
 // shows player their character and username
-void view_profile(){};
+void view_profile() {}
 
 // shows player their current room
-void current_room(){};
+void current_room() {}
 
 // shows player room which they can visit
 // possibly a map (like the lego land map)
-void display_rooms(){};
+void display_rooms() {}
 
 // quits game also saving game into some history file
-void quit(){};
+void quit() {}
 
 // displays introduction to player
-void introduction(){};
+void introduction() {}
 
 // connects first room to second room
 void connectRoom(room *first, room *second) {

@@ -1,4 +1,4 @@
-#include "util.h"
+#include "print_util.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -9,7 +9,7 @@
 int main(void) {
 
   building *huxley = initialiseBuilding();
-  //  printRoomDetails(lobby);
+  // printRoomDetails(lobby);
   freeBuilding(huxley);
 
   exit(EXIT_SUCCESS);

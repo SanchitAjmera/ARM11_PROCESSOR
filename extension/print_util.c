@@ -1,4 +1,4 @@
-#include "util.h"
+#include "print_util.h"
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
@@ -43,4 +43,6 @@ void printRoomDetails(room *room1) {
   printAdjacentRooms(room1);
 }
 
-void printBuildingDetails(building huxley) { room_name *printedRooms; }
+void printBuildingDetails(building huxley) {
+  // room_name *printedRooms;
+}
