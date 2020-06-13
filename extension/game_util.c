@@ -1,4 +1,5 @@
 #include "util.h"
+#include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,9 +29,12 @@ void introduction(){};
 // initialises room
 room *initialiseRoom(room_name current_room) {
   room *this_room = malloc(sizeof(*this_room));
+  assert(this_room);
   this_room->current_room = current_room;
-  this_room->adjacent_rooms = malloc(sizeof(*this_room->adjacent_rooms));
+  this_room->adjacent_rooms = malloc(sizeof(room) * 5);
+  assert(this_room->adjacent_rooms);
   this_room->adjacent_room_count = 0;
+
   return this_room;
 }
 
@@ -45,26 +49,32 @@ void printRoom(room_name name) {
   switch (name) {
   case LOBBY:
     printf("LOBBY\n");
+    break;
   case LAB:
     printf("LAB\n");
+    break;
   case HARRODS:
     printf("HARRODS\n");
+    break;
   case FUSION:
     printf("FUSION\n");
+    break;
   case LECTURE_HALL:
     printf("LECTURE_HALL\n");
+    break;
   }
 }
 
 void freeRoom(room *room1) {
+
   if (room1 == NULL) {
     return;
   }
-  if (room1->adjacent_rooms == NULL) {
-    free(room1);
-  }
-  for (int i = 0; i < room1->adjacent_room_count; i++) {
-    freeRoom((room1->adjacent_rooms[i]));
+  if (room1->adjacent_rooms != NULL) {
+    for (int i = 0; i < room1->adjacent_room_count; i++) {
+      freeRoom((room1->adjacent_rooms[i]));
+    }
+    free(room1->adjacent_rooms);
   }
   free(room1);
 }
