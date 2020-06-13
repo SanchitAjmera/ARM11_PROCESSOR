@@ -27,7 +27,7 @@ void quit() {}
 void introduction() {}
 
 // connects first room to second room
-void connectRoom(room *first, room *second) {
+void connectRoom(room_t *first, room_t *second) {
   first->adjacent_rooms[first->adjacent_room_count] = second;
   // second->adjacent_rooms[second->adjacent_room_count] = first;
   // second->adjacent_room_count++;
@@ -35,24 +35,24 @@ void connectRoom(room *first, room *second) {
 }
 
 // initialises room
-room *initialiseRoom(room_name current_room) {
-  room *this_room = malloc(sizeof(*this_room));
+room_t *initialiseRoom(room_name current_room) {
+  room_t *this_room = malloc(sizeof(*this_room));
   assert(this_room);
   this_room->current_room = current_room;
-  this_room->adjacent_rooms = malloc(sizeof(room) * 5);
+  this_room->adjacent_rooms = malloc(sizeof(room_t) * 5);
   assert(this_room->adjacent_rooms);
   this_room->adjacent_room_count = 0;
 
   return this_room;
 }
 
-building *initialiseBuilding() {
-  building *huxley = malloc(sizeof(*huxley));
-  huxley->start_room = malloc(sizeof(room));
-  room *lobby = initialiseRoom(LOBBY);
-  room *lecture_hall = initialiseRoom(LECTURE_HALL);
-  room *fusion = initialiseRoom(FUSION);
-  room *lab = initialiseRoom(LAB);
+building_t *initialiseBuilding() {
+  building_t *huxley = malloc(sizeof(*huxley));
+  huxley->start_room = malloc(sizeof(room_t));
+  room_t *lobby = initialiseRoom(LOBBY);
+  room_t *lecture_hall = initialiseRoom(LECTURE_HALL);
+  room_t *fusion = initialiseRoom(FUSION);
+  room_t *lab = initialiseRoom(LAB);
 
   connectRoom(lobby, lecture_hall);
   connectRoom(lobby, lab);
@@ -63,7 +63,7 @@ building *initialiseBuilding() {
   return huxley;
 }
 
-void freeRoom(room *room1) {
+void freeRoom(room_t *room1) {
 
   if (room1 == NULL) {
     return;
@@ -77,7 +77,7 @@ void freeRoom(room *room1) {
   free(room1);
 }
 
-void freeBuilding(building *huxley) {
+void freeBuilding(building_t *huxley) {
 
   if (huxley == NULL) {
     return;
@@ -86,4 +86,4 @@ void freeBuilding(building *huxley) {
   free(huxley);
 }
 // changes room of person and pushes current room into room histroy of player
-void changeRoom(state *person, room dest_room) {}
+void changeRoom(state *person, room_t dest_room) {}

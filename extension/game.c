@@ -8,8 +8,8 @@
 
 int main(void) {
 
-  building *huxley = initialiseBuilding();
-  // printRoomDetails(lobby);
+  building_t *huxley = initialiseBuilding();
+  printBuildingDetails(huxley);
   freeBuilding(huxley);
 
   exit(EXIT_SUCCESS);
