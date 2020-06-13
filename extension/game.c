@@ -7,17 +7,10 @@
 #include <string.h>
 
 int main(void) {
-  room *lobby = initialiseRoom(LOBBY);
-  room *lecture_hall = initialiseRoom(LECTURE_HALL);
-  room *fusion = initialiseRoom(FUSION);
-  room *lab = initialiseRoom(LAB);
 
-  connectRoom(lobby, lecture_hall);
-  connectRoom(lobby, lab);
-  connectRoom(lobby, fusion);
-
-  printRoomDetails(lobby);
-  freeRoom(lobby);
+  building *huxley = initialiseBuilding();
+  //  printRoomDetails(lobby);
+  freeBuilding(huxley);
 
   exit(EXIT_SUCCESS);
 }
