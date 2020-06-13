@@ -24,6 +24,11 @@ typedef struct room {
   char *description;
 } room;
 
+// structure for building consisting of room_history
+typedef struct building {
+  room *start_room;
+} building;
+
 typedef struct {
   item *inventory;
   int cash;
@@ -38,7 +43,6 @@ typedef struct {
   room_name room_history[MAX_ROOM_HISTORY];
 } state;
 
-extern room *initialiseRoom(room_name current_room);
-extern void connectRoom(room *first, room *second);
+extern building *initialiseBuilding();
 extern void printRoomDetails(room *room1);
-extern void freeRoom(room *room1);
+extern void freeBuilding(building *huxley);
