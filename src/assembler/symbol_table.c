@@ -42,7 +42,7 @@ symbol *getSymbol(const symbol_table *s, const char *name) {
 
 void addSymbol(symbol_table *s, symbol *entry) {
   if (getSymbol(s, entry.name) != NULL) {
-    // Label already defined
+    // label already defined
     return;
   }
   // TODO: collision code to be implemented
@@ -55,14 +55,22 @@ void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
   }
 }
 
-void freeTable(symbol_table *s) {
+void freeList(symbol *symbols, int size) {
+  for (int i = 0; i < size; i++) {
+    free(symbols[i]);
+  }
+  free(symbols);
+}
+
+void freeSymbols(symbol_table *s) {
   for (int i = 0; i < s->size; i++) {
-    if (s->symbols[i] != NULL) {
-      free(s->symbols[i].name);
-      free(s->symbols[i]);
-    }
+    freeList(s->symbols[i], sizeof(s->symbols[i]) / sizeof(s->symbols[i][0]));
   }
   free(s->symbols);
+}
+
+void freeTable(symbol_table *s) {
+  freeSymbols(s);
   free(s);
 }
 
