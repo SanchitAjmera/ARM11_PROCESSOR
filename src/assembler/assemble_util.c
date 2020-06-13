@@ -338,9 +338,9 @@ along with bits set (U and I) based on those values */
 static word *remBracket(char *string) {
   word *addresses = malloc(sizeof(*addresses));
 
-  // Removing preceding brackets
+  // Removing preceding bracket
   char unbracketed[strlen(string) - 1];
-  strcpy(unbracketed, ++string);
+  strcpy(unbracketed, REMOVE_FIRST_CHAR(string));
 
   // Separator
   char *delim = ", ";
