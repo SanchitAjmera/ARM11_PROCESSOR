@@ -17,6 +17,10 @@ item_t *lookup(item_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
+bool hasProperty(Property property, item_t *item) {
+  return (property & item->properties);
+}
+
 // shows player their inventory of items
 void view_inventory() {}
 
