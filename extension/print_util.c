@@ -69,3 +69,20 @@ void printBuildingDetails(building_t *huxley) {
     printf("\n");
   }
 }
+
+void print(room_t *entranceRoom, room_t *room1) {
+  if (room1 == NULL) {
+    return;
+  }
+  if (room1->adjacent_rooms != NULL) {
+    for (int i = 0; i < room1->adjacent_room_count; i++) {
+      if (room1->adjacent_rooms[i] != entranceRoom) {
+        print(room1, room1->adjacent_rooms[i]);
+      }
+    }
+  }
+  printRoomDetails(room1);
+  printf("\n");
+}
+
+void printBuilding(building_t *huxley) { print(NULL, huxley->start_room); }
