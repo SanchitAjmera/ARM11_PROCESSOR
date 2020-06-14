@@ -24,10 +24,10 @@ void printAttack(const char *name, int damage, const char *attackName) {
 }
 
 // deals damage to opponent
-void attackPlayer(boss_t *boss, player_t *player) {
-  int damage = boss->fighting->attack;
+void attackPlayer(boss_t *boss, player_t *player, int damage,
+                  const char *attackName) {
   player->health -= damage;
-  printAttack(boss->name, damage, boss->fighting->attackName);
+  printAttack(boss->name, damage, attackName);
 }
 
 // player's turn in battle
@@ -36,8 +36,15 @@ void playerTurn(boss_t *boss, player_t *player) {
 }
 
 // boss's turn in battle
-void bossTurn(boss_t *boss, player_t *player) {}
+void bossTurn(boss_t *boss, player_t *player) {
+  if (boss->fighting->health < BOSS_LOW_HEALTH(boss)) {
+    attackPlayer(boss, player, boss->fighting->special,
+                 boss->fighting->specialName);
+    return;
+  }
+  attackPlayer(boss, player, boss->fighting->attack,
+               boss->fighting->attackName);
+}
 
-void printPlayer() {}
-
-void printBoss() {}
+// to display battle options to user
+void printPlayer(player_t *player) {}
