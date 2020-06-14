@@ -3,14 +3,14 @@
 
 // determines if the game is finished
 bool gameOver(boss_t *boss, player_t *player) {
-  return boss->fighting->health <= 0;
+  return FIGHT(boss)->health <= 0;
   || player->health <= 0;
 }
 
 // determins if the player won
 bool playerWon(boss_t *boss, player_t *player) {
   // PRE: gamover() returns true
-  return boss->fighting->health < player->health;
+  return FIGHT(boss)->health < player->health;
 }
 
 void printAttack(const char *name, int damage, const char *attackName) {
@@ -36,13 +36,11 @@ void playerTurn(boss_t *boss, player_t *player) {
 
 // boss's turn in battle
 void bossTurn(boss_t *boss, player_t *player) {
-  if (boss->fighting->health < BOSS_LOW_HEALTH(boss)) {
-    attackPlayer(boss, player, boss->fighting->special,
-                 boss->fighting->specialName);
+  if (FIGHT(boss)->health < BOSS_LOW_HEALTH(boss)) {
+    attackPlayer(boss, player, FIGHT(boss)->special, FIGHT(boss)->specialName);
     return;
   }
-  attackPlayer(boss, player, boss->fighting->attack,
-               boss->fighting->attackName);
+  attackPlayer(boss, player, FIGHT(boss)->attack, FIGHT(boss)->attackName);
 }
 
 // function to start the battle with the boss
