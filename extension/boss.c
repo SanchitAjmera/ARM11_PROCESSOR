@@ -17,20 +17,6 @@ passive_t *createPassive(const char **questions, const char **answers,
   return passive;
 }
 
-aggressive_t *createAggressive(int attack, int special, const char *attackName,
-                               const char *specialName, int maxHealth) {
-  aggressive_t *aggressive = malloc(sizeof(*aggressive));
-  NULL_POINTER(aggressive);
-  aggressive->attack = attack;
-  aggressive->special = special;
-  NULL_POINTER(aggressive->attackName);
-  aggressive->attackName = attackName;
-  NULL_POINTER(aggressive->specialName);
-  aggressive->specialName = specialName;
-  aggressive->maxHealth = maxHealth;
-  aggressive->health = aggressive->maxHealth;
-}
-
 // function to create and initialise a pointer to boss_t on the heap
 boss_t *createBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
@@ -69,6 +55,11 @@ void freeBoss(boss_t *boss) {
   freeBossFighting(boss->fighting);
   free(boss->name);
   free(boss);
+}
+
+void initBattle(boss_t *boss, aggressive_t stats) {
+  boss->fighting = malloc(sizeof(*boss->fighting));
+  *boss->fighting = stats;
 }
 
 boss_t *createKGK(void) {
