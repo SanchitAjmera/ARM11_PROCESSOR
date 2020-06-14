@@ -29,6 +29,19 @@ void printInventory(state *currentState) {
   printf("\n");
 }
 
+void printProperties(state *currentState, char *item_count) {
+  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  if (!item || !currentState->player->inventory[item->name]) {
+    printf("% is not in your inventory!");
+    return;
+  }
+  for (int i = 1; i <= MAX_PROPERTY; i << 1) {
+    if (i & item->properties) {
+      printf("TODO: Figure out a way to print the properties");
+    }
+  }
+}
+
 void printPlayer(state *currentState) {
   printHealth(currentState);
   printCash(currentState);
@@ -37,7 +50,7 @@ void printPlayer(state *currentState) {
 
 //--------------------------End of Prints--------------------------------
 
-// returns index of item if it is in the list TODO: remove magic numbers
+// returns index of item if it is in the list. TODO: remove magic numbers
 int findItem(item_t **inventory, int item_count, char *itemName) {
   for (int i = 0; i < item_count; i++) {
     if (!strcmp(inventory[i]->key, itemName)) {
@@ -74,3 +87,6 @@ bool dropItem(state *currentState, char *itemName) {
   printf("%s has been dropped!\n", itemName);
 }
 return true;
+
+// Todo:
+bool buyItem(state *currentState, char *itemName) {}
