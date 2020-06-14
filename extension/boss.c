@@ -6,15 +6,13 @@
 // dummy function
 void validatePtr(void *pointer, const char *) {}
 
-passive_t *createPassive(const char **questions, int qNum, const char **answers,
-                         int aNum) {
+passive_t *createPassive(const char **questions, const char **answers,
+                         int num) {
   passive_t *passive = malloc(sizeof(*passive));
-  validatePtr(boss, "Not enough memory.");
-  passive->questions = malloc(qNum * sizeof(*passive->questions));
-  validatePtr(passive->questions, "Not enough memory.");
+  NULL_POINTER(passive);
+  NULL_POINTER(questions);
+  NULL_POINTER(answers);
   passive->questions = questions;
-  passive->answers = malloc(aNum * sizeof(*passive->answers));
-  validatePtr(passive->answers, "Not enough memory.");
   passive->answers = answers;
   return passive;
 }
@@ -22,17 +20,13 @@ passive_t *createPassive(const char **questions, int qNum, const char **answers,
 aggressive_t *createAggressive(int attack, int special, const char *attackName,
                                const char *specialName, int maxHealth) {
   aggressive_t *aggressive = malloc(sizeof(*aggressive));
-  validatePtr(passive->answers, "Not enough memory.");
+  NULL_POINTER(aggressive);
   aggressive->attack = attack;
   aggressive->special = special;
-  aggressive->attackName =
-      malloc(strlen(attackName) * sizeof(*aggressive->attackName));
+  NULL_POINTER(aggressive->attackName);
   aggressive->attackName = attackName;
-  validatePtr(aggressive->attackName, "Not enough memory.");
-  aggressive->specialName =
-      malloc(strlen(specialName) * sizeof(*specialName->attackName));
+  NULL_POINTER(aggressive->specialName);
   aggressive->specialName = specialName;
-  validatePtr(aggressive->specialName, "Not enough memory.");
   aggressive->maxHealth = maxHealth;
   aggressive->health = aggressive->maxHealth;
 }
@@ -40,13 +34,11 @@ aggressive_t *createAggressive(int attack, int special, const char *attackName,
 // function to create and initialise a pointer to boss_t on the heap
 boss_t *createBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
-  validatePtr(boss, "Not enough memory.");
-  boss->name = malloc(sizeof(*boss->name));
-  validatePtr(boss->name, "Not enough memory.");
-  strcpy(boss->name, name);
+  NULL_POINTER(boss);
+  NULL_POINTER(name);
+  boss->name = name;
   boss->isPassive = true;
-  boss->teaching = malloc(sizeof(*boss->teaching));
-  validatePtr(boss->teaching, "Not enough memory.");
+  boss->teaching = NULL;
 }
 
 void freeBossFighting(aggressive_t *aggressive) {
