@@ -12,6 +12,8 @@
 #define CLEAR ("clear")
 #define ITEM_NUM (5)
 #define LOOKUP_FAILURE (NULL)
+#define INITIAL_CASH (0)
+#define MAX_HEALTH (100)
 
 // enum for items stored by person in inventory
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } Item;
@@ -53,6 +55,7 @@ typedef struct building_t {
 
 typedef struct {
   item_t **inventory;
+  int item_count;
   int health;
   int cash;
 } player_t;
