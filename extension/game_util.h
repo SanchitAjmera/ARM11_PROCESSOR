@@ -1,3 +1,4 @@
+#include "player.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -10,24 +11,27 @@
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
 #define PROPERTY_NUM (4)
+#define LOOKUP_FAILURE (NULL)
 
 // enum for items stored by person in inventory
-typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } item;
+typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } Item;
 
 // enum for properties of products
-typedef enum { EDIBLE, THROWABLE, VALUABLE, USABLE } property;
+typedef enum { EDIBLE, THROWABLE, VALUABLE } Property;
 
 // enum for room
-typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
+typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } Room_name;
 
 // enum for character type
-typedef enum { BATMAN, UTA } character;
+typedef enum { BATMAN, UTA } Character;
 
 // struct for items and their properties
 typedef struct item_t {
 
+  char *key;
   item name;
-  bool properties[PROPERTY_NUM];
+  Property properties[];
+  int propertySize;
   char *description;
 
 } item_t;
@@ -49,6 +53,12 @@ typedef struct building_t {
 } building_t;
 
 typedef struct {
+  item_t **inventory;
+  int health;
+  int cash;
+} player_t;
+
+typedef struct {
   player_t player;
   room_t curr_room_node; // struct for room_t structure
 
@@ -62,21 +72,29 @@ typedef struct {
 } state;
 
 // Supported Items
-const item_t[] = {
-    {APPLE,
-     {true, false, false, false},
+static const item_t gameItems[] = {
+    {"apple",
+     APPLE,
+     {EDIBLE},
+     1,
      "An apple. Increases health by 5 when eaten!"},
-    {KEYBOARD,
-     {false, true, false, true},
+    {"keyboard",
+     KEYBOARD,
+     {THROWABLE},
+     1,
      "A keyboard. A programmer's best friend."},
-    {MOUSE, {false, true, false, true}, "A mouse. Click and scroll for days."},
-    {MONITOR,
-     {false, true, false, true},
+    {"mouse", MOUSE, {THROWABLE}, 1, "A mouse. Click and scroll for days."},
+    {"monitor",
+     MONITOR,
+     {THROWABLE},
+     1,
      "A monitor. Can't see your seg faults without it!"},
-    {CASH,
-     {false, true, true, true},
-     "Cash. I wonder what I could buy around here..."}}
-}
+    {"cash",
+     CASH,
+     {VALUABLE},
+     1,
+     "Cash. I wonder what I could buy around here..."}};
+
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
 extern void printRemaining(void);
