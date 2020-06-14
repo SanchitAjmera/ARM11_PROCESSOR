@@ -22,11 +22,15 @@ typedef struct {
 
 typedef struct {
   char *name;
+  // default: true
   bool isPassive;
   union {
     passive_t *teaching;
     aggressive_t *fighting;
   }
 } boss_t;
+
+static const char *kgkQuestions[] = {};
+static const char *kgkAnswers[] = {};
 
 #endif
