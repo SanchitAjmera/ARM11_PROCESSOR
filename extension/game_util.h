@@ -10,14 +10,11 @@
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
 
-// Struct for items stored by person in inventory
-typedef struct {
-  char *itemName;
-  property *properties; // array of properties
-} item;
+// enum for items stored by person in inventory
+typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } item;
 
 // enum for properties of products
-typedef enum { PROP1, PROP2, PROP3 } property;
+typedef enum { EDIBLE, THROWABLE, VALUABLE, USABLE } property;
 
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
@@ -30,6 +27,7 @@ typedef struct item_t {
 
   item name;
   property *properties;
+  char *description;
 
 } item_t;
 
@@ -62,6 +60,14 @@ typedef struct {
   room_name room_history[MAX_ROOM_HISTORY];
 } state;
 
-extern building_t *initialiseBuilding();
+const item_t[] = {{APPLE,
+                   {EDIBLE},
+                   {"An apple. Increases health by 5 when eaten!"}},
+                  {KEYBOARD, {USABLE}}
+
+}
+
+                 extern building_t *
+                 initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
 extern void printRemaining(void);
