@@ -7,6 +7,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Returns respective int value; -1 for failure */
+item_t *lookup(const pair_t table[], const int size, const char *key) {
+  for (int i = 0; i < size; i++) {
+    if (!strcmp(table[i].key, key)) {
+      return table[i];
+    }
+  }
+  return LOOKUP_FAILURE;
+}
+
 // shows player their inventory of items
 void view_inventory() {}
 
