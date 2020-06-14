@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #define MIN_QUESTIONS_CORRECT (3)
+#define KGK_SIZE (5)
 
 typedef struct {
   const char **questions;
