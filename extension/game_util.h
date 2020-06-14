@@ -57,7 +57,7 @@ typedef struct building_t {
 
 typedef struct {
   item_t **inventory;
-  int item_count;
+  int itemCount;
   int health;
   int cash;
 } player_t;
