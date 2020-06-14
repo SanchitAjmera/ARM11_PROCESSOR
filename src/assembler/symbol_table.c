@@ -8,7 +8,7 @@
 
 #define LOAD_FACTOR (0.75)
 
-static symbol **createSymbols(int num, size_t size) {
+symbol **createSymbols(int num, int size) {
   symbol **symbols = malloc(num * size);
   validatePtr(symbols, "Not enough memory.");
   for (int i = 0; i < num; i++) {
@@ -52,7 +52,7 @@ static int hash(const symbol_table *s, const char *key) {
   for (int i = 0; i < strlen(key); i++) {
     index = (index * 31) + key[i];
   }
-  return index;
+  return index % s->size;
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
@@ -78,7 +78,6 @@ static void rehash(symbol_table *s) {
   if (s->symbolCount / s->size < LOAD_FACTOR) {
     return;
   }
-  // symbol symbols[s->symbolCount][1];
   symbol **symbols = createSymbols(s->symbolCount, sizeof(*symbols));
   int index = 0;
   for (int i = 0; i < s->size; i++) {
@@ -93,10 +92,11 @@ static void rehash(symbol_table *s) {
 }
 
 void addSymbol(symbol_table *s, symbol *entry) {
-  if (getSymbol(s, entry->name) != NULL) {
+  if (getSymbol(s, entry->name)->name != NULL) {
     // label already defined
     return;
   }
+
   int index1 = hash(s, entry->name);
   int index2 = 0;
   int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
