@@ -9,6 +9,7 @@
 
 int main(int argc, char **argv) {
   symbol_table *symbolTable = newSymbolTable();
+  symbol **pre = createSymbols(PREDEFINED_SYMBOLS_COUNT, sizeof(*pre));
   symbol predefinedSymbols[PREDEFINED_SYMBOLS_COUNT] = {
       {strptr("add"), INSTR, .body.assembleFunc = assembleDPI},
       {strptr("sub"), INSTR, .body.assembleFunc = assembleDPI},
@@ -33,7 +34,10 @@ int main(int argc, char **argv) {
       {strptr("b"), INSTR, .body.assembleFunc = assembleBranch},
       {strptr("lsl"), INSTR, .body.assembleFunc = assembleDPI},
       {strptr("andeq"), INSTR, .body.assembleFunc = assembleDPI}};
-  addSymbols(symbolTable, predefinedSymbols, PREDEFINED_SYMBOLS_COUNT);
+  for (int i = 0; i < PREDEFINED_SYMBOLS_COUNT; i++) {
+    pre[i][0] = predefinedSymbols[i];
+  }
+  addSymbols(symbolTable, pre, PREDEFINED_SYMBOLS_COUNT);
   file_lines *fileLines = newFileLines();
 
   FILE *armFile = fopen(argv[1], "r");
