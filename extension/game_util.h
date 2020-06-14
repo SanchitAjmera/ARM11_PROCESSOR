@@ -13,11 +13,20 @@
 // enum for position in rooms
 typedef enum { EAST, WEST, NORTH, SOUTH } room_position;
 
-// enum for items stored by person in inventory
-typedef enum { ITEM1, ITEM2, ETC } item;
+// enum for items stored by person in inventory with respective cost
+typedef enum {
+  KEYBOARD,
+  PASS,
+  TELEPORTER,
+  KATSU_CURRY,
+  TESCO_MEAL_DEAL,
+  MONEY1,
+  MONEY2,
+  MONEY3
+} item;
 
 // enum for properties of products
-typedef enum { PROP1, PROP2, PROP3 } property;
+typedef enum { CONSUMABLE, PROP2 } property;
 
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
@@ -41,6 +50,7 @@ typedef struct room_t {
   char *description;
   item_t **items;
   int item_count;
+
 } room_t;
 
 // structure for building consisting of room_history

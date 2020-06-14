@@ -43,14 +43,14 @@ room_t *initialiseRoom(room_name current_room) {
   room_t *room = malloc(sizeof(*room));
 
   room->current_room = current_room;
-  room->position = SOUTH;
+  room->position = 0;
 
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
-
+  assert(room->adjacent_rooms);
   room->item_count = 0;
   room->items = malloc(sizeof(item_t) * 10);
-
+  assert(room->items);
   return room;
 }
 
@@ -60,6 +60,7 @@ building_t *initialiseBuilding() {
   building_t *huxley = malloc(sizeof(*huxley));
 
   huxley->start_room = malloc(sizeof(room_t));
+  assert(huxley->start_room);
   // initialises all the rooms within the building
   room_t *lobby = initialiseRoom(LOBBY);
   room_t *lab = initialiseRoom(LAB);
@@ -92,6 +93,12 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
       }
     }
     free(room1->adjacent_rooms);
+  }
+
+  if (room1->items != NULL) {
+    for (int i = 0; i < room1->item_count; i++) {
+      free(room1->items[i]);
+    }
   }
 
   free(room1);

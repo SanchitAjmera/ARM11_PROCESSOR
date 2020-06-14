@@ -496,3 +496,16 @@ void roomTraverser(room_t *entranceRoom, room_t *room1,
 void printBuildingDetails(building_t *huxley) {
   roomTraverser(NULL, huxley->start_room, printRoomDetails);
 }
+
+void printRemaining(void) {
+  printf("                                          YOU");
+  fflush(stdout);
+  printf("       HAVE");
+  fflush(stdout);
+  printf("       10");
+  fflush(stdout);
+  printf("       MEEEENATES");
+  fflush(stdout);
+  printf("      REMAINING");
+  fflush(stdout);
+}

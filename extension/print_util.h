@@ -11,5 +11,5 @@ void printKonstantinos(void);
 void printKonstantinosMouthOpen(void);
 void printKonstantinosIndent(void);
 void printKonstantinosMouthOpenIndent(void);
-
+void printRemaining(void);
 #endif
