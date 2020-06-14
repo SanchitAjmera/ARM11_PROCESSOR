@@ -31,10 +31,16 @@ boss_t *initBoss(const char *name) {
   return boss;
 }
 
-boss_t *createKGK(void) {
+boss_t *createKGK(const char **qs, const char **as) {
   boss_t *kgk = initBoss("Konstantinos");
-  kgk->teaching = createPassive(kgkQuestions, kgkAnswers, KGK_SIZE);
+  kgk->teaching = createPassive(qa, as, MAX_QUESTIONS);
   return kgk;
+}
+
+boss_t *createTony(const char **qs, const char **as) {
+  boss_t *tony = initBoss("Tony");
+  tony->teaching = createPassive(qa, as, MAX_QUESTIONS);
+  return tony;
 }
 
 boss_t *createBoss(const char *name) { lookup(name).create; }
