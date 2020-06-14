@@ -21,7 +21,7 @@
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } Item;
 
 // enum for properties of products
-typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4 } Property;
+typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
 
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } Room_name;
