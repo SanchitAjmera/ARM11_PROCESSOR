@@ -8,10 +8,10 @@
 #include <string.h>
 
 /* Returns respective int value; -1 for failure */
-item_t *lookup(const pair_t table[], const int size, const char *key) {
+item_t *lookup(item_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
-      return table[i];
+      return &table[i];
     }
   }
   return LOOKUP_FAILURE;
@@ -48,7 +48,7 @@ void connectRoom(room_t *first, room_t *second) {
 }
 
 // initialises room
-room_t *initialiseRoom(room_name current_room) {
+room_t *initialiseRoom(Room_name current_room) {
   // allocates memory to room and adjacent room array
   room_t *room = malloc(sizeof(*room));
 
