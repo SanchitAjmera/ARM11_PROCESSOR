@@ -4,7 +4,12 @@
 #include <stdbool.h>
 
 #define MIN_QUESTIONS_CORRECT (3)
-#define KGK_SIZE (5)
+#define KGK_SIZE ()
+#define KGK_ATTACK ()
+#define KGK_SPECIAL ()
+#define KGK_ATTACK_NAME ()
+#define KGK_SPECIAL_NAME ()
+#define KGK_MAX_HEALTH ()
 
 typedef struct {
   const char **questions;
@@ -31,7 +36,10 @@ typedef struct {
   }
 } boss_t;
 
-static const char *kgkQuestions[] = {};
-static const char *kgkAnswers[] = {};
+static const kgkQuestions[KGK_SIZE][] = {};
+static const kgkAnswers[KGK_SIZE][] = {};
+static const aggressive_t kgkBattle = {KGK_ATTACK,      KGK_SPECIAL,
+                                       KGK_ATTACK_NAME, KGK_SPECIAL_NAME,
+                                       KGK_MAX_HEALTH,  KGK_MAX_HEALTH};
 
 #endif
