@@ -20,7 +20,7 @@ passive_t *createPassive(const char **questions, const char **answers,
 }
 
 // function to create and initialise a pointer to boss_t on the heap
-boss_t *createBoss(const char *name) {
+boss_t *initBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
   NULL_POINTER(boss);
   NULL_POINTER(name);
@@ -28,6 +28,13 @@ boss_t *createBoss(const char *name) {
   // defaults to true
   boss->isPassive = true;
   boss->teaching = NULL;
+  return boss;
+}
+
+boss_t *createKGK(void) {
+  boss_t *kgk = initBoss("Konstantinos");
+  kgk->teaching = createPassive(kgkQuestions, kgkAnswers, KGK_SIZE);
+  return kgk;
 }
 
 void freeBossFighting(aggressive_t *aggressive) {
@@ -65,12 +72,6 @@ void initBattle(boss_t *boss, aggressive_t stats) {
   boss->fighting = malloc(sizeof(*boss->fighting));
   NULL_POINTER(boss->fighting);
   *boss->fighting = stats;
-}
-
-boss_t *createKGK(void) {
-  boss_t *kgk = createBoss("Konstantinos");
-  kgk->teaching = createPassive(kgkQuestions, kgkAnswers, KGK_SIZE);
-  return kgk;
 }
 
 // takes in the user's input for the answer
