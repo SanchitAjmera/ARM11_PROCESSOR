@@ -6,6 +6,97 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+#define CLEAR ("clear")
+
+// function for testing sleep() functions
+void printKonstantinos(void) {
+  system(CLEAR);
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("                                                               \n");
+  printf("                                                               \n");
+  printf("                                                               \n");
+  printf("                                                 "
+         "_/_/_/_/_/_/_/_/_/_/              "
+         "          \n");
+  printf("                                         _/_/_/_/_/               "
+         "_/_/_/_/_/       "
+         "        \n");
+  printf("                                   _/_/_/_/_/                        "
+         "   _/_/_/_/_/ "
+         "     \n");
+  printf("                                 _/_/_/_/_/                          "
+         "     "
+         "_/_/_/_/_/      \n");
+  printf("                               _/_/_/_/_/   ####                   "
+         "####     "
+         "_/_/_/_/_/   \n");
+  printf("                               _/_/_/_/_/       ####            #### "
+         "       "
+         "_/_/_/_/_/ \n");
+  printf("                               _/_/_/_/    _______________  "
+         "______________    "
+         "_/_/_/_/  \n");
+  printf("                               _/_/_/_/    _/             ||         "
+         "   _/    "
+         "_/_/_/_/  \n");
+  printf("                               _/_/_/      _/             _/         "
+         "   _/      "
+         "_/_/_/  \n");
+  printf("                               _/_/_/      _/           _/  _/       "
+         "   _/      "
+         "_/_/_/ \n");
+  printf("                               _/_/_/        _/_/_/_/_/_/     "
+         "_/_/_/_/_/        "
+         "_/_/_/ \n");
+  printf("                               _/_/_/_/                 _/  _/       "
+         "         "
+         "_/_/_/_/ \n");
+  printf("                               _/_/_/ _/               _/    _/      "
+         "        _/ "
+         "_/_/_/ \n");
+  printf("                               _/_/_/  _/              _/ _/ _/      "
+         "      _/  "
+         "_/_/_/ \n");
+  printf("                               _/_/      _/                          "
+         "    _/      "
+         "_/_/ \n");
+  printf("                               _/_/       _/                         "
+         "   _/       "
+         "_/_/ \n");
+  printf("                               _/_/        _/      ###############   "
+         "  _/        "
+         "_/_/ \n");
+  printf("                               _/_/          _/       #########      "
+         "_/          "
+         "_/_/ \n");
+  printf("                                _/            _/         _/         "
+         "_/            "
+         "_/ \n");
+  printf("                                _/             _/       _/_/       "
+         "_/             "
+         "_/ \n");
+  printf("                                _/              _/    _/_/_/_/    _/ "
+         "             "
+         "_/  \n");
+  printf("                               _/_/               _/_/_/_/_/_/_/_/   "
+         "            "
+         "_/_/   \n");
+  printf("                              _/_/_/                                 "
+         "           "
+         "_/_/_/  \n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+
+  // fflush(stdout);
+  // sleep(3);
+}
 
 // function for printing out name of room
 void printRoomName(room_t *room1) {
