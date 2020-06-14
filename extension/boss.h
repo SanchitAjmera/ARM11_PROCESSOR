@@ -17,7 +17,7 @@ typedef struct {
   char *attackName;
   char *specialName;
   int health;
-  int stamina;
+  const int maxHealth;
 } aggressive_t;
 
 typedef struct {
