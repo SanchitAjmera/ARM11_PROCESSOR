@@ -4,6 +4,14 @@
 // dummy function
 void validatePtr(void *pointer, const char *) {}
 
+passive_t *createPassive(const char **questions, const char **answers) {
+  passive_t *passive = malloc(sizeof(*passive));
+  validatePtr(boss, "Not enough memory.");
+  passive->questions = questions;
+  passive->answers = answers;
+  return passive;
+}
+
 // function to create and initialise a pointer to boss_t on the heap
 boss_t *createBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
