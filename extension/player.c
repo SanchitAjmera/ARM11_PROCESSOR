@@ -36,3 +36,15 @@ bool pickUpItem(state *currentState, char *itemName) {
   }
   return true;
 }
+
+bool dropItem(state *currentState, char *itemName) {
+  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  if (!item || !currentState->player->inventory[item->name]) {
+    printf("You do not have this item to drop: %s\n", itemName);
+    return false;
+  }
+  currentState->player->inventory[item->name] = REMOVED;
+  currentState->curr_room_node->items[item->name] = item;
+  printf("%s has been dropped!\n", itemName);
+}
+return true;
