@@ -10,6 +10,9 @@
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
 
+// enum for position in rooms
+typedef enum { EAST, WEST, NORTH, SOUTH } room_position;
+
 // enum for items stored by person in inventory
 typedef enum { ITEM1, ITEM2, ETC } item;
 
@@ -24,17 +27,16 @@ typedef enum { BATMAN, UTA } character;
 
 // struct for items and their properties
 typedef struct item_t {
-
   item name;
   property *properties;
-
 } item_t;
 
 // structure for rooms
-// valid for no cyclical room structure
+// valid for non cyclical room structure
 typedef struct room_t {
   room_name current_room;
   struct room_t **adjacent_rooms;
+  room_position position;
   int adjacent_room_count;
   char *description;
   item_t **items;
@@ -62,4 +64,3 @@ typedef struct {
 
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
-extern void printRemaining(void);

@@ -43,6 +43,7 @@ room_t *initialiseRoom(room_name current_room) {
   room_t *room = malloc(sizeof(*room));
 
   room->current_room = current_room;
+  room->position = SOUTH;
 
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
@@ -108,21 +109,3 @@ void freeBuilding(building_t *huxley) {
 }
 // changes room of person and pushes current room into room histroy of player
 void changeRoom(state *person, room_t dest_room) {}
-
-void printRemaining(void) {
-  usleep(10000);
-  printf("                                          YOU");
-  fflush(stdout);
-  usleep(10000);
-  printf("       HAVE");
-  fflush(stdout);
-  usleep(10000);
-  printf("       10");
-  fflush(stdout);
-  usleep(10000);
-  printf("       MEEEENATES");
-  fflush(stdout);
-  usleep(10000);
-  printf("      REMAINING");
-  fflush(stdout);
-}
