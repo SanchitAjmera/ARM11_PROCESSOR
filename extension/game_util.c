@@ -72,6 +72,28 @@ building_t *initialiseBuilding() {
 
   huxley->start_room = malloc(sizeof(room_t));
   assert(huxley->start_room);
+
+  // initialise items to put in rooms
+  // initilaising 5 game apples
+  item_t apple1 = gameItems[0];
+  item_t apple2 = gameItems[0];
+  item_t apple3 = gameItems[0];
+  item_t apple4 = gameItems[0];
+  item_t apple5 = gameItems[0];
+  // initialising 5 game cash bundles
+  item_t cash1 = gameItem[4];
+  item_t cash1 = gameItem[4];
+  item_t cash1 = gameItem[4];
+  item_t cash1 = gameItem[4];
+  item_t cash1 = gameItem[4];
+  // initialising keyboard
+  item_t keyboard = gameItem[1];
+  // initialising mouse
+  item_t mouse = gameItem[2];
+  // initialing monitor
+  item_t monitor = gameItem[3];
+  // initialising pass to lab
+  item_t pass = gameItem[5];
   // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
   room_t *lobbyEast = initialiseRoom(LOBBY, EAST);
