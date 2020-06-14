@@ -434,14 +434,19 @@ void printRoomPosition(room_t *room) {
   switch (room->position) {
   case NORTH:
     printf("NORTH ");
+    break;
   case SOUTH:
     printf("SOUTH ");
+    break;
   case WEST:
     printf("WEST ");
+    break;
   case EAST:
     printf("EAST ");
+    break;
   case CENTRE:
     printf("CENTRE ");
+    break;
   }
 }
 
