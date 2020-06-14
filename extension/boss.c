@@ -13,9 +13,22 @@ boss_t *createBoss() {
   validatePtr(boss->teaching, "Not enough memory.");
 }
 
+void freeBossFighting(aggressive_t *aggressive) {
+  free(attackName);
+  free(specialName);
+  free(aggressive);
+}
+
+void freeBossTeaching(passive_t *passive) {
+  free(questions);
+  free(answers);
+  free(passive);
+}
+
 void freeBoss(boss_t *boss) {
-  free(boss->teaching);
-  free(boss->fighting);
+  freeBossTeaching(boss->teaching);
+  freeBossFighting(boss->fighting);
+  free(boss->name);
   free(boss);
 }
 
