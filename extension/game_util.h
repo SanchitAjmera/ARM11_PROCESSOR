@@ -17,7 +17,7 @@
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } Item;
 
 // enum for properties of products
-typedef enum { EDIBLE, THROWABLE, VALUABLE } Property;
+typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4 } Property;
 
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } Room_name;
@@ -29,9 +29,8 @@ typedef enum { BATMAN, UTA } Character;
 typedef struct item_t {
 
   char *key;
-  item name;
-  Property properties[];
-  int propertySize;
+  Item name;
+  uint8_t properties;
   char *description;
 
 } item_t;
@@ -39,7 +38,7 @@ typedef struct item_t {
 // structure for rooms
 // valid for no cyclical room structure
 typedef struct room_t {
-  room_name current_room;
+  Room_name current_room;
   struct room_t **adjacent_rooms;
   int adjacent_room_count;
   char *description;
@@ -64,36 +63,22 @@ typedef struct {
 
   struct {
     char *username;
-    character character;
+    Character character;
     int score;
   } profile;
 
-  room_name room_history[MAX_ROOM_HISTORY];
+  Room_name room_history[MAX_ROOM_HISTORY];
 } state;
 
 // Supported Items
 static const item_t gameItems[] = {
-    {"apple",
-     APPLE,
-     {EDIBLE},
-     1,
-     "An apple. Increases health by 5 when eaten!"},
-    {"keyboard",
-     KEYBOARD,
-     {THROWABLE},
-     1,
+    {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
+    {"keyboard", KEYBOARD, THROWABLE,
      "A keyboard. A programmer's best friend."},
-    {"mouse", MOUSE, {THROWABLE}, 1, "A mouse. Click and scroll for days."},
-    {"monitor",
-     MONITOR,
-     {THROWABLE},
-     1,
+    {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days."},
+    {"monitor", MONITOR, THROWABLE,
      "A monitor. Can't see your seg faults without it!"},
-    {"cash",
-     CASH,
-     {VALUABLE},
-     1,
-     "Cash. I wonder what I could buy around here..."}};
+    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."}};
 
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
