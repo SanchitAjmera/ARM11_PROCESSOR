@@ -4,7 +4,7 @@
 #include <string.h>
 
 // dummy pre-processor function
-#define NULL_POINTER(pointer) (validatePtr(pointer, "Not enough memory."))
+#define NULL_POINTER(pointer) (validatePtr(pointer, "NULL pointer."))
 // dummy function
 void validatePtr(void *pointer, const char *) {}
 
@@ -31,19 +31,12 @@ boss_t *initBoss(const char *name) {
   return boss;
 }
 
-boss_t *createKGK(const char **qs, const char **as) {
-  boss_t *kgk = initBoss("Konstantinos");
-  kgk->teaching = createPassive(qa, as, MAX_QUESTIONS);
-  return kgk;
+boss_t *createBoss(const char *name) {
+  lookupBoss_t table = lookup(name);
+  NULL_POINTER(table);
+  boss_t *boss = initBoss(table.name);
+  boss->teaching = createPassive(table.questions, table.answers, MAX_QUESTIONS);
 }
-
-boss_t *createTony(const char **qs, const char **as) {
-  boss_t *tony = initBoss("Tony");
-  tony->teaching = createPassive(qa, as, MAX_QUESTIONS);
-  return tony;
-}
-
-boss_t *createBoss(const char *name) { lookup(name).create; }
 
 void freeBossFighting(aggressive_t *aggressive) {
   if (aggressive == NULL) {
