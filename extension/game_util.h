@@ -14,7 +14,6 @@
 typedef struct {
   char *itemName;
   property *properties; // array of properties
-
 } item;
 
 // enum for properties of products
@@ -51,14 +50,13 @@ typedef struct building_t {
 } building_t;
 
 typedef struct {
-  item_t *inventory;
-  int cash;
-  int health;
+  player_t player;
   room_t curr_room_node; // struct for room_t structure
 
   struct {
     char *username;
     character character;
+    int score;
   } profile;
 
   room_name room_history[MAX_ROOM_HISTORY];
