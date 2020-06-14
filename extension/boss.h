@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#define MIN_QUESTIONS_CORRECT (3)
+
 typedef struct {
   char **questions;
   char **answers;

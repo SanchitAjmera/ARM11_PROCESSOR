@@ -44,10 +44,9 @@ void quiz(boss_t *boss) {
     // IF checkAnswer(boss, answer);
     // THEN correct++;
   }
-}
 
-// function to start the battle with the boos
-void battle(boss_t *boss) {
-  // PRE: boss->fighting has been initialised
-  // TODO: turn based combat against the player
+  // if small number of questions correct start turn-based comabat
+  if (correct < MIN_QUESTIONS_CORRECT) {
+    battle(boss);
+  }
 }
