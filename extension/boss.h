@@ -6,8 +6,8 @@
 #define MIN_QUESTIONS_CORRECT (3)
 
 typedef struct {
-  char **questions;
-  char **answers;
+  const char **questions;
+  const char **answers;
   int num;
 } passive_t;
 
