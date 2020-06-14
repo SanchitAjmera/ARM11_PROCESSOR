@@ -1,15 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// dummy pre-processor function
+#define NULL_POINTER(pointer) (validatePtr(pointer, "Not enough memory."))
 // dummy function
 void validatePtr(void *pointer, const char *) {}
 
-passive_t *createPassive(const char **questions, const char **answers) {
+passive_t *createPassive(const char **questions, int qNum, const char **answers,
+                         int aNum) {
   passive_t *passive = malloc(sizeof(*passive));
   validatePtr(boss, "Not enough memory.");
+  passive->questions = malloc(qNum * sizeof(*passive->questions));
+  validatePtr(passive->questions, "Not enough memory.");
   passive->questions = questions;
+  passive->answers = malloc(aNum * sizeof(*passive->answers));
+  validatePtr(passive->answers, "Not enough memory.");
   passive->answers = answers;
   return passive;
+}
+
+aggressive_t *createAggressive(int attack, int special, const char *attackName,
+                               const char *specialName, int maxHealth) {
+  aggressive_t *aggressive = malloc(sizeof(*aggressive));
+  validatePtr(passive->answers, "Not enough memory.");
+  aggressive->attack = attack;
+  aggressive->special = special;
+  aggressive->attackName =
+      malloc(strlen(attackName) * sizeof(*aggressive->attackName));
+  aggressive->attackName = attackName;
+  validatePtr(aggressive->attackName, "Not enough memory.");
+  aggressive->specialName =
+      malloc(strlen(specialName) * sizeof(*specialName->attackName));
+  aggressive->specialName = specialName;
+  validatePtr(aggressive->specialName, "Not enough memory.");
+  aggressive->maxHealth = maxHealth;
+  aggressive->health = aggressive->maxHealth;
 }
 
 // function to create and initialise a pointer to boss_t on the heap
@@ -31,6 +56,7 @@ void freeBossFighting(aggressive_t *aggressive) {
 }
 
 void freeBossTeaching(passive_t *passive) {
+  // TODO: fix logical error
   free(questions);
   free(answers);
   free(passive);
