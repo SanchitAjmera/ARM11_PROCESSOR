@@ -9,6 +9,7 @@
 #define MAX_ROOM_HISTORY (5)
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
+#define PROPERTY_NUM (4)
 
 // enum for items stored by person in inventory
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } item;
@@ -26,7 +27,7 @@ typedef enum { BATMAN, UTA } character;
 typedef struct item_t {
 
   item name;
-  property *properties;
+  bool properties[PROPERTY_NUM];
   char *description;
 
 } item_t;
@@ -60,14 +61,22 @@ typedef struct {
   room_name room_history[MAX_ROOM_HISTORY];
 } state;
 
-const item_t[] = {{APPLE,
-                   {EDIBLE},
-                   {"An apple. Increases health by 5 when eaten!"}},
-                  {KEYBOARD, {USABLE}}
-
+// Supported Items
+const item_t[] = {
+    {APPLE,
+     {true, false, false, false},
+     "An apple. Increases health by 5 when eaten!"},
+    {KEYBOARD,
+     {false, true, false, true},
+     "A keyboard. A programmer's best friend."},
+    {MOUSE, {false, true, false, true}, "A mouse. Click and scroll for days."},
+    {MONITOR,
+     {false, true, false, true},
+     "A monitor. Can't see your seg faults without it!"},
+    {CASH,
+     {false, true, true, true},
+     "Cash. I wonder what I could buy around here..."}}
 }
-
-                 extern building_t *
-                 initialiseBuilding();
+extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
 extern void printRemaining(void);
