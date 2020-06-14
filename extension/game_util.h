@@ -16,6 +16,7 @@
 #define MAX_HEALTH (100)
 #define FIND_FAIL (-1)
 #define REMOVED (NULL)
+#define MAX_PROPERTY (8)
 
 // enum for items stored by person in inventory
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } Item;
