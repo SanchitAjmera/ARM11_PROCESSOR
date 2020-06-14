@@ -18,11 +18,6 @@ void printKonstantinos(void) {
   printf("\n");
   printf("\n");
   printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -115,11 +110,6 @@ void printKonstantinosMouthOpen(void) {
   printf("\n");
   printf("\n");
   printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -204,17 +194,10 @@ void printKonstantinosMouthOpen(void) {
   printf("\n");
   printf("\n");
   printf("\n");
-  printf("\n");
-  printf("\n");
 }
 
 void printKonstantinosIndent(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
   printf("\n");
   printf("\n");
   printf("\n");
@@ -335,11 +318,6 @@ void printKonstantinosMouthOpenIndent(void) {
   printf("\n");
   printf("\n");
   printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -443,8 +421,6 @@ void printKonstantinosMouthOpenIndent(void) {
          "                                "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
   printf("\n");
   printf("\n");
   printf("\n");

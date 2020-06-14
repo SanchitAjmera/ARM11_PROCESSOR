@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define MAX_ROOM_HISTORY (5)
 #define ROOM_COUNT (5)
+#define CLEAR ("clear")
 
 // enum for items stored by person in inventory
 typedef enum { ITEM1, ITEM2, ETC } item;
@@ -60,3 +62,4 @@ typedef struct {
 
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
+extern void printRemaining(void);
