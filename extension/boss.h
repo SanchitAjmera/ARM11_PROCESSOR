@@ -7,16 +7,16 @@
 #define MIN_QUESTIONS_CORRECT (3)
 #define MAX_QUESTIONS (5)
 #define BOSSES (2)
-#define KGK_ATTACK ()
-#define KGK_SPECIAL ()
-#define KGK_ATTACK_NAME ()
-#define KGK_SPECIAL_NAME ()
-#define KGK_MAX_HEALTH ()
-#define TONY_ATTACK ()
-#define TONY_SPECIAL ()
-#define TONY_ATTACK_NAME ()
-#define TONY_SPECIAL_NAME ()
-#define TONY_MAX_HEALTH ()
+#define KGK_ATTACK (15)
+#define KGK_SPECIAL (25)
+#define KGK_ATTACK_NAME ("10 mins remaining")
+#define KGK_SPECIAL_NAME ("LabTS is down")
+#define KGK_MAX_HEALTH (120)
+#define TONY_ATTACK (20)
+#define TONY_SPECIAL (1000)
+#define TONY_ATTACK_NAME ("Code style violations")
+#define TONY_SPECIAL_NAME ("Minus 1000 marks")
+#define TONY_MAX_HEALTH (90)
 
 typedef struct {
   const char **questions;
@@ -45,7 +45,6 @@ typedef struct {
 
 typedef struct {
   const char *key;
-  boss_t *(*create)(const char **, const char **);
   const char **questions;
   const char **answers;
   aggressive_t fightingState;
@@ -65,7 +64,8 @@ static const aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
                                         TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
 // lookup table for bosses
 static const lookupBoss_t bossTable[] = {
-    {"Konstantinos", createKGK, kgkQuestions, kgkAnswers, kgkBattle}};
+    {"Konstantinos", kgkQuestions, kgkAnswers, kgkBattle},
+    {"Tony", tonyQuestions, tonyAnswers, tonyBattle}};
 
 lookupBoss_t lookup(const char *name) {
   for (int i = 0; i < BOSSES; i++) {
