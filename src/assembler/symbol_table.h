@@ -37,7 +37,9 @@ struct symbol {
 extern symbol_table *newSymbolTable();
 extern symbol *getSymbol(const symbol_table *s, const char *name);
 extern void addSymbol(symbol_table *symbolTable, symbol *entry);
+extern symbol **createSymbols(int num, int size);
 extern void addSymbols(symbol_table *s, symbol **symbols, int symbolCount);
+extern void freeSymbols(symbol **symbols, int size);
 extern void freeTable(symbol_table *symbolTable);
 extern void printSymbolTable(symbol_table *s);
 
