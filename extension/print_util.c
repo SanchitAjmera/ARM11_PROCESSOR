@@ -450,7 +450,15 @@ void printRoomPosition(room_t *room) {
   }
 }
 
-void printItemDetails(Item_t *Item) {}
+void printItemDetails(room_t *room) {
+  if (room->Items != NULL) {
+    for (int i = 0; i < room->Item_count; i++) {
+      printf(room->Items[i]->key);
+      printf(" ");
+    }
+    printf("\n");
+  }
+}
 
 // function for printing out name of room
 void printRoomName(room_t *room1) {
@@ -486,6 +494,8 @@ void printAdjacentRooms(room_t *room1) {
 void printRoomDetails(room_t *room1) {
   printRoomPosition(room1);
   printRoomName(room1);
+  printf("Items in the room: ");
+  printItemDetails(room1);
   printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
   printf("adjacent rooms:\n");
   printAdjacentRooms(room1);
