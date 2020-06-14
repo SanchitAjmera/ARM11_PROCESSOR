@@ -7,5 +7,6 @@ void printRoomName(room_t *room1);
 void printAdjacentRooms(room_t *room1);
 void printRoomDetails(room_t *room1);
 void printBuildingDetails(building_t *huxley);
+void printBuilding(building_t *huxley);
 
 #endif
