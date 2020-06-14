@@ -20,3 +20,19 @@ int findItem(item_t **inventory, int item_count, char *itemName) {
   }
   return FIND_FAIL;
 }
+
+bool pickUpItem(state *currentState, char *itemName) {
+  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  if (!item || !currentState->curr_room_node->items[item->name]) {
+    printf("This item could not be found here!\n");
+    return false;
+  }
+  if (currentState->player->inventory[item->name] == item) {
+    printf("%s is already in your inventory!", itemName);
+  } else {
+    currentState->curr_room_node->items[item->name] = REMOVED;
+    currentState->player->inventory[item->name] = item;
+    printf("%s has been picked up\n", itemName);
+  }
+  return true;
+}
