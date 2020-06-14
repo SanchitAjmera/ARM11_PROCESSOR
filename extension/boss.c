@@ -5,10 +5,13 @@
 void validatePtr(void *pointer, const char *) {}
 
 // function to create and initialise a pointer to boss_t on the heap
-boss_t *createBoss() {
+boss_t *createBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
   validatePtr(boss, "Not enough memory.");
-  boss->isPassive = false;
+  boss->name = malloc(sizeof(*boss->name));
+  validatePtr(boss->name, "Not enough memory.");
+  strcpy(boss->name, name);
+  boss->isPassive = true;
   boss->teaching = malloc(sizeof(*boss->teaching));
   validatePtr(boss->teaching, "Not enough memory.");
 }
@@ -30,6 +33,12 @@ void freeBoss(boss_t *boss) {
   freeBossFighting(boss->fighting);
   free(boss->name);
   free(boss);
+}
+
+boss_t *createKGK(void) {
+  boss_t *kgk = createBoss("Konstantinos");
+  kgk->teaching->questions = kgkQuestions;
+  kgk->teaching->answers = kgkAnswers;
 }
 
 // function to start the quiz on assembly code
