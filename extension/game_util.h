@@ -63,7 +63,7 @@ typedef struct {
 } player_t;
 
 typedef struct {
-  player_t player;
+  player_t *player;
   room_t *curr_room_node; // struct for room_t structure
 
   struct {
