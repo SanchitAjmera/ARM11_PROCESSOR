@@ -30,9 +30,7 @@ void printPlayer(player_t *player) {
 }
 
 // player's turn in battle
-void playerTurn(boss_t *boss, player_t *player) {
-  // TODO: @Luqman to code...
-}
+void playerTurn(boss_t *boss, player_t *player) {}
 
 // boss's turn in battle
 void bossTurn(boss_t *boss, player_t *player) {
@@ -51,4 +49,5 @@ void battle(boss_t *boss, player_t *player) {
     playerTurn(boss, player);
     bossTurn(boss, player);
   }
+  playerWon(boss, player);
 }
