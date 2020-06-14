@@ -450,6 +450,8 @@ void printRoomPosition(room_t *room) {
   }
 }
 
+void printItemDetails(Item_t *Item) {}
+
 // function for printing out name of room
 void printRoomName(room_t *room1) {
 
@@ -480,7 +482,7 @@ void printAdjacentRooms(room_t *room1) {
   }
 }
 
-// function purely for testing ouptut of connect room_name
+// function purely for testing ouptut of connect RoomName
 void printRoomDetails(room_t *room1) {
   printRoomPosition(room1);
   printRoomName(room1);
@@ -555,3 +557,4 @@ void printKonstantinosTalking(void) {
       usleep(300000);
     }
   }
+}
