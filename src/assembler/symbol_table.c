@@ -27,13 +27,21 @@ symbol_table *newSymbolTable(void) {
   return s;
 }
 
-static int hash(symbol_table *s, const char *key) { return 0; }
+static int hash(symbol_table *s, const char *key) {
+  int index = 7;
+  for (int i = 0; i < strlen(key); i++) {
+    index = (index * 31) + key[i];
+  }
+  return index;
+}
 
 static void rehash(symbol_table *s) {
   if (s->symbolCount / s->size < LOAD_FACTOR) {
     return;
   }
-  // TODO: resize hash table & rehash all entries
+  // TODO: copy all entries
+  // TODO: freeSymbols(s)
+  // TODO: addSymbols()
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
