@@ -10,3 +10,11 @@ player_t *initialisePlayer() {
   assert(newPlayer && newPlayer->inventory);
   return newPlayer;
 }
+bool findItem(item_t **inventory, int item_count, char *itemName) {
+  for (int i = 0; i < item_count; i++) {
+    if (!strcmp(inventory[i]->key, itemName)) {
+      return true;
+    }
+  }
+  return false;
+}
