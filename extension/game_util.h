@@ -43,6 +43,7 @@ typedef struct room_t {
   int adjacent_room_count;
   char *description;
   item_t **items;
+  int item_count;
   int visits;
 
 } room_t;

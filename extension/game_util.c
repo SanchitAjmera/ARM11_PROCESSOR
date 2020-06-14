@@ -56,6 +56,7 @@ room_t *initialiseRoom(room_name current_room, room_position position) {
   room->items = malloc(sizeof(item_t) * 20);
   room->desciptions = malloc(sizeof(char) * 100);
   room->visits = 0;
+  room->item_count = 0;
   return room;
 }
 
@@ -111,6 +112,12 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     }
     free(room1->adjacent_rooms);
   }
+  // freeing itemss
+  for (int i = 0; i < room1->item_count; i++) {
+    free(room1->items[i]);
+  }
+  free(room1->items);
+  free(room1->description);
   free(room1);
 }
 
