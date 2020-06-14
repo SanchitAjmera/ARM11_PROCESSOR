@@ -6,6 +6,7 @@
 typedef struct {
   char **questions;
   char **answers;
+  int num;
 } passive_t;
 
 typedef struct {
