@@ -461,7 +461,8 @@ void printAdjacentRooms(room_t *room1) {
 // function purely for testing ouptut of connect room_name
 void printRoomDetails(room_t *room1) {
   printRoomName(room1);
-  printf("%d\n", room1->adjacent_room_count);
+  printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
+  printf("adjacent rooms:\n");
   printAdjacentRooms(room1);
 }
 
