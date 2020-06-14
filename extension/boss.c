@@ -68,12 +68,13 @@ void freeBoss(boss_t *boss) {
   free(boss);
 }
 
-void initBattle(boss_t *boss) {
+void initBattle(boss_t *boss, player_t *player) {
   boss->isPassive = false;
   freeBossTeaching(boss->teaching);
   boss->fighting = malloc(sizeof(*boss->fighting));
   NULL_POINTER(boss->fighting);
   *boss->fighting = lookup(boss->name).fightingState;
+  battle(boss, player);
 }
 
 // takes in the user's input for the answer
@@ -82,8 +83,21 @@ char *getAnswer(void) {
   printf(">");
 }
 
+void processResult(boss_t *boss, player_t *player) {
+  // TODO: special KGK case
+  printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
+  if (pass) {
+    printf("%s is happy you scored well!\n", boss->name);
+    return;
+  }
+  // if small number of questions correct start turn-based comabat
+  printf("%s gets aggravated due to your low score...\n", boss->name);
+  printf("%s says: mitigations won't save you this time!\n", boss->name);
+  initBattle(boss, player);
+}
+
 // function to start the quiz on assembly code
-void quiz(boss_t *boss) {
+void quiz(boss_t *boss, player_t *player) {
   // PRE: boss->teaching has been initialised
   int correct = 0;
   printf("Wild %s appeared!\n%s starts asking you assembly questions!",
@@ -95,15 +109,5 @@ void quiz(boss_t *boss) {
       correct++;
     }
   }
-
-  printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
-  // if small number of questions correct start turn-based comabat
-  if (correct < MIN_QUESTIONS_CORRECT) {
-    printf("%s gets aggravated due to your low score...\n", boss->name);
-    printf("%s says: mitigations won't save you this time!\n", boss->name);
-    // initBattle(boss);
-    battle(boss);
-  } else {
-    printf("%s is happy you scored well!\n", boss->name);
-  }
+  processResult(correct);
 }
