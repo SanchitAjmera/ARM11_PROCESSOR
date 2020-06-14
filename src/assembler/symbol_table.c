@@ -9,12 +9,13 @@
 #define LOAD_FACTOR (0.75)
 
 static symbol **createSymbols(int num, size_t size) {
-  s->symbols = malloc(num * size);
-  validatePtr(s->symbols, "Not enough memory.");
+  symbol **symbols = malloc(num * size);
+  validatePtr(symbols, "Not enough memory.");
   for (int i = 0; i < num; i++) {
-    s->symbols[i] = malloc(sizeof(*s->symbols[i]));
-    validatePtr(s->symbols[i], "Not enough memory.");
+    symbols[i] = malloc(sizeof(*symbols[i]));
+    validatePtr(symbols[i], "Not enough memory.");
   }
+  return symbols;
 }
 
 /* Takes in a pointer to an uninitialised symbol table and initialises it */
@@ -30,24 +31,23 @@ symbol_table *newSymbolTable(void) {
 void freeList(symbol *symbols, int size) {
   for (int i = 0; i < size; i++) {
     free(symbols[i].name);
-    free(symbols[i]);
   }
   free(symbols);
 }
 
-void freeSymbols(symbol_table *s) {
-  for (int i = 0; i < s->size; i++) {
-    freeList(s->symbols[i], sizeof(s->symbols[i]) / sizeof(s->symbols[i][0]));
+void freeSymbols(symbol **symbols, int size) {
+  for (int i = 0; i < size; i++) {
+    freeList(symbols[i], sizeof(symbols[i]) / sizeof(symbols[i][0]));
   }
-  free(s->symbols);
+  free(symbols);
 }
 
 void freeTable(symbol_table *s) {
-  freeSymbols(s);
+  freeSymbols(s->symbols, s->size);
   free(s);
 }
 
-static int hash(symbol_table *s, const char *key) {
+static int hash(const symbol_table *s, const char *key) {
   int index = 7;
   for (int i = 0; i < strlen(key); i++) {
     index = (index * 31) + key[i];
@@ -56,34 +56,16 @@ static int hash(symbol_table *s, const char *key) {
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
-  int index1 = hash(s, entry->name);
+  int index1 = hash(s, name);
   int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
   if (size > 1) {
     for (int i = 0; i < size; i++) {
       if (s->symbols[index1][i].name == name) {
-        return s->symbols[index1][i];
+        return s->symbols[index1] + i;
       }
     }
   }
-  return s->symbols[index1][0];
-}
-
-void addSymbol(symbol_table *s, symbol *entry) {
-  if (getSymbol(s, entry.name) != NULL) {
-    // label already defined
-    return;
-  }
-  int index1 = hash(s, entry->name);
-  int index2 = 0;
-  int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
-  if (size > 1) {
-    s->symbols[index1] =
-        realloc(s->symbols[index1], sizeof(*s->symbols[index1]) * (++size));
-    validatePtr(s->symbols[index1], "Not enough memory.");
-    index2 = size - 1;
-  }
-  s->symbols[index1][index2] = entry;
-  s->symbolCount++;
+  return s->symbols[index1];
 }
 
 void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
@@ -96,16 +78,37 @@ static void rehash(symbol_table *s) {
   if (s->symbolCount / s->size < LOAD_FACTOR) {
     return;
   }
-  symbol symbols[s->symbolCount];
+  // symbol symbols[s->symbolCount][1];
+  symbol **symbols = createSymbols(s->symbolCount, sizeof(*symbols));
   int index = 0;
   for (int i = 0; i < s->size; i++) {
     for (int j = 0; j < s->size; j++) {
-      symbols[index++] = s->symbols[i][j];
+      symbols[index++][0] = s->symbols[i][j];
     }
   }
-  freeSymbols(s);
+  freeSymbols(s->symbols, s->size);
   s->size *= 2;
   addSymbols(s, symbols, s->symbolCount);
+  freeSymbols(symbols, s->symbolCount);
+}
+
+void addSymbol(symbol_table *s, symbol *entry) {
+  if (getSymbol(s, entry->name) != NULL) {
+    // label already defined
+    return;
+  }
+  int index1 = hash(s, entry->name);
+  int index2 = 0;
+  int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
+  if (size > 1) {
+    s->symbols[index1] =
+        realloc(s->symbols[index1], sizeof(*s->symbols[index1]) * (++size));
+    validatePtr(s->symbols[index1], "Not enough memory.");
+    index2 = size - 1;
+  }
+  s->symbols[index1][index2] = *entry;
+  s->symbolCount++;
+  rehash(s);
 }
 
 // dummy functions for compilation
