@@ -532,3 +532,26 @@ void printRemaining(void) {
   printf("      REMAINING");
   fflush(stdout);
 }
+
+void printKonstantinosTalking(void) {
+  for (int i = 0; i < 18; i++) {
+    if (i % 6 == 0 || i % 6 == 1 || i % 6 == 2) {
+      printKonstantinos();
+      printRemaining();
+      fflush(stdout);
+      usleep(300000);
+      printKonstantinosMouthOpen();
+      printRemaining();
+      fflush(stdout);
+      usleep(300000);
+    } else {
+      printKonstantinosIndent();
+      printRemaining();
+      fflush(stdout);
+      usleep(300000);
+      printKonstantinosMouthOpenIndent();
+      printRemaining();
+      fflush(stdout);
+      usleep(300000);
+    }
+  }
