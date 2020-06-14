@@ -8,9 +8,6 @@
 #define MAX_ROOM_HISTORY (5)
 #define ROOM_COUNT (5)
 
-// enum for position in room
-typedef enum { EAST, SOUTH, NORTH, WEST, CENTRE } room_position;
-
 // enum for items stored by person in inventory
 typedef enum { ITEM1, ITEM2, ETC } item;
 
@@ -22,9 +19,6 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
 
 // enum for character type
 typedef enum { BATMAN, UTA } character;
-
-// enum for bosses
-typedef enum { KONSTANTINOS, LANCASTER, TONY } bosses;
 
 // struct for items and their properties
 typedef struct item_t {
@@ -38,14 +32,9 @@ typedef struct item_t {
 // valid for no cyclical room structure
 typedef struct room_t {
   room_name current_room;
-  //  room_position position;
-  // char *description;
-  // item_t **items;
-  int item_count;
-  int visits;
   struct room_t **adjacent_rooms;
   int adjacent_room_count;
-
+  char *description;
 } room_t;
 
 // structure for building consisting of room_history

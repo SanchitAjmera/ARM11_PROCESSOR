@@ -34,65 +34,18 @@ void connectRoom(room_t *first, room_t *second) {
   first->adjacent_room_count++;
 }
 
-// connects all position in room
-void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
-                          room_t *r5) {
-  room_t *rooms[4] = {r1, r2, r3, r4};
-  for (int i = 0; i < 4; i++) {
-    connectRoom(r5, rooms[i]);
-  }
-}
-
 // initialises room
-room_t *initialiseRoom(room_name current_room /*, room_position position*/) {
+room_t *initialiseRoom(room_name current_room) {
   room_t *room = malloc(sizeof(*room));
-  // room->position = position;
   room->current_room = current_room;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
   room->adjacent_room_count = 0;
-  //  room->items = malloc(sizeof(item_t) * 20);
-  //  room->description = malloc(sizeof(char) * 100);
-  room->visits = 0;
-  room->item_count = 0;
   return room;
 }
 
 building_t *initialiseBuilding() {
   building_t *huxley = malloc(sizeof(*huxley));
   huxley->start_room = malloc(sizeof(room_t));
-  /*
-    room_t *lobbyEast = initialiseRoom(LOBBY, EAST);
-    room_t *lobbyWest = initialiseRoom(LOBBY, WEST);
-    room_t *lobbyNorth = initialiseRoom(LOBBY, NORTH);
-    room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
-    room_t *lobbyCentre = initialiseRoom(LOBBY, CENTRE);
-
-    room_t *lectureHallEast = initialiseRoom(LECTURE_HALL, EAST);
-    room_t *lectureHallWest = initialiseRoom(LECTURE_HALL, WEST);
-    room_t *lectureHallNorth = initialiseRoom(LECTURE_HALL, NORTH);
-    room_t *lectureHallSouth = initialiseRoom(LECTURE_HALL, SOUTH);
-    room_t *lectureHallCentre = initialiseRoom(LECTURE_HALL, CENTRE);
-
-    room_t *fusionEast = initialiseRoom(FUSION, EAST);
-    room_t *fusionWest = initialiseRoom(FUSION, WEST);
-    room_t *fusionNorth = initialiseRoom(FUSION, NORTH);
-    room_t *fusionSouth = initialiseRoom(FUSION, SOUTH);
-    room_t *fusionCentre = initialiseRoom(FUSION, CENTRE);
-
-    room_t *labEast = initialiseRoom(LAB, EAST);
-    room_t *labWest = initialiseRoom(LAB, WEST);
-    room_t *labNorth = initialiseRoom(LAB, NORTH);
-    room_t *labSouth = initialiseRoom(LAB, SOUTH);
-    room_t *labCentre = initialiseRoom(LAB, CENTRE);
-  */
-  /*  connectRoomPositions(lobbyEast, lobbyWest, lobbySouth, lobbyNorth,
-                         lobbyCentre);
-    connectRoomPositions(lectureHallEast, lectureHallWest, lectureHallSouth,
-                         lectureHallNorth, lectureHallCentre);
-    connectRoomPositions(fusionWest, fusionEast, fusionNorth, fusionSouth,
-                         fusionCentre);
-    connectRoomPositions(labEast, labWest, labSouth, labNorth, labCentre);
-  */
 
   room_t *lobby = initialiseRoom(LOBBY);
   room_t *lab = initialiseRoom(LAB);
@@ -121,9 +74,6 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     }
     free(room1->adjacent_rooms);
   }
-  // freeing itemss
-  //  free(room1->items);
-  //  free(room1->description);
   free(room1);
 }
 
