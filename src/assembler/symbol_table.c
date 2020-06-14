@@ -27,21 +27,32 @@ symbol_table *newSymbolTable(void) {
   return s;
 }
 
+void freeList(symbol *symbols, int size) {
+  for (int i = 0; i < size; i++) {
+    free(symbols[i].name);
+    free(symbols[i]);
+  }
+  free(symbols);
+}
+
+void freeSymbols(symbol_table *s) {
+  for (int i = 0; i < s->size; i++) {
+    freeList(s->symbols[i], sizeof(s->symbols[i]) / sizeof(s->symbols[i][0]));
+  }
+  free(s->symbols);
+}
+
+void freeTable(symbol_table *s) {
+  freeSymbols(s);
+  free(s);
+}
+
 static int hash(symbol_table *s, const char *key) {
   int index = 7;
   for (int i = 0; i < strlen(key); i++) {
     index = (index * 31) + key[i];
   }
   return index;
-}
-
-static void rehash(symbol_table *s) {
-  if (s->symbolCount / s->size < LOAD_FACTOR) {
-    return;
-  }
-  // TODO: copy all entries
-  // TODO: freeSymbols(s)
-  // TODO: addSymbols()
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
@@ -81,24 +92,20 @@ void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
   }
 }
 
-void freeList(symbol *symbols, int size) {
-  for (int i = 0; i < size; i++) {
-    free(symbols[i].name);
-    free(symbols[i]);
+static void rehash(symbol_table *s) {
+  if (s->symbolCount / s->size < LOAD_FACTOR) {
+    return;
   }
-  free(symbols);
-}
-
-void freeSymbols(symbol_table *s) {
+  symbol symbols[s->symbolCount];
+  int index = 0;
   for (int i = 0; i < s->size; i++) {
-    freeList(s->symbols[i], sizeof(s->symbols[i]) / sizeof(s->symbols[i][0]));
+    for (int j = 0; j < s->size; j++) {
+      symbols[index++] = s->symbols[i][j];
+    }
   }
-  free(s->symbols);
-}
-
-void freeTable(symbol_table *s) {
   freeSymbols(s);
-  free(s);
+  s->size *= 2;
+  addSymbols(s, symbols, s->symbolCount);
 }
 
 // dummy functions for compilation
