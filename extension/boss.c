@@ -33,7 +33,21 @@ void freeBoss(boss_t *boss) {
 }
 
 // function to start the quiz on assembly code
-void quiz() {}
+void quiz(boss_t *boss) {
+  // PRE: boss->teaching has been initialised
+  // TODO: WHILE loop asking questions
+  int correct = 0;
+  for (int i = 0; i < boss->teaching->num; i++) {
+    // TODO: get answer from user as input
+    // char *answer = askQuestion(boss->teaching->questions[i]);
+    // TODO: check if answer provided is correct
+    // IF checkAnswer(boss, answer);
+    // THEN correct++;
+  }
+}
 
 // function to start the battle with the boos
-void battle() {}
+void battle(boss_t *boss) {
+  // PRE: boss->fighting has been initialised
+  // TODO: turn based combat against the player
+}
