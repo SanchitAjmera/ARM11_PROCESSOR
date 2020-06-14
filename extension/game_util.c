@@ -93,23 +93,19 @@ building_t *initialiseBuilding() {
   // initilaising 5 game apples
   Item_t *apple1, *apple2, *apple3, *apple4,
       *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  Item_t *apple1, *apple2, *apple3, *apple4,
-      *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   // initialising 5 game cash bundles
-  /*  Item_t *cash1 = gameItems[CASH_Item_INDEX];
-    Item_t *cash2 = gameItems[CASH_Item_INDEX];
-    Item_t *cash3 = gameItems[CASH_Item_INDEX];
-    Item_t *cash4 = gameItems[CASH_Item_INDEX];
-    Item_t *cash5 = gameItems[CASH_Item_INDEX];
-    // initialising keyboard
-    Item_t *keyboard = gameItems[KEYBOARD_Item_INDEX];
-    // initialising mouse
-    Item_t *mouse = gameItems[MOUSE_Item_INDEX];
-    // initialing monitor
-    Item_t *monitor = gameItems[MONITOR_Item_INDEX];
-    // initialising pass to lab
-    Item_t *pass = gameItems[PASS_Item_INDEX];
-    */ // initialises all the rooms within the building
+  Item_t *cash1, *cash2, *cash3, *cash4,
+      *cash5 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  // initialising keyboard
+  Item_t *keyboard = initialiseItem(gameItems[KEYBOARD_ITEM_INDEX]);
+  // initialising mouse
+  Item_t *mouse = initialiseItem(gameItems[MOUSE_ITEM_INDEX]);
+  // initialing monitor
+  Item_t *monitor = initialiseItem(gameItems[MONITOR_ITEM_INDEX]);
+  // initialising pass to lab
+  Item_t *pass = initialiseItem(gameItems[PASS_ITEM_INDEX]);
+
+  // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
   room_t *lobbyEast = initialiseRoom(LOBBY, EAST);
   room_t *lobbyWest = initialiseRoom(LOBBY, WEST);
