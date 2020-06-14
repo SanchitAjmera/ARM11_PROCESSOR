@@ -429,6 +429,22 @@ void printKonstantinosMouthOpenIndent(void) {
   printf("\n");
 }
 
+// funcion to print Room position
+void printRoomPosition(room_t *room) {
+  switch (room->position) {
+  case NORTH:
+    printf("NORTH ");
+  case SOUTH:
+    printf("SOUTH ");
+  case WEST:
+    printf("WEST ");
+  case EAST:
+    printf("EAST ");
+  case CENTRE:
+    printf("CENTRE ");
+  }
+}
+
 // function for printing out name of room
 void printRoomName(room_t *room1) {
 
@@ -460,6 +476,7 @@ void printAdjacentRooms(room_t *room1) {
 
 // function purely for testing ouptut of connect room_name
 void printRoomDetails(room_t *room1) {
+  printRoomPosition(room1);
   printRoomName(room1);
   printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
   printf("adjacent rooms:\n");
