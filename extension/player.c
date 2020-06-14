@@ -11,6 +11,17 @@ player_t *initialisePlayer() {
   return newPlayer;
 }
 
+/* To be moved into print_utils */
+void printPlayer(state *currentState) {
+  player_t *player = currentState->player;
+  printf("Your current health is: %d\n", player->health);
+  printf("You have £%d cash to spend\n", player->cash);
+  printf("The items in your inventory are:");
+  for (int i = 0; i < player->item_count; i++) {
+    printf(" %s|", player->inventory[i]->name);
+  }
+}
+
 // returns index of item if it is in the list TODO: remove magic numbers
 int findItem(item_t **inventory, int item_count, char *itemName) {
   for (int i = 0; i < item_count; i++) {
