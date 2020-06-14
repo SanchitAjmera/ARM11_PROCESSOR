@@ -53,7 +53,6 @@ functions:
 
 	ROOM:
 
-		- left/right/down/up
 		- desciptions
 		- examineRoom()
 		- items/ objects
