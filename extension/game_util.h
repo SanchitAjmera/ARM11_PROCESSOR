@@ -14,19 +14,10 @@
 typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } room_position;
 
 // enum for items stored by person in inventory with respective cost
-typedef enum {
-  KEYBOARD,
-  PASS,
-  TELEPORTER,
-  KATSU_CURRY,
-  TESCO_MEAL_DEAL,
-  MONEY1,
-  MONEY2,
-  MONEY3
-} item;
+typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
-typedef enum { CONSUMABLE, PROP2 } property;
+typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
 
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
@@ -36,8 +27,10 @@ typedef enum { BATMAN, UTA } character;
 
 // struct for items and their properties
 typedef struct item_t {
+  char *key;
   item name;
   property *properties;
+  char *description;
 } item_t;
 
 // structure for rooms
@@ -79,7 +72,9 @@ static const item_t gameItems[] = {
     {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days."},
     {"monitor", MONITOR, THROWABLE,
      "A monitor. Can't see your seg faults without it!"},
-    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."}};
+    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
+    {"pass", PASS, THROWABLE,
+     "pass which lets you access the lab and battle the BOSSMAN"}};
 
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
