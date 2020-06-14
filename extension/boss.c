@@ -1,5 +1,7 @@
+#include "boss.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // dummy pre-processor function
 #define NULL_POINTER(pointer) (validatePtr(pointer, "Not enough memory."))
@@ -58,7 +60,10 @@ void freeBoss(boss_t *boss) {
 }
 
 void initBattle(boss_t *boss, aggressive_t stats) {
+  boss->isPassive = false;
+  freeBossTeaching(boss->teaching);
   boss->fighting = malloc(sizeof(*boss->fighting));
+  NULL_POINTER(boss->fighting);
   *boss->fighting = stats;
 }
 
@@ -68,21 +73,34 @@ boss_t *createKGK(void) {
   return kgk;
 }
 
+// takes in the user's input for the answer
+char *getAnswer(void) {
+  // TODO: get answer from user as input
+  printf(">");
+}
+
 // function to start the quiz on assembly code
 void quiz(boss_t *boss) {
   // PRE: boss->teaching has been initialised
-  // TODO: WHILE loop asking questions
   int correct = 0;
+  printf("Wild %s appeared!\n%s starts asking you assembly questions!",
+         boss->name, boss->name);
   for (int i = 0; i < boss->teaching->num; i++) {
-    // TODO: get answer from user as input
-    // char *answer = askQuestion(boss->teaching->questions[i]);
-    // TODO: check if answer provided is correct
-    // IF checkAnswer(boss, answer);
-    // THEN correct++;
+    printf("Question %d: %s\n", i + 1, boss->teaching->questions[i]);
+    const char *input = getAnswer();
+    if (strcmp(input, boss->teaching->answers[i]) == 0) {
+      correct++;
+    }
   }
 
+  printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
   // if small number of questions correct start turn-based comabat
   if (correct < MIN_QUESTIONS_CORRECT) {
+    printf("%s gets aggravated due to your low score...\n", boss->name);
+    printf("%s says: mitigations won't save you this time!\n", boss->name);
+    // initBattle(boss);
     battle(boss);
+  } else {
+    printf("%s is happy you scored well!\n", boss->name);
   }
 }
