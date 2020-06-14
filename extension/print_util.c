@@ -470,6 +470,7 @@ void printRoomName(room_t *room1) {
 // function for printing out names of adjacent rooms
 void printAdjacentRooms(room_t *room1) {
   for (int i = 0; i < room1->adjacent_room_count; i++) {
+    printRoomPosition(room1->adjacent_rooms[i]);
     printRoomName(room1->adjacent_rooms[i]);
   }
 }
