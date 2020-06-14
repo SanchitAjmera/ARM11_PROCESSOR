@@ -10,8 +10,12 @@
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
 
-// enum for items stored by person in inventory
-typedef enum { ITEM1, ITEM2, ETC } item;
+// Struct for items stored by person in inventory
+typedef struct {
+  char *itemName;
+  property *properties; // array of properties
+
+} item;
 
 // enum for properties of products
 typedef enum { PROP1, PROP2, PROP3 } property;
