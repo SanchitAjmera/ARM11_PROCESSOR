@@ -72,5 +72,14 @@ typedef struct {
   room_name room_history[MAX_ROOM_HISTORY];
 } state;
 
+static const item_t gameItems[] = {
+    {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
+    {"keyboard", KEYBOARD, THROWABLE,
+     "A keyboard. A programmer's best friend."},
+    {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days."},
+    {"monitor", MONITOR, THROWABLE,
+     "A monitor. Can't see your seg faults without it!"},
+    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."}};
+
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
