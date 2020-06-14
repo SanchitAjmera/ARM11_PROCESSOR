@@ -37,6 +37,8 @@ boss_t *createKGK(void) {
   return kgk;
 }
 
+boss_t *createBoss(const char *name) { lookup(name).create; }
+
 void freeBossFighting(aggressive_t *aggressive) {
   if (aggressive == NULL) {
     return;
@@ -66,12 +68,12 @@ void freeBoss(boss_t *boss) {
   free(boss);
 }
 
-void initBattle(boss_t *boss, aggressive_t stats) {
+void initBattle(boss_t *boss) {
   boss->isPassive = false;
   freeBossTeaching(boss->teaching);
   boss->fighting = malloc(sizeof(*boss->fighting));
   NULL_POINTER(boss->fighting);
-  *boss->fighting = stats;
+  *boss->fighting = lookup(boss->name).fightingState;
 }
 
 // takes in the user's input for the answer
