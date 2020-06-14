@@ -8,6 +8,15 @@
 // dummy function
 void validatePtr(void *pointer, const char *) {}
 
+lookupBoss_t lookup(const char *name) {
+  for (int i = 0; i < BOSSES; i++) {
+    if (strcmp(bossTable[i].key, name) == 0) {
+      return bossTable[i];
+    }
+  }
+  return NULL;
+}
+
 static passive_t *createPassive(const char **questions, const char **answers,
                                 int num) {
   passive_t *passive = malloc(sizeof(*passive));

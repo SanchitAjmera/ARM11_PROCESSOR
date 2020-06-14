@@ -15,7 +15,7 @@
 #define TONY_ATTACK (20)
 #define TONY_SPECIAL (1000)
 #define TONY_ATTACK_NAME ("Code style violations")
-#define TONY_SPECIAL_NAME ("Minus 1000 marks")
+#define TONY_SPECIAL_NAME ("Minus 1000")
 #define TONY_MAX_HEALTH (90)
 
 typedef struct {
@@ -66,14 +66,5 @@ static const aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
 static const lookupBoss_t bossTable[] = {
     {"Konstantinos", kgkQuestions, kgkAnswers, kgkBattle},
     {"Tony", tonyQuestions, tonyAnswers, tonyBattle}};
-
-lookupBoss_t lookup(const char *name) {
-  for (int i = 0; i < BOSSES; i++) {
-    if (strcmp(bossTable[i].key, name) == 0) {
-      return bossTable[i];
-    }
-  }
-  return NULL;
-}
 
 #endif
