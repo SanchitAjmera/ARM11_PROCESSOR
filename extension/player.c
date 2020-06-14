@@ -3,18 +3,20 @@
 // need ptr checks
 player_t *initialisePlayer() {
   player_t *newPlayer = malloc(sizeof(*newPlayer));
-  newPlayer->inventory = malloc(sizeof(*newPlayer->inventory));
+  newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t)));
   newPlayer->health = MAX_HEALTH;
   newPlayer->cash = INITIAL_CASH;
   newPlayer->item_count = 0;
   assert(newPlayer && newPlayer->inventory);
   return newPlayer;
 }
-bool findItem(item_t **inventory, int item_count, char *itemName) {
+
+// returns index of item if it is in the list TODO: remove magic numbers
+int findItem(item_t **inventory, int item_count, char *itemName) {
   for (int i = 0; i < item_count; i++) {
     if (!strcmp(inventory[i]->key, itemName)) {
-      return true;
+      return i;
     }
   }
-  return false;
+  return FIND_FAIL;
 }
