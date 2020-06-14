@@ -37,7 +37,16 @@ static void rehash(symbol_table *s) {
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
-  return h->symbols[hash(s, name)][0];
+  int index1 = hash(s, entry->name);
+  int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
+  if (size > 1) {
+    for (int i = 0; i < size; i++) {
+      if (s->symbols[index1][i].name == name) {
+        return s->symbols[index1][i];
+      }
+    }
+  }
+  return s->symbols[index1][0];
 }
 
 void addSymbol(symbol_table *s, symbol *entry) {
@@ -45,8 +54,17 @@ void addSymbol(symbol_table *s, symbol *entry) {
     // label already defined
     return;
   }
-  // TODO: collision code to be implemented
-  s->symbols[hash(s, entry->name)][0] = entry;
+  int index1 = hash(s, entry->name);
+  int index2 = 0;
+  int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
+  if (size > 1) {
+    s->symbols[index1] =
+        realloc(s->symbols[index1], sizeof(*s->symbols[index1]) * (++size));
+    validatePtr(s->symbols[index1], "Not enough memory.");
+    index2 = size - 1;
+  }
+  s->symbols[index1][index2] = entry;
+  s->symbolCount++;
 }
 
 void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
@@ -57,6 +75,7 @@ void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
 
 void freeList(symbol *symbols, int size) {
   for (int i = 0; i < size; i++) {
+    free(symbols[i].name);
     free(symbols[i]);
   }
   free(symbols);
