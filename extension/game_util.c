@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ROOM_POSITION_NUMBER (5)
+
 // shows player their inventory of items
 void view_inventory() {}
 
@@ -37,13 +39,21 @@ void connectRoom(room_t *first, room_t *second) {
   first->adjacent_room_count++;
 }
 
+// connects all room positions to center room position r5
+void connectRoomPositions(room_t *r1,room_t *r2,room_t *r3,room_t *r4,room_t *r5){
+  room_t *roomArray[ROOM_POSITION_NUMBER -1] = {r1,r2,r3,r4};
+  for(int i = 0 ; i< ROOM_POSITION_NUMBER -1; i++){
+    connectRoom(roomArray[i], r5);
+  }
+}
+
 // initialises room
-room_t *initialiseRoom(room_name current_room) {
+room_t *initialiseRoom(room_name current_room, room_position initial_position) {
   // allocates memory to room and adjacent room array
   room_t *room = malloc(sizeof(*room));
 
   room->current_room = current_room;
-  room->position = 0;
+  room->position = initial_position;
 
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
@@ -62,11 +72,11 @@ building_t *initialiseBuilding() {
   huxley->start_room = malloc(sizeof(room_t));
   assert(huxley->start_room);
   // initialises all the rooms within the building
-  room_t *lobby = initialiseRoom(LOBBY);
-  room_t *lab = initialiseRoom(LAB);
-  room_t *fusion = initialiseRoom(FUSION);
-  room_t *lectureHall = initialiseRoom(LECTURE_HALL);
-  room_t *harrods = initialiseRoom(HARRODS);
+  room_t *lobby = initialiseRoom(LOBBY, SOUTH);
+  room_t *lab = initialiseRoom(LAB, SOUTH);
+  room_t *fusion = initialiseRoom(FUSION, SOUTH);
+  room_t *lectureHall = initialiseRoom(LECTURE_HALL, SOUTH);
+  room_t *harrods = initialiseRoom(HARRODS, SOUTH);
 
   // connecting rooms which link to each other
   connectRoom(lobby, lab);

@@ -11,7 +11,7 @@
 #define CLEAR ("clear")
 
 // enum for position in rooms
-typedef enum { EAST, WEST, NORTH, SOUTH } room_position;
+typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } room_position;
 
 // enum for items stored by person in inventory with respective cost
 typedef enum {
