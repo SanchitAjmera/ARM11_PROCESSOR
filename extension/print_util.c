@@ -52,37 +52,24 @@ bool containsRoom(room_t *printedRooms[4], int size, room_t *room) {
   return false;
 }
 
-void printBuildingDetails(building_t *huxley) {
-  room_t *printedRooms[ROOM_COUNT];
-  int size = 1;
-  room_t *room = huxley->start_room;
-  printedRooms[0] = room;
-  for (int i = 0; i < room->adjacent_room_count; i++) {
-    if (!containsRoom(printedRooms, size, room->adjacent_rooms[i])) {
-      printedRooms[size] = (room->adjacent_rooms[i]);
-      size++;
-    }
-  }
-
-  for (int i = 0; i < ROOM_COUNT; i++) {
-    printRoomDetails(printedRooms[i]);
-    printf("\n");
-  }
-}
-
-void print(room_t *entranceRoom, room_t *room1) {
+// traverses through all rooms and applies function pointer to each room
+void roomTraverser(room_t *entranceRoom, room_t *room1,
+                   void (*funcRooms)(room_t *)) {
   if (room1 == NULL) {
     return;
   }
   if (room1->adjacent_rooms != NULL) {
     for (int i = 0; i < room1->adjacent_room_count; i++) {
       if (room1->adjacent_rooms[i] != entranceRoom) {
-        print(room1, room1->adjacent_rooms[i]);
+        roomTraverser(room1, room1->adjacent_rooms[i], funcRooms);
       }
     }
   }
-  printRoomDetails(room1);
+  (*funcRooms)(room1);
   printf("\n");
 }
 
-void printBuilding(building_t *huxley) { print(NULL, huxley->start_room); }
+// prints details of all rooms in the building
+void printBuildingDetails(building_t *huxley) {
+  roomTraverser(NULL, huxley->start_room, printRoomDetails);
+}
