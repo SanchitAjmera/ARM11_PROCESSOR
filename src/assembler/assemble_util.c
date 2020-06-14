@@ -37,9 +37,11 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
         char *label = strtok(line, ":");
-        symbol labelSymbol = {strptr(label), LABEL,
-                              .body.address =
-                                  output->lineCount * WORD_SIZE_BYTES};
+        symbol *labelSymbol = malloc(sizeof(*labelSymbol));
+        validatePtr(labelSymbol, "NULL pointer.");
+        symbol temp = {strptr(label), LABEL,
+                       .body.address = output->lineCount * WORD_SIZE_BYTES};
+        *labelSymbol = temp;
         addSymbol(symbolTable, labelSymbol);
         isLabel = true;
         break;                     // Line contains only one label
@@ -65,7 +67,10 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   for (int i = 0; i < expressions->lineCount; i++) {
     char *expr = expressions->lines[i];
     word address = (output->lineCount + i) * WORD_SIZE_BYTES;
-    symbol exprSymbol = {strptr(expr), LABEL, .body.address = address};
+    symbol *exprSymbol = malloc(sizeof(*exprSymbol));
+    validatePtr(exprSymbol, "Null pointer.");
+    symbol temp = {strptr(expr), LABEL, .body.address = address};
+    *exprSymbol = temp;
     addSymbol(symbolTable, exprSymbol);
   }
 
@@ -191,7 +196,7 @@ including registers with shifts attached */
 static word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
   if (args < SHIFT_NO_ARGS) {
-    // No shift type/ shift of 0
+    // No shift type - shift of 0
     return rm;
   }
   Shift shiftType = parseShiftType(op2[1]);
