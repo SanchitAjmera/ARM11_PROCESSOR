@@ -8,8 +8,8 @@
 // dummy function
 void validatePtr(void *pointer, const char *) {}
 
-passive_t *createPassive(const char **questions, const char **answers,
-                         int num) {
+static passive_t *createPassive(const char **questions, const char **answers,
+                                int num) {
   passive_t *passive = malloc(sizeof(*passive));
   NULL_POINTER(passive);
   NULL_POINTER(questions);
@@ -20,7 +20,7 @@ passive_t *createPassive(const char **questions, const char **answers,
 }
 
 // function to create and initialise a pointer to boss_t on the heap
-boss_t *initBoss(const char *name) {
+static boss_t *initBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
   NULL_POINTER(boss);
   NULL_POINTER(name);
@@ -38,7 +38,7 @@ boss_t *createBoss(const char *name) {
   boss->teaching = createPassive(table.questions, table.answers, MAX_QUESTIONS);
 }
 
-void freeBossFighting(aggressive_t *aggressive) {
+static void freeBossFighting(aggressive_t *aggressive) {
   if (aggressive == NULL) {
     return;
   }
@@ -47,7 +47,7 @@ void freeBossFighting(aggressive_t *aggressive) {
   free(aggressive);
 }
 
-void freeBossTeaching(passive_t *passive) {
+static void freeBossTeaching(passive_t *passive) {
   if (passive == NULL) {
     return;
   }
@@ -67,7 +67,7 @@ void freeBoss(boss_t *boss) {
   free(boss);
 }
 
-void initBattle(boss_t *boss, player_t *player) {
+static void initBattle(boss_t *boss, player_t *player) {
   boss->isPassive = false;
   freeBossTeaching(boss->teaching);
   boss->fighting = malloc(sizeof(*boss->fighting));
@@ -77,12 +77,12 @@ void initBattle(boss_t *boss, player_t *player) {
 }
 
 // takes in the user's input for the answer
-char *getAnswer(void) {
+static char *getAnswer(void) {
   // TODO: get answer from user as input
   printf(">");
 }
 
-void processResult(boss_t *boss, player_t *player) {
+static void processResult(boss_t *boss, player_t *player) {
   // TODO: special KGK case
   printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
   if (pass) {
