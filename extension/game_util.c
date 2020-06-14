@@ -9,6 +9,12 @@
 
 #define ROOM_POSITION_NUMBER (5)
 #define TOTAL_ITEM_COUNT (10)
+#define CASH_ITEM_INDEX (4)
+#define APPLE_ITEM_INDEX (0)
+#define KEYBOARD_ITEM_INDEX (1)
+#define MOUSE_ITEM_INDEX (2)
+#define MONITOR_ITEM_INDEX (3)
+#define PASS_ITEM_INDEX (5)
 // shows player their inventory of items
 void view_inventory() {}
 
@@ -75,25 +81,25 @@ building_t *initialiseBuilding() {
 
   // initialise items to put in rooms
   // initilaising 5 game apples
-  item_t apple1 = gameItems[0];
-  item_t apple2 = gameItems[0];
-  item_t apple3 = gameItems[0];
-  item_t apple4 = gameItems[0];
-  item_t apple5 = gameItems[0];
+  item_t apple1 = gameItems[APPLE_ITEM_INDEX];
+  item_t apple2 = gameItems[APPLE_ITEM_INDEX];
+  item_t apple3 = gameItems[APPLE_ITEM_INDEX];
+  item_t apple4 = gameItems[APPLE_ITEM_INDEX];
+  item_t apple5 = gameItems[APPLE_ITEM_INDEX];
   // initialising 5 game cash bundles
-  item_t cash1 = gameItem[4];
-  item_t cash1 = gameItem[4];
-  item_t cash1 = gameItem[4];
-  item_t cash1 = gameItem[4];
-  item_t cash1 = gameItem[4];
+  item_t cash1 = gameItem[CASH_ITEM_INDEX];
+  item_t cash2 = gameItem[CASH_ITEM_INDEX];
+  item_t cash3 = gameItem[CASH_ITEM_INDEX];
+  item_t cash4 = gameItem[CASH_ITEM_INDEX];
+  item_t cash5 = gameItem[CASH_ITEM_INDEX];
   // initialising keyboard
-  item_t keyboard = gameItem[1];
+  item_t keyboard = gameItem[KEYBOARD_ITEM_INDEX];
   // initialising mouse
-  item_t mouse = gameItem[2];
+  item_t mouse = gameItem[MOUSE_ITEM_INDEX];
   // initialing monitor
-  item_t monitor = gameItem[3];
+  item_t monitor = gameItem[MONITOR_ITEM_INDEX];
   // initialising pass to lab
-  item_t pass = gameItem[5];
+  item_t pass = gameItem[PASS_ITEM_INDEX];
   // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
   room_t *lobbyEast = initialiseRoom(LOBBY, EAST);
