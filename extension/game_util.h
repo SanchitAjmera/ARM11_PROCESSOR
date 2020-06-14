@@ -10,7 +10,7 @@
 #define MAX_ROOM_HISTORY (5)
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
-#define PROPERTY_NUM (4)
+#define ITEM_NUM (5)
 #define LOOKUP_FAILURE (NULL)
 
 // enum for items stored by person in inventory
