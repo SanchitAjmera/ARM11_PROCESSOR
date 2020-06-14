@@ -37,20 +37,30 @@ boss_t *createBoss(const char *name) {
   NULL_POINTER(boss);
   NULL_POINTER(name);
   boss->name = name;
+  // defaults to true
   boss->isPassive = true;
   boss->teaching = NULL;
 }
 
 void freeBossFighting(aggressive_t *aggressive) {
+  if (aggressive == NULL) {
+    return;
+  }
   free(attackName);
   free(specialName);
   free(aggressive);
 }
 
 void freeBossTeaching(passive_t *passive) {
-  // TODO: fix logical error
-  free(questions);
-  free(answers);
+  if (passive == NULL) {
+    return;
+  }
+  for (int i = 0; i < passive->num; i++) {
+    free(passive->questions[i]);
+    free(passive->answers[i]);
+  }
+  free(passive->questions);
+  free(passive->answers);
   free(passive);
 }
 
@@ -63,8 +73,8 @@ void freeBoss(boss_t *boss) {
 
 boss_t *createKGK(void) {
   boss_t *kgk = createBoss("Konstantinos");
-  kgk->teaching->questions = kgkQuestions;
-  kgk->teaching->answers = kgkAnswers;
+  kgk->teaching = createPassive(kgkQuestions, kgkAnswers, KGK_SIZE);
+  return kgk;
 }
 
 // function to start the quiz on assembly code
