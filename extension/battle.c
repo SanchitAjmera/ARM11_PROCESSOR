@@ -1,12 +1,6 @@
 #include "boss.h"
 #include <stdio.h>
 
-// function to start the battle with the boss
-void battle(boss_t *boss, player_t *player) {
-  // PRE: boss->fighting has been initialised
-  // TODO: turn based combat against the player
-}
-
 // determines if the game is finished
 bool gameOver(boss_t *boss, player_t *player) {
   return boss->fighting->health <= 0;
@@ -30,9 +24,14 @@ void attackPlayer(boss_t *boss, player_t *player, int damage,
   printAttack(boss->name, damage, attackName);
 }
 
+// to display battle options to user
+void printPlayer(player_t *player) {
+  // // TODO: @Luqman to code...
+}
+
 // player's turn in battle
 void playerTurn(boss_t *boss, player_t *player) {
-  // TODO: let them choose a form of attack
+  // TODO: @Luqman to code...
 }
 
 // boss's turn in battle
@@ -46,5 +45,12 @@ void bossTurn(boss_t *boss, player_t *player) {
                boss->fighting->attackName);
 }
 
-// to display battle options to user
-void printPlayer(player_t *player) {}
+// function to start the battle with the boss
+void battle(boss_t *boss, player_t *player) {
+  // PRE: boss->fighting has been initialised
+  // TODO: turn based combat against the player
+  while (!gameOver(boss, player)) {
+    playerTurn(boss, player);
+    bossTurn(boss, player);
+  }
+}
