@@ -14,6 +14,7 @@
 #define LOOKUP_FAILURE (NULL)
 #define INITIAL_CASH (0)
 #define MAX_HEALTH (100)
+#define FIND_FAIL (-1)
 
 // enum for items stored by person in inventory
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } Item;
@@ -62,7 +63,7 @@ typedef struct {
 
 typedef struct {
   player_t player;
-  room_t curr_room_node; // struct for room_t structure
+  room_t *curr_room_node; // struct for room_t structure
 
   struct {
     char *username;
