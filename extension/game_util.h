@@ -11,38 +11,38 @@
 #define CLEAR ("clear")
 
 // enum for position in rooms
-typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } room_position;
+typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
 
-// enum for items stored by person in inventory with respective cost
+// enum for Items stored by person in inventory with respective cost
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
 typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
 
 // enum for room
-typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } room_name;
+typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 
 // enum for character type
 typedef enum { BATMAN, UTA } character;
 
-// struct for items and their properties
-typedef struct item_t {
+// struct for Items and their properties
+typedef struct Item_t {
   char *key;
-  item name;
-  property *properties;
+  Item name;
+  Property properties;
   char *description;
-} item_t;
+} Item_t;
 
 // structure for rooms
 // valid for non cyclical room structure
 typedef struct room_t {
-  room_name current_room;
+  RoomName current_room;
   struct room_t **adjacent_rooms;
-  room_position position;
+  RoomPosition position;
   int adjacent_room_count;
   char *description;
-  item_t **items;
-  int item_count;
+  Item_t **Items;
+  int Item_count;
 
 } room_t;
 
@@ -52,7 +52,7 @@ typedef struct building_t {
 } building_t;
 
 typedef struct {
-  item_t *inventory;
+  Item_t *inventory;
   int cash;
   int health;
   room_t curr_room_node; // struct for room_t structure
@@ -62,10 +62,10 @@ typedef struct {
     character character;
   } profile;
 
-  room_name room_history[MAX_ROOM_HISTORY];
+  RoomName room_history[MAX_ROOM_HISTORY];
 } state;
 
-static const item_t gameItems[] = {
+static const Item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
     {"keyboard", KEYBOARD, THROWABLE,
      "A keyboard. A programmer's best friend."},

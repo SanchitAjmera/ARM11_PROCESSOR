@@ -7,15 +7,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ITEM_COUNT (10)
+#define RoomPosition_NUMBER (5)
+#define TOTAL_Item_COUNT (10)
 #define CASH_ITEM_INDEX (4)
 #define APPLE_ITEM_INDEX (0)
 #define KEYBOARD_ITEM_INDEX (1)
 #define MOUSE_ITEM_INDEX (2)
 #define MONITOR_ITEM_INDEX (3)
 #define PASS_ITEM_INDEX (5)
-// shows player their inventory of items
+// shows player their inventory of Items
 void view_inventory() {}
 
 // shows player their character and username
@@ -48,14 +48,24 @@ void connectRoom(room_t *first, room_t *second) {
 // connects all room positions to center room position r5
 void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
                           room_t *r5) {
-  room_t *roomArray[ROOM_POSITION_NUMBER - 1] = {r1, r2, r3, r4};
-  for (int i = 0; i < ROOM_POSITION_NUMBER - 1; i++) {
+  room_t *roomArray[RoomPosition_NUMBER - 1] = {r1, r2, r3, r4};
+  for (int i = 0; i < RoomPosition_NUMBER - 1; i++) {
     connectRoom(roomArray[i], r5);
   }
 }
 
+// initialese Items
+Item_t *initialiseItem(Item_t gameItem) {
+  Item_t *item = malloc(sizeof(*item));
+  item->key = gameItem.key;
+  item->name = gameItem.name;
+  item->properties = gameItem.properties;
+  item->description = gameItem.description;
+  return item;
+}
+
 // initialises room
-room_t *initialiseRoom(room_name current_room, room_position initial_position) {
+room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   // allocates memory to room and adjacent room array
   room_t *room = malloc(sizeof(*room));
 
@@ -65,9 +75,9 @@ room_t *initialiseRoom(room_name current_room, room_position initial_position) {
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
   assert(room->adjacent_rooms);
-  room->item_count = 0;
-  room->items = malloc(sizeof(item_t) * 10);
-  assert(room->items);
+  room->Item_count = 0;
+  room->Items = malloc(sizeof(Item_t) * 10);
+  assert(room->Items);
   return room;
 }
 
@@ -79,28 +89,27 @@ building_t *initialiseBuilding() {
   huxley->start_room = malloc(sizeof(room_t));
   assert(huxley->start_room);
 
-  // initialise items to put in rooms
+  // initialise Items to put in rooms
   // initilaising 5 game apples
-  item_t apple1 = gameItems[APPLE_ITEM_INDEX];
-  item_t apple2 = gameItems[APPLE_ITEM_INDEX];
-  item_t apple3 = gameItems[APPLE_ITEM_INDEX];
-  item_t apple4 = gameItems[APPLE_ITEM_INDEX];
-  item_t apple5 = gameItems[APPLE_ITEM_INDEX];
+  Item_t *apple1, *apple2, *apple3, *apple4,
+      *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple1, *apple2, *apple3, *apple4,
+      *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   // initialising 5 game cash bundles
-  item_t cash1 = gameItem[CASH_ITEM_INDEX];
-  item_t cash2 = gameItem[CASH_ITEM_INDEX];
-  item_t cash3 = gameItem[CASH_ITEM_INDEX];
-  item_t cash4 = gameItem[CASH_ITEM_INDEX];
-  item_t cash5 = gameItem[CASH_ITEM_INDEX];
-  // initialising keyboard
-  item_t keyboard = gameItem[KEYBOARD_ITEM_INDEX];
-  // initialising mouse
-  item_t mouse = gameItem[MOUSE_ITEM_INDEX];
-  // initialing monitor
-  item_t monitor = gameItem[MONITOR_ITEM_INDEX];
-  // initialising pass to lab
-  item_t pass = gameItem[PASS_ITEM_INDEX];
-  // initialises all the rooms within the building
+  /*  Item_t *cash1 = gameItems[CASH_Item_INDEX];
+    Item_t *cash2 = gameItems[CASH_Item_INDEX];
+    Item_t *cash3 = gameItems[CASH_Item_INDEX];
+    Item_t *cash4 = gameItems[CASH_Item_INDEX];
+    Item_t *cash5 = gameItems[CASH_Item_INDEX];
+    // initialising keyboard
+    Item_t *keyboard = gameItems[KEYBOARD_Item_INDEX];
+    // initialising mouse
+    Item_t *mouse = gameItems[MOUSE_Item_INDEX];
+    // initialing monitor
+    Item_t *monitor = gameItems[MONITOR_Item_INDEX];
+    // initialising pass to lab
+    Item_t *pass = gameItems[PASS_Item_INDEX];
+    */ // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
   room_t *lobbyEast = initialiseRoom(LOBBY, EAST);
   room_t *lobbyWest = initialiseRoom(LOBBY, WEST);
@@ -169,9 +178,9 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     free(room1->adjacent_rooms);
   }
 
-  if (room1->items != NULL) {
-    for (int i = 0; i < room1->item_count; i++) {
-      free(room1->items[i]);
+  if (room1->Items != NULL) {
+    for (int i = 0; i < room1->Item_count; i++) {
+      free(room1->Items[i]);
     }
   }
 
