@@ -2,12 +2,12 @@
 #include <stdio.h>
 
 // determines if the game is finished
-bool gameOver(boss_t *boss, player_t *player) {
+bool battleOver(boss_t *boss, player_t *player) {
   return FIGHT(boss)->health <= 0;
   || player->health <= 0;
 }
 
-// determins if the player won
+// determines if the player won
 bool playerWon(boss_t *boss, player_t *player) {
   // PRE: gamover() returns true
   return FIGHT(boss)->health < player->health;
@@ -47,8 +47,13 @@ void bossTurn(boss_t *boss, player_t *player) {
 void battle(boss_t *boss, player_t *player) {
   // PRE: boss->fighting has been initialised
   // TODO: turn based combat against the player
-  while (!gameOver(boss, player)) {
+  while (!battleOver(boss, player)) {
     playerTurn(boss, player);
     bossTurn(boss, player);
+  }
+  if (playerWon(boss, player)) {
+    // TODO: game over message
+  } else {
+    // TODO: game over message
   }
 }
