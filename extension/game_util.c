@@ -40,6 +40,8 @@ room_t *initialiseRoom(room_name current_room) {
   room->current_room = current_room;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
   room->adjacent_room_count = 0;
+  room->item_count = 0;
+  room->items = malloc(sizeof(item_t) * 10);
   return room;
 }
 

@@ -35,6 +35,8 @@ typedef struct room_t {
   struct room_t **adjacent_rooms;
   int adjacent_room_count;
   char *description;
+  item_t **items;
+  int item_count;
 } room_t;
 
 // structure for building consisting of room_history
