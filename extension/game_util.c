@@ -210,7 +210,9 @@ building_t *initialiseBuilding() {
   randomlyPlaceItems(itemArray, roomArray);
 
   huxley->start_room = lobbySouth;
-  //  free(itemArray);
+  for (int i = 0; i < TOTAL_ITEM_COUNT; i++) {
+    free(itemArray[i]);
+  }
   //  free(roomArray);
   return huxley;
 }
