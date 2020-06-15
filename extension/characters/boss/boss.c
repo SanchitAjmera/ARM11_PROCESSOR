@@ -20,8 +20,8 @@ lookupBoss_t lookup(const char *name) {
   return NULL;
 }
 
-static passive_t *createPassive(const char **questions, const char **answers,
-                                int num) {
+passive_t *createPassive(const char **questions, const char **answers,
+                         int num) {
   passive_t *passive = malloc(sizeof(*passive));
   NULL_POINTER(passive);
   NULL_POINTER(questions);
@@ -32,7 +32,7 @@ static passive_t *createPassive(const char **questions, const char **answers,
 }
 
 // function to create and initialise a pointer to boss_t on the heap
-static boss_t *initBoss(const char *name) {
+boss_t *initBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
   NULL_POINTER(boss);
   NULL_POINTER(name);
@@ -54,7 +54,7 @@ boss_t *createBoss(const char *name) {
   return boss;
 }
 
-static void freeBossFighting(aggressive_t *aggressive) {
+void freeBossFighting(aggressive_t *aggressive) {
   if (aggressive == NULL) {
     return;
   }
@@ -63,7 +63,7 @@ static void freeBossFighting(aggressive_t *aggressive) {
   free(aggressive);
 }
 
-static void freeBossTeaching(passive_t *passive) {
+void freeBossTeaching(passive_t *passive) {
   if (passive == NULL) {
     return;
   }
@@ -83,7 +83,7 @@ void freeBoss(boss_t *boss) {
   free(boss);
 }
 
-static void initBattle(boss_t *boss, player_t *player) {
+void initBattle(boss_t *boss, player_t *player) {
   boss->isPassive = false;
   freeBossTeaching(boss->teaching);
   boss->fighting = malloc(sizeof(*boss->fighting));
@@ -98,7 +98,7 @@ static char *getAnswer(void) {
   printf(">");
 }
 
-static void processResult(boss_t *boss, player_t *player) {
+void processResult(boss_t *boss, player_t *player) {
   // TODO: special KGK case
   printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
   if (pass) {
