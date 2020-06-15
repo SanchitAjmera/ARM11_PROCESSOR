@@ -4,8 +4,8 @@
 #include <string.h>
 
 /* Takes in a string and returns a pointer to that string on heap */
-char *strptr(char *in) {
-  char *out = malloc(sizeof(char) * (strlen(in)) + 1);
+char *strptr(const char *in) {
+  char *out = malloc(sizeof(char) * (strlen(in) + 1));
   strcpy(out, in);
   return out;
 }
