@@ -7,8 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define RoomPosition_NUMBER (5)
-#define TOTAL_Item_COUNT (10)
+#define ROOM_POSITION_NUMBER (5)
+#define TOTAL_ITEM_COUNT (14)
+#define TOTAL_APPLE_COUNT (5)
+#define TOTAL_CASH_COUNT (5)
+#define TOTAL_ROOM_COUNT (25)
 #define CASH_ITEM_INDEX (4)
 #define APPLE_ITEM_INDEX (0)
 #define KEYBOARD_ITEM_INDEX (1)
@@ -34,6 +37,37 @@ void quit() {}
 // displays introduction to player
 void introduction() {}
 
+// generates array of random numbers of length n
+void randomiseArray(int *randArray, int length, int randMax) {
+  for (int i = 0; i < length; i++) {
+    randArray[i] = rand() % randMax;
+  }
+}
+
+// randomly places items in room
+void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
+  int randomCashLocations[TOTAL_CASH_COUNT],
+      randomAppleLocations[TOTAL_APPLE_COUNT];
+  // array for random locations of apples and cash
+  randomiseArray(*randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
+  randomiseArray(*randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
+  // dynamically addes apple and cash items into random rooms
+  for (int i = 0; i < 5; i++) {
+    rooms[randomCashLocations[i]]
+        ->Items[rooms[randomCashLocations[i]]->Item_count] = items[i];
+    rooms[randomAppleLocations[i]]
+        ->Items[rooms[randomAppleLocations[i]]->Item_count] = items[i + 5];
+  }
+  // 4 IS THE NUMBER OF OTHER ITEMS APART FROM CASH & APPLES
+  // added other items randomly around lobby
+  int randomOtherItemLocations[4];
+  ramdomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_COUNT);
+  for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
+    rooms[randomOtherItemLocations[i - 10]]
+        ->Items[rooms[randomOtherItemLocations]->Item_count] = items[i];
+  }
+}
+
 // connects first room to second room
 void connectRoom(room_t *first, room_t *second) {
   // assigns room to each other's adjacent rooms array
@@ -48,8 +82,8 @@ void connectRoom(room_t *first, room_t *second) {
 // connects all room positions to center room position r5
 void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
                           room_t *r5) {
-  room_t *roomArray[RoomPosition_NUMBER - 1] = {r1, r2, r3, r4};
-  for (int i = 0; i < RoomPosition_NUMBER - 1; i++) {
+  room_t *roomArray[ROOM_POSITION_NUMBER - 1] = {r1, r2, r3, r4};
+  for (int i = 0; i < ROOM_POSITION_NUMBER - 1; i++) {
     connectRoom(roomArray[i], r5);
   }
 }
@@ -152,6 +186,21 @@ building_t *initialiseBuilding() {
   connectRoom(lobbyNorth, lectureHallSouth);
   connectRoom(lobbyNorth, fusionSouth);
   connectRoom(fusionNorth, harrodsSouth);
+
+  room_t *roomArray[TOTAL_ROOM_COUNT] = {
+      lobbySouth,      lobbyEast,        lobbyWest,        lobbyNorth,
+      lobbyCentre,     labEast,          labNorth,         labWest,
+      labSouth,        labCentre,        fusionNorth,      fusionEast,
+      fusionWest,      fusionSouth,      fusionCentre,     lectureHallEast,
+      lectureHallWest, lectureHallNorth, lectureHallSouth, lectureHallCentre,
+      harrodsSouth,    harrodsEast,      harrodsWest,      harrodsCentre,
+      harrodsNorth
+
+  };
+
+  item_t *itemArray[TOTAL_ITEM_COUNT] = {
+      cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
+      apple3, apple4, apple5, keyboard, mouse, monitor, pass};
 
   huxley->start_room = lobbySouth;
 
