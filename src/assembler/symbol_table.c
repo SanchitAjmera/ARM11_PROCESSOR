@@ -10,7 +10,7 @@
 symbol_table *newSymbolTable() {
   symbol_table *s = malloc(sizeof(symbol_table));
   assert(s != NULL);
-  symbol *symbols = malloc(INIT_S_TABLE_SIZE * sizeof(symbol));
+  symbol *symbols = calloc(INIT_S_TABLE_SIZE, sizeof(symbol));
   assert(symbols != NULL);
   s->symbols = symbols;
   s->maxSymbols = INIT_S_TABLE_SIZE;
