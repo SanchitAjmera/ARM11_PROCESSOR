@@ -40,6 +40,9 @@ typedef enum { BATMAN, UTA } Character;
 // enum for menu choices
 typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
 
+// enum for supported commands
+typedef enum { EXIT, PICKUP, DROP, BUY, MOVE } Commands;
+
 // generic (string, enum) struct for lookups
 typedef struct {
   char *key;
@@ -97,6 +100,7 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"throwable", THROWABLE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
+
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
