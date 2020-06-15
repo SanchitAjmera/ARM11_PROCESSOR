@@ -196,19 +196,19 @@ building_t *initialiseBuilding() {
   connectRoom(fusionNorth, harrodsSouth);
 
   cash1->dummy = 1;
-  cash2->dummy = 1;
-  cash3->dummy = 1;
-  cash4->dummy = 1;
-  cash5->dummy = 1;
-  apple1->dummy = 1;
-  apple2->dummy = 1;
-  apple3->dummy = 1;
-  apple4->dummy = 1;
-  apple5->dummy = 1;
-  keyboard->dummy = 1;
-  mouse->dummy = 1;
-  monitor->dummy = 1;
-  pass->dummy = 1;
+  cash2->dummy = 2;
+  cash3->dummy = 3;
+  cash4->dummy = 4;
+  cash5->dummy = 5;
+  apple1->dummy = 6;
+  apple2->dummy = 7;
+  apple3->dummy = 8;
+  apple4->dummy = 9;
+  apple5->dummy = 10;
+  keyboard->dummy = 11;
+  mouse->dummy = 12;
+  monitor->dummy = 13;
+  pass->dummy = 14;
 
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
       lobbySouth,      lobbyEast,        lobbyWest,        lobbyNorth,
