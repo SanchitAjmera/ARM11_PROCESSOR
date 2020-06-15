@@ -1,0 +1,14 @@
+This is the format the save file will have (it's a binary file, so no newlines):
+
+<state struct>
+<player_t struct>
+for each item in player's inventory:
+  <Item enum>
+  <int item's hash>
+<RoomName enum>
+<RoomPosition enum>
+for each room in the game:
+  <int ItemCount>
+  for each item in the room:
+    <Item enum>
+    <int item's hash>
