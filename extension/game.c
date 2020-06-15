@@ -13,11 +13,17 @@ void getCommand(char *command, char *argument) {
   printf(" >> ");
   fgets(input, sizeof(input), stdin);
 
-  command = strtok(input, " ");
-  argument = strtok(NULL, " ");
+  // obtain user input
+  char *comm = strtok(input, " ");
+  char *arg = strtok(NULL, " ");
 
-  lowercase(command);
-  lowercase(argument);
+  // comm = lowercase(command);
+  // arg = lowercase(argument);
+
+  strcpy(command, comm);
+  if (arg) {
+    strcpy(argument, arg);
+  }
 }
 
 void playGame(state *currentState) {
