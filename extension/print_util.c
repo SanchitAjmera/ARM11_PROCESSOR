@@ -453,8 +453,7 @@ void printRoomPosition(room_t *room) {
 void printItemDetails(room_t *room) {
   if (room->Items != NULL) {
     for (int i = 0; i < room->Item_count; i++) {
-      printf("%s %d", room->Items[i]->key, room->Items[i]->dummy);
-      printf(" ");
+      printf("%s ", room->Items[i]->key);
     }
     printf("\n");
   }
