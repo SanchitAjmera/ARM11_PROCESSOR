@@ -450,7 +450,7 @@ void printRoomPosition(room_t *room) {
   }
 }
 
-void printItemDetails(Item_t **items, int itemCount) {
+void printItemDetails(item_t **items, int itemCount) {
   if (items != NULL) {
     for (int i = 0; i < itemCount; i++) {
       printf("%s ", items[i]->key);
@@ -537,7 +537,7 @@ void printStateDetails(state *state1) {
   printf("Health: %d\n", state1->player->health);
   printf("Cash: %d\n", state1->player->cash);
   printf("Items in inventory: ");
-  printItemDetails(state1->player->inventory, state1->player->ItemCount);
+  printItemDetails(state1->player->inventory, state1->player->itemCount);
   printf("currently in room: ");
   printRoomDetails(state1->curr_room_node);
 }

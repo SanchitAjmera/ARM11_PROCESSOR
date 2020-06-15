@@ -1,4 +1,4 @@
-#include "boss.h"
+#include "../characters/boss/boss.h"
 #include <stdio.h>
 
 // determines if the game is finished

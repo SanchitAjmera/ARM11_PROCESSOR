@@ -1,4 +1,4 @@
-#include "game_utils.h"
+#include "../../game_util.h"
 
 // need ptr checks
 player_t *initialisePlayer() {

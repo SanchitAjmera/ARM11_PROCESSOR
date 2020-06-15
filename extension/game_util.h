@@ -1,4 +1,4 @@
-#include "player.h"
+#include "characters/player/player.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -29,7 +29,7 @@ typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
 
 // enum for room
-typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } Room_name;
+typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 
 // enum for character type
 typedef enum { BATMAN, UTA } Character;
@@ -99,7 +99,8 @@ static const item_t gameItems[] = {
     {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days."},
     {"monitor", MONITOR, THROWABLE,
      "A monitor. Can't see your seg faults without it!"},
-    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."}};
+    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
+    {"pass", PASS, THROWABLE, "You shall not pass"}};
 
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
