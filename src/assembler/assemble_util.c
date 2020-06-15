@@ -409,6 +409,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     // check if expression can fit inside a mov function
     if (parseImmediate(input.fields[1] + 1) <= SDTI_EXP_BOUND) {
       input.opcode = "mov";
+      free(addresses);
       return assembleDPI(symbolTable, input);
     } else {
       // offset
