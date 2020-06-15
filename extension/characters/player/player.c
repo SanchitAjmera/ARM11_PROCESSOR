@@ -39,7 +39,7 @@ char *getPropertyStr(Property property) {
 }
 
 void printProperties(state *currentState, char *itemName) {
-  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   if (!item || !currentState->player->inventory[item->name]) {
     printf("%s is not in your inventory!\n", itemName);
     return;
@@ -71,7 +71,7 @@ int findItem(item_t **inventory, int item_count, char *itemName) {
 }
 
 bool pickUpItem(state *currentState, char *itemName) {
-  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   if (!item || !currentState->curr_room_node->items[item->name]) {
     printf("This item could not be found here!\n");
     return false;
@@ -89,7 +89,7 @@ bool pickUpItem(state *currentState, char *itemName) {
 }
 
 bool dropItem(state *currentState, char *itemName) {
-  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   if (!item || !currentState->player->inventory[item->name]) {
     printf("You do not have this item to drop: %s\n", itemName);
     return false;
