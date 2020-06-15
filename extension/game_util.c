@@ -8,16 +8,17 @@
 #include <string.h>
 
 #define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ITEM_COUNT (14)
+#define TOTAL_ItemCount (14)
 #define TOTAL_APPLE_COUNT (5)
 #define TOTAL_CASH_COUNT (5)
 #define TOTAL_ROOM_COUNT (25)
-#define CASH_ITEM_INDEX (4)
-#define APPLE_ITEM_INDEX (0)
-#define KEYBOARD_ITEM_INDEX (1)
-#define MOUSE_ITEM_INDEX (2)
-#define MONITOR_ITEM_INDEX (3)
-#define PASS_ITEM_INDEX (5)
+#define CASH_Item_INDEX (4)
+#define APPLE_Item_INDEX (0)
+#define KEYBOARD_Item_INDEX (1)
+#define MOUSE_Item_INDEX (2)
+#define MONITOR_Item_INDEX (3)
+#define PASS_Item_INDEX (5)
+
 // shows player their inventory of Items
 void view_inventory() {}
 
@@ -44,30 +45,30 @@ void randomiseArray(int randArray[], int length, int randMax) {
   }
 }
 
-// randomly places items in room
-void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
+// randomly places Items in room
+void randomlyPlaceItems(Item_t *Items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
   int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
   // array for random locations of apples and cash
   randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
   randomiseArray(randomCashLocations, TOTAL_CASH_COUNT, TOTAL_ROOM_COUNT);
-  // dynamically addes apple and cash items into random rooms
+  // dynamically addes apple and cash Items into random rooms
   for (int i = 0; i < 5; i++) {
     rooms[randomCashLocations[i]]
-        ->Items[rooms[randomCashLocations[i]]->Item_count] = items[i];
-    rooms[randomCashLocations[i]]->Item_count++;
+        ->Items[rooms[randomCashLocations[i]]->ItemCount] = Items[i];
+    rooms[randomCashLocations[i]]->ItemCount++;
     rooms[randomAppleLocations[i]]
-        ->Items[rooms[randomAppleLocations[i]]->Item_count] = items[i + 5];
-    rooms[randomAppleLocations[i]]->Item_count++;
+        ->Items[rooms[randomAppleLocations[i]]->ItemCount] = Items[i + 5];
+    rooms[randomAppleLocations[i]]->ItemCount++;
   }
-  // 4 IS THE NUMBER OF OTHER ITEMS APART FROM CASH & APPLES
-  // added other items randomly around lobby
+  // 4 IS THE NUMBER OF OTHER ItemS APART FROM CASH & APPLES
+  // added other Items randomly around lobby
   int *randomOtherItemLocations = malloc(sizeof(int) * 4);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
-  for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
+  for (int i = 10; i < TOTAL_ItemCount; i++) {
     rooms[randomOtherItemLocations[i - 10]]
-        ->Items[rooms[randomOtherItemLocations[i - 10]]->Item_count] = items[i];
-    rooms[randomOtherItemLocations[i - 10]]->Item_count++;
+        ->Items[rooms[randomOtherItemLocations[i - 10]]->ItemCount] = Items[i];
+    rooms[randomOtherItemLocations[i - 10]]->ItemCount++;
   }
   free(randomCashLocations);
   free(randomAppleLocations);
@@ -96,12 +97,12 @@ void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
 
 // initialese Items
 Item_t *initialiseItem(Item_t gameItem) {
-  Item_t *item = malloc(sizeof(*item));
-  item->key = gameItem.key;
-  item->name = gameItem.name;
-  item->properties = gameItem.properties;
-  item->description = gameItem.description;
-  return item;
+  Item_t *Item = malloc(sizeof(*Item));
+  Item->key = gameItem.key;
+  Item->name = gameItem.name;
+  Item->properties = gameItem.properties;
+  Item->description = gameItem.description;
+  return Item;
 }
 
 // initialises room
@@ -115,7 +116,7 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
   assert(room->adjacent_rooms);
-  room->Item_count = 0;
+  room->ItemCount = 0;
   room->Items = malloc(sizeof(Item_t) * 20);
   assert(room->Items);
   return room;
@@ -131,25 +132,25 @@ building_t *initialiseBuilding() {
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
-  Item_t *apple1 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  Item_t *apple2 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  Item_t *apple3 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  Item_t *apple4 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  Item_t *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple1 = initialiseItem(gameItems[APPLE_Item_INDEX]);
+  Item_t *apple2 = initialiseItem(gameItems[APPLE_Item_INDEX]);
+  Item_t *apple3 = initialiseItem(gameItems[APPLE_Item_INDEX]);
+  Item_t *apple4 = initialiseItem(gameItems[APPLE_Item_INDEX]);
+  Item_t *apple5 = initialiseItem(gameItems[APPLE_Item_INDEX]);
   // initialising 5 game cash bundles
-  Item_t *cash1 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  Item_t *cash2 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  Item_t *cash3 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  Item_t *cash4 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  Item_t *cash5 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  Item_t *cash1 = initialiseItem(gameItems[CASH_Item_INDEX]);
+  Item_t *cash2 = initialiseItem(gameItems[CASH_Item_INDEX]);
+  Item_t *cash3 = initialiseItem(gameItems[CASH_Item_INDEX]);
+  Item_t *cash4 = initialiseItem(gameItems[CASH_Item_INDEX]);
+  Item_t *cash5 = initialiseItem(gameItems[CASH_Item_INDEX]);
   // initialising keyboard
-  Item_t *keyboard = initialiseItem(gameItems[KEYBOARD_ITEM_INDEX]);
+  Item_t *keyboard = initialiseItem(gameItems[KEYBOARD_Item_INDEX]);
   // initialising mouse
-  Item_t *mouse = initialiseItem(gameItems[MOUSE_ITEM_INDEX]);
+  Item_t *mouse = initialiseItem(gameItems[MOUSE_Item_INDEX]);
   // initialing monitor
-  Item_t *monitor = initialiseItem(gameItems[MONITOR_ITEM_INDEX]);
+  Item_t *monitor = initialiseItem(gameItems[MONITOR_Item_INDEX]);
   // initialising pass to lab
-  Item_t *pass = initialiseItem(gameItems[PASS_ITEM_INDEX]);
+  Item_t *pass = initialiseItem(gameItems[PASS_Item_INDEX]);
 
   // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
@@ -225,11 +226,11 @@ building_t *initialiseBuilding() {
 
   };
 
-  Item_t *itemArray[TOTAL_ITEM_COUNT] = {
+  Item_t *ItemArray[TOTAL_ItemCount] = {
       cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
       apple3, apple4, apple5, keyboard, mouse, monitor, pass};
 
-  randomlyPlaceItems(itemArray, roomArray);
+  randomlyPlaceItems(ItemArray, roomArray);
 
   huxley->start_room = lobbySouth;
   //  free(roomArray);
@@ -253,7 +254,7 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
   }
 
   if (room1->Items != NULL) {
-    for (int i = 0; i < room1->Item_count; i++) {
+    for (int i = 0; i < room1->ItemCount; i++) {
       free(room1->Items[i]);
     }
     free(room1->Items);
@@ -274,3 +275,95 @@ void freeBuilding(building_t *huxley) {
 }
 // changes room of person and pushes current room into room histroy of player
 void changeRoom(state *person, room_t dest_room) {}
+
+//
+//
+//
+//
+//
+//
+//
+// --------------------------------------------------------------------------
+// ----------- LUQMANS IMPLEMENTATION OF PLAYER FUNCTIONS--------------------
+//
+//
+//
+//
+//
+//
+//
+// need ptr checks
+player_t *initialisePlayer() {
+  player_t *newPlayer = malloc(sizeof(*newPlayer));
+  newPlayer->inventory = calloc(Item_NUM, sizeof(Item_t));
+  newPlayer->health = MAX_HEALTH;
+  newPlayer->cash = INITIAL_CASH;
+  newPlayer->ItemCount = 0;
+  assert(newPlayer && newPlayer->inventory);
+  return newPlayer;
+}
+
+state *initialiseState(room_t *initialRoom) {
+  state *initialState = malloc(sizeof(*initialState));
+  initialState->player = initialisePlayer();
+
+  initialState->curr_room_node = initialRoom;
+  char *username = "";
+  printf("enter a username\n");
+  scanf("%s\n", username);
+  initialState->profile.username = username;
+  initialState->profile.character = UTA;
+  initialState->profile.score = 0;
+
+  return initialState;
+}
+
+void freePlayer(player_t *player) {
+  for (int i = 0; i < player->ItemCount; i++) {
+  }
+}
+
+//--------------------------Start of Prints-----------------------------------
+/* Prints To be moved into print_utils maybe */
+//--------------------------End of Prints--------------------------------
+
+// returns index of Item if it is in the list. TODO: remove magic numbers
+int findItem(Item_t **inventory, int ItemCount, char *ItemName) {
+  for (int i = 0; i < ItemCount; i++) {
+    if (!strcmp(inventory[i]->key, ItemName)) {
+      return i;
+    }
+  }
+  return FIND_FAIL;
+}
+
+bool pickUpItem(state *currentState, char *ItemName) {
+  Item_t *Item = lookup(gameItems, Item_NUM, ItemName);
+  if (!Item || !currentState->curr_room_node->Items[Item->name]) {
+    printf("This Item could not be found here!\n");
+    return false;
+  }
+  if (currentState->player->inventory[Item->name] == Item) {
+    printf("%s is already in your inventory!", ItemName);
+  } else {
+    currentState->curr_room_node->Items[Item->name] = REMOVED;
+    currentState->player->inventory[Item->name] = Item;
+    printf("%s has been picked up\n", ItemName);
+  }
+  return true;
+}
+
+bool dropItem(state *currentState, char *ItemName) {
+  Item_t *Item = lookup(gameItems, Item_NUM, ItemName);
+  if (!Item || !currentState->player->inventory[Item->name]) {
+    printf("You do not have this Item to drop: %s\n", ItemName);
+    return false;
+  }
+  currentState->player->inventory[Item->name] = REMOVED;
+  currentState->curr_room_node->Items[Item->name] = Item;
+  printf("%s has been dropped!\n", ItemName);
+  return true;
+}
+
+// Todo:
+bool buyItem(state *currentState, char *ItemName) { return false; }

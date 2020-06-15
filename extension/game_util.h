@@ -9,6 +9,13 @@
 #define MAX_ROOM_HISTORY (5)
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
+#define Item_NUM (5)
+#define LOOKUP_FAILURE (NULL)
+#define INITIAL_CASH (0)
+#define MAX_HEALTH (100)
+#define FIND_FAIL (-1)
+#define REMOVED (NULL)
+#define MAX_PROPERTY (8)
 
 // enum for position in rooms
 typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
@@ -23,7 +30,7 @@ typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 
 // enum for character type
-typedef enum { BATMAN, UTA } character;
+typedef enum { BATMAN, UTA } Character;
 
 // struct for Items and their properties
 typedef struct Item_t {
@@ -43,7 +50,7 @@ typedef struct room_t {
   int adjacent_room_count;
   char *description;
   Item_t **Items;
-  int Item_count;
+  int ItemCount;
 
 } room_t;
 
@@ -53,20 +60,25 @@ typedef struct building_t {
 } building_t;
 
 typedef struct {
-  Item_t *inventory;
-  int cash;
+  Item_t **inventory;
+  int ItemCount;
   int health;
-  room_t curr_room_node; // struct for room_t structure
+  int cash;
+} player_t;
+
+typedef struct {
+  player_t *player;
+  room_t *curr_room_node; // struct for room_t structure
 
   struct {
     char *username;
-    character character;
+    Character character;
+    int score;
   } profile;
 
-  RoomName room_history[MAX_ROOM_HISTORY];
 } state;
 
-static const Item_t gameItems[] = {
+static Item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!", 0},
     {"keyboard", KEYBOARD, THROWABLE, "A keyboard. A programmer's best friend.",
      0},
@@ -80,3 +92,17 @@ static const Item_t gameItems[] = {
 
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
+
+/* Returns respective int value; -1 for failure */
+Item_t *lookup(Item_t table[], const int size, const char *key) {
+  for (int i = 0; i < size; i++) {
+    if (!strcmp(table[i].key, key)) {
+      return &table[i];
+    }
+  }
+  return LOOKUP_FAILURE;
+}
+
+bool hasProperty(Property property, Item_t *item) {
+  return (property & item->properties);
+}
