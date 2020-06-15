@@ -450,10 +450,10 @@ void printRoomPosition(room_t *room) {
   }
 }
 
-void printItemDetails(room_t *room) {
-  if (room->Items != NULL) {
-    for (int i = 0; i < room->ItemCount; i++) {
-      printf("%s ", room->Items[i]->key);
+void printItemDetails(Item_t **items, int itemCount) {
+  if (items != NULL) {
+    for (int i = 0; i < itemCount; i++) {
+      printf("%s ", items[i]->key);
     }
     printf("\n");
   }
@@ -494,7 +494,7 @@ void printRoomDetails(room_t *room1) {
   printRoomPosition(room1);
   printRoomName(room1);
   printf("Items in the room: ");
-  printItemDetails(room1);
+  printItemDetails(room1->Items, room1->ItemCount);
   printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
   printf("adjacent rooms:\n");
   printAdjacentRooms(room1);
@@ -529,6 +529,17 @@ void roomTraverser(room_t *entranceRoom, room_t *room1,
 // prints details of all rooms in the building
 void printBuildingDetails(building_t *huxley) {
   roomTraverser(NULL, huxley->start_room, printRoomDetails);
+}
+
+void printStateDetails(state *state1) {
+  printf("hi I am %s\n", state1->profile.username);
+  printf("score: %d\n", state1->profile.score);
+  printf("Health: %d\n", state1->player->health);
+  printf("Cash: %d\n", state1->player->cash);
+  printf("Items in inventory: ");
+  printItemDetails(state1->player->inventory, state1->player->ItemCount);
+  printf("currently in room: ");
+  printRoomDetails(state1->curr_room_node);
 }
 
 void printRemaining(void) {
