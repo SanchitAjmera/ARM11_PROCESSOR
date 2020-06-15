@@ -38,7 +38,7 @@ void quit() {}
 void introduction() {}
 
 // generates array of random numbers of length n
-void randomiseArray(int *randArray, int length, int randMax) {
+void randomiseArray(int randArray[], int length, int randMax) {
   for (int i = 0; i < length; i++) {
     randArray[i] = rand() % randMax;
   }
@@ -49,8 +49,8 @@ void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
   int randomCashLocations[TOTAL_CASH_COUNT],
       randomAppleLocations[TOTAL_APPLE_COUNT];
   // array for random locations of apples and cash
-  randomiseArray(*randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
-  randomiseArray(*randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
+  randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
+  randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
   // dynamically addes apple and cash items into random rooms
   for (int i = 0; i < 5; i++) {
     rooms[randomCashLocations[i]]
@@ -61,10 +61,10 @@ void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
   // 4 IS THE NUMBER OF OTHER ITEMS APART FROM CASH & APPLES
   // added other items randomly around lobby
   int randomOtherItemLocations[4];
-  ramdomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_COUNT);
+  randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
   for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
-        ->Items[rooms[randomOtherItemLocations]->Item_count] = items[i];
+        ->Items[rooms[randomOtherItemLocations[i - 10]]->Item_count] = items[i];
   }
 }
 
@@ -125,11 +125,13 @@ building_t *initialiseBuilding() {
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
-  Item_t *apple1, *apple2, *apple3, *apple4,
-      *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple1, *apple2, *apple3, *apple4, *apple5;
+  apple1 = apple2 = apple3 = apple4 = apple5 =
+      initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   // initialising 5 game cash bundles
-  Item_t *cash1, *cash2, *cash3, *cash4,
-      *cash5 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  Item_t *cash1, *cash2, *cash3, *cash4, *cash5;
+  cash1 = cash2 = cash3 = cash4 = cash5 =
+      initialiseItem(gameItems[CASH_ITEM_INDEX]);
   // initialising keyboard
   Item_t *keyboard = initialiseItem(gameItems[KEYBOARD_ITEM_INDEX]);
   // initialising mouse
@@ -198,9 +200,11 @@ building_t *initialiseBuilding() {
 
   };
 
-  item_t *itemArray[TOTAL_ITEM_COUNT] = {
+  Item_t *itemArray[TOTAL_ITEM_COUNT] = {
       cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
       apple3, apple4, apple5, keyboard, mouse, monitor, pass};
+
+  randomlyPlaceItems(itemArray, roomArray);
 
   huxley->start_room = lobbySouth;
 
