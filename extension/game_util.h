@@ -126,5 +126,6 @@ extern void freeState(state *state1);
 extern void quit();
 extern int lookup(const pair_t table[], const int size, const char *key);
 extern void lowercase(char *in);
+extern void checkPtr(const *ptr);
 
 #endif
