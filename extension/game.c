@@ -21,8 +21,9 @@ void getCommand(char *command, char *argument) {
   comm = strtok(comm, "\n");
   arg = strtok(arg, "\n");
 
-  // comm = lowercase(command);
-  // arg = lowercase(argument);
+  // Make both into lowercase
+  lowercase(comm);
+  lowercase(arg);
 
   strcpy(command, comm);
   if (arg) {
@@ -32,7 +33,7 @@ void getCommand(char *command, char *argument) {
 
 void playGame(state *currentState) {
   bool play = true;
-  // TODO: validate ptr on these
+  // TODO: validate ptr on these and look at size/magic numbers
   char *command = malloc(sizeof(char) * 30);
   char *argument = malloc(sizeof(char) * 30);
 
@@ -50,7 +51,6 @@ void playGame(state *currentState) {
       break;
     case MOVE:
       break;
-
     case BUY:
       break;
     default:
