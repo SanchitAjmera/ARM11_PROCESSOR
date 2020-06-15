@@ -35,6 +35,15 @@ void lowercase(char *in) {
   }
 }
 
+/* Checks for failed memory allocation */
+Error validatePtr(const void *ptr, const char *errorMsg) {
+  if (ptr == NULL) {
+    printf("Error: %s\n", errorMsg);
+    return ERR_FAIL;
+  }
+  return ERR_PASS;
+}
+
 // shows player their inventory of Items
 /* Returns respective int value; -1 for failure */
 item_t *itemLookup(item_t table[], const int size, const char *key) {
@@ -376,10 +385,6 @@ void freeState(state *state1) {
   freePlayer(state1->player);
   free(state1);
 }
-
-//--------------------------Start of Prints-----------------------------------
-/* Prints To be moved into print_utils maybe */
-//--------------------------End of Prints--------------------------------
 
 // returns index of Item if it is in the list. TODO: remove magic numbers
 bool buyItem(state *currentState, char *ItemName) { return false; }
