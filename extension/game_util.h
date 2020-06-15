@@ -38,7 +38,7 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 typedef enum { BATMAN, UTA } Character;
 
 // enum for menu choices
-typedef enum { QUIT, NEW_GAME, LOAD_GAME, NONE } Menu;
+typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
 
 // generic (string, enum) struct for lookups
 typedef struct {
