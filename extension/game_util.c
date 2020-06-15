@@ -53,8 +53,11 @@ void current_room() {}
 // possibly a map (like the lego land map)
 void display_rooms() {}
 
-// quits game also saving game into some history file
-void quit() {}
+// quits game
+void quit() {
+  printf("Thanks for playing!\n");
+  exit(EXIT_SUCCESS);
+}
 
 // displays introduction to player
 void introduction() {}
