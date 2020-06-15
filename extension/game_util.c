@@ -37,7 +37,7 @@ int validatePtr(const void *ptr, const char *errorMsg) {
 /* loadGameState takes in a filename and a pointer to an uninitialised state.
    If such file does not exist or cannot be opened, return -1.
    Otherwise, it writes the file's contents to the state. */
-int loadGameState(const char *fname, state *playerState) {
+int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
   assert(playerState);
   if (access(fname, F_OK) == -1) { // File does not exist
     printf("File does not exist.\n");
@@ -47,6 +47,9 @@ int loadGameState(const char *fname, state *playerState) {
     if (validatePtr(file, "could not open this save file.") == -1) {
       return -1;
     } else {
+      // TODO: add error checking to each fread to ensure that the end of the
+      // file isn't reached prematurely (save file must be corrupted in this
+      // case)
       fread(playerState, sizeof(state), 1, file);
 
       playerState->player = malloc(sizeof(player_t));
@@ -69,11 +72,22 @@ int loadGameState(const char *fname, state *playerState) {
       fread(&currentRoom, sizeof(RoomName), 1, file);
       RoomPosition currentPosition;
       fread(&currentPosition, sizeof(RoomPosition), 1, file);
-      /* TODO: use currentRoom and currentPosition to somehow get a room_t
-          pointer to the corresonding room */
+      playerState->curr_room_node =
+          worldMap[(currentRoom * 5) + currentPosition];
 
       /* Load items in each room */
-      /* TODO: find a way to iterate through each room in the game? */
+      for (int i = 0; i < 25; i++) { // For each room in the map
+        int itemCount;
+        fread(&itemCount, sizeof(int), 1, file);
+        for (int j = 0; j < itemCount; j++) {
+          Item item;
+          fread(&item, sizeof(Item), 1, file);
+          int hash;
+          fread(&hash, sizeof(int), 1, file);
+          worldMap[i]->Items[j] = initialiseItem(gameItems[item]);
+          worldMap[i]->Items[j]->hash = hash;
+        }
+      }
     }
     fclose(file);
     return 0;
@@ -214,8 +228,10 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   return room;
 }
 
-// initialises all rooms in building
-building_t *initialiseBuilding() {
+/* Initialises all rooms in building.
+    Takes in a pointer to an array of room_t pointers, and fills this
+    array with all the rooms in the building */
+building_t *initialiseBuilding(room_t **out) {
 
   building_t *huxley = malloc(sizeof(*huxley));
 
@@ -307,14 +323,18 @@ building_t *initialiseBuilding() {
   monitor->hash = 13;
   pass->hash = 14;
 
+  // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
-      lobbySouth,      lobbyEast,        lobbyWest,        lobbyNorth,
-      lobbyCentre,     labEast,          labNorth,         labWest,
-      labSouth,        labCentre,        fusionNorth,      fusionEast,
-      fusionWest,      fusionSouth,      fusionCentre,     lectureHallEast,
-      lectureHallWest, lectureHallNorth, lectureHallSouth, lectureHallCentre,
-      harrodsSouth,    harrodsEast,      harrodsWest,      harrodsCentre,
-      harrodsNorth};
+      lobbyEast,        lobbyWest,        lobbyNorth,        lobbySouth,
+      lobbyCentre,      labEast,          labWest,           labNorth,
+      labSouth,         labCentre,        lectureHallEast,   lectureHallWest,
+      lectureHallNorth, lectureHallSouth, lectureHallCentre, fusionEast,
+      fusionWest,       fusionNorth,      fusionSouth,       fusionCentre,
+      harrodsEast,      harrodsWest,      harrodsNorth,      harrodsSouth,
+      harrodsCentre};
+  for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
+    out[i] = roomArray[i];
+  }
 
   item_t *ItemArray[TOTAL_ITEM_COUNT] = {
       cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
