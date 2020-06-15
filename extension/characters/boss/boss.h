@@ -21,14 +21,16 @@ typedef struct {
   const int maxHealth;
 } aggressive_t;
 
+typedef union {
+  passive_t *teaching;
+  aggressive_t *fighting;
+} state_t;
+
 typedef struct {
-  char *name;
+  const char *name;
   // default: true
   bool isPassive;
-  union {
-    passive_t *teaching;
-    aggressive_t *fighting;
-  } state;
+  state_t *state;
 } boss_t;
 
 typedef struct {
@@ -41,15 +43,15 @@ typedef struct {
 // variables for KGK boss
 static const char *kgkQuestions[MAX_QUESTIONS] = {"", "", "", "", ""};
 static const char *kgkAnswers[MAX_QUESTIONS] = {"", "", "", "", ""};
-static const aggressive_t kgkBattle = {KGK_ATTACK,      KGK_SPECIAL,
-                                       KGK_ATTACK_NAME, KGK_SPECIAL_NAME,
-                                       KGK_MAX_HEALTH,  KGK_MAX_HEALTH};
+// static aggressive_t kgkBattle = {KGK_ATTACK,      KGK_SPECIAL,
+//                                        KGK_ATTACK_NAME, KGK_SPECIAL_NAME,
+//                                        KGK_MAX_HEALTH,  KGK_MAX_HEALTH};
 // variables for TONY boss
 static const char *tonyQuestions[MAX_QUESTIONS] = {"", "", "", "", ""};
 static const char *tonyAnswers[MAX_QUESTIONS] = {"", "", "", "", ""};
-static const aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
-                                        TONY_ATTACK_NAME, TONY_SPECIAL_NAME,
-                                        TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
+// static aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
+//                                         TONY_ATTACK_NAME, TONY_SPECIAL_NAME,
+//                                         TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
 // lookup table for bosses
 static const lookupBoss_t bossTable[] = {
     {"Konstantinos", kgkQuestions, kgkAnswers},
@@ -64,7 +66,7 @@ extern void freeBossFighting(aggressive_t *aggressive);
 extern void freeBossTeaching(passive_t *passive);
 extern void freeBoss(boss_t *boss);
 extern void initBattle(boss_t *boss, player_t *player);
-extern void processResult(boss_t *boss, player_t *player);
+extern void processResult(boss_t *boss, player_t *player, int correct);
 extern void quiz(boss_t *boss, player_t *player);
 
 #endif

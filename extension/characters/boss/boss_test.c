@@ -45,19 +45,19 @@ bool testCreateBossKGK(void) {
 bool testCreateBossKGKTeaching(void) {
   printTestName("testCreateBossKGKTeaching");
   boss_t *kgk = createBoss("Konstantinos");
-  return kgk->state.teaching != NULL;
+  return kgk->state->teaching != NULL;
 }
 
 bool testCreateBossKGKTeachingQs(void) {
   printTestName("testCreateBossKGKTeachingQs");
   boss_t *kgk = createBoss("Konstantinos");
-  return kgk->state.teaching->questions == kgkQuestions;
+  return kgk->state->teaching->questions == kgkQuestions;
 }
 
 bool testCreateBossKGKTeachingAs(void) {
   printTestName("testCreateBossKGKTeachingAs");
   boss_t *kgk = createBoss("Konstantinos");
-  return kgk->state.teaching->questions == kgkAnswers;
+  return kgk->state->teaching->questions == kgkAnswers;
 }
 
 void testCreateBossAll(void) {
