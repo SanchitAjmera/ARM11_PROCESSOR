@@ -112,5 +112,6 @@ extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
 extern void freeState(state *state1);
+extern void quit();
 
 #endif
