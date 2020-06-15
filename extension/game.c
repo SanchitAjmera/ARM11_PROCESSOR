@@ -37,6 +37,8 @@ void playGame(state *currentState) {
   // TODO: validate ptr on these and look at size/magic numbers
   char *command = malloc(sizeof(char) * 30);
   char *argument = malloc(sizeof(char) * 30);
+  checkPtr(command);
+  checkPtr(argument);
 
   while (play) {
     getCommand(command, argument);
