@@ -1,23 +1,27 @@
-#include "util.h"
+#include "print_util.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 int main(void) {
-  room *lobby = initialiseRoom(LOBBY);
-  room *lecture_hall = initialiseRoom(LECTURE_HALL);
-  room *fusion = initialiseRoom(FUSION);
-  room *lab = initialiseRoom(LAB);
 
-  connectRoom(lobby, lecture_hall);
-  connectRoom(lobby, lab);
-  connectRoom(lobby, fusion);
+  building_t *huxley = initialiseBuilding();
 
-  printRoom(lobby->current_room);
-  freeRoom(lobby);
+  state *playerState = initialiseState(huxley->start_room);
+
+  printBuildingDetails(huxley);
+
+  printf("\n");
+
+  printStateDetails(playerState);
+
+  freeState(playerState);
+
+  freeBuilding(huxley);
 
   exit(EXIT_SUCCESS);
 }
