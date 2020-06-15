@@ -8,8 +8,6 @@
 #include <string.h>
 #include <unistd.h>
 
-// TODO:
-
 void getCommand(char *command, char *argument) {
   char input[30];
   printf(" >> ");
@@ -32,7 +30,7 @@ void playGame(state *currentState) {
     getCommand(command, argument);
     Command type = lookup(commandsTable, COMMAND_NUM, command);
     switch (type) {
-    case QUIT:
+    case EXIT:
       free(command);
       free(argument);
       quit();
@@ -42,7 +40,10 @@ void playGame(state *currentState) {
       break;
     case MOVE:
       break;
+
     case BUY:
+      break;
+    default:
       break;
     }
   }
