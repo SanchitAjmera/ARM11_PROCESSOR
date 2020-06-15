@@ -13,13 +13,15 @@ int main(void) {
 
   state *playerState = initialiseState(huxley->start_room);
 
-  // printBuildingDetails(huxley);
+  printBuildingDetails(huxley);
+
+  printf("\n");
+
+  printStateDetails(playerState);
 
   freeState(playerState);
 
   freeBuilding(huxley);
-
-  printf("this works");
 
   exit(EXIT_SUCCESS);
 }
