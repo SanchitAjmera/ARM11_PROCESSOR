@@ -10,9 +10,12 @@
 int main(void) {
 
   building_t *huxley = initialiseBuilding();
-  printf("%d\n", rand() % 5);
 
-  printBuildingDetails(huxley);
+  state *playerState = initialiseState(huxley->start_room);
+
+  // printBuildingDetails(huxley);
+
+  freeState(playerState);
 
   freeBuilding(huxley);
 
