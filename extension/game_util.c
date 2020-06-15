@@ -1,5 +1,6 @@
 #include "game_util.h"
 #include <assert.h>
+#include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,6 +26,13 @@ char *strptr(const char *in) {
   return out;
 }
 
+// converts a string to lowercase
+void lowercase(char *in) {
+  for (char *string = in; *string; string++) {
+    *string = toLower(*string);
+  }
+}
+
 // shows player their inventory of Items
 /* Returns respective int value; -1 for failure */
 item_t *lookup(item_t table[], const int size, const char *key) {
@@ -36,6 +44,7 @@ item_t *lookup(item_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
+// Checks if an item has a certain property
 bool hasProperty(Property property, item_t *item) {
   return (property & item->properties);
 }
