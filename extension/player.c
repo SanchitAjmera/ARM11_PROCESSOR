@@ -79,7 +79,9 @@ char *getPropertyStr(Property property) {
       printf("%s is already in your inventory!", itemName);
     } else {
       currentState->curr_room_node->items[item->name] = REMOVED;
+      currentState->curr_room_node->item_count--;
       currentState->player->inventory[item->name] = item;
+      currentState->player->itemCount++;
       printf("%s has been picked up\n", itemName);
     }
     return true;
@@ -92,7 +94,9 @@ char *getPropertyStr(Property property) {
       return false;
     }
     currentState->player->inventory[item->name] = REMOVED;
+    currentState->player->itemCount--;
     currentState->curr_room_node->items[item->name] = item;
+    currentState->curr_room_node->item_count++;
     printf("%s has been dropped!\n", itemName);
   }
   return true;
