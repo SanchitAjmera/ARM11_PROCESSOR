@@ -1,4 +1,7 @@
 #include "boss.h"
+#include "../../battle/battle.h"
+#include "../player/player.h"
+#include "boss_constants.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
