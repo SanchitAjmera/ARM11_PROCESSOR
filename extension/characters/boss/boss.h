@@ -52,8 +52,8 @@ static const aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
                                         TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
 // lookup table for bosses
 static const lookupBoss_t bossTable[] = {
-    {"Konstantinos", kgkQuestions, kgkAnswers, kgkBattle},
-    {"Tony", tonyQuestions, tonyAnswers, tonyBattle}};
+    {"Konstantinos", kgkQuestions, kgkAnswers},
+    {"Tony", tonyQuestions, tonyAnswers}};
 
 extern boss_t *createBoss(const char *name);
 // for testing
