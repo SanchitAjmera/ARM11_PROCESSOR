@@ -44,10 +44,14 @@ static boss_t *initBoss(const char *name) {
 }
 
 boss_t *createBoss(const char *name) {
+  // PRE: name is one of the pre-defined bosses
   lookupBoss_t table = lookup(name);
-  NULL_POINTER(table);
+  if (table == NULL) {
+    return NULL;
+  }
   boss_t *boss = initBoss(table.name);
   boss->teaching = createPassive(table.questions, table.answers, MAX_QUESTIONS);
+  return boss;
 }
 
 static void freeBossFighting(aggressive_t *aggressive) {
