@@ -340,42 +340,4 @@ void freeState(state *state1) {
 //--------------------------End of Prints--------------------------------
 
 // returns index of Item if it is in the list. TODO: remove magic numbers
-int findItem(Item_t **inventory, int ItemCount, char *ItemName) {
-  for (int i = 0; i < ItemCount; i++) {
-    if (!strcmp(inventory[i]->key, ItemName)) {
-      return i;
-    }
-  }
-  return FIND_FAIL;
-}
-
-bool pickUpItem(state *currentState, char *ItemName) {
-  Item_t *Item = lookup(gameItems, Item_NUM, ItemName);
-  if (!Item || !currentState->curr_room_node->Items[Item->name]) {
-    printf("This Item could not be found here!\n");
-    return false;
-  }
-  if (currentState->player->inventory[Item->name] == Item) {
-    printf("%s is already in your inventory!", ItemName);
-  } else {
-    currentState->curr_room_node->Items[Item->name] = REMOVED;
-    currentState->player->inventory[Item->name] = Item;
-    printf("%s has been picked up\n", ItemName);
-  }
-  return true;
-}
-
-bool dropItem(state *currentState, char *ItemName) {
-  Item_t *Item = lookup(gameItems, Item_NUM, ItemName);
-  if (!Item || !currentState->player->inventory[Item->name]) {
-    printf("You do not have this Item to drop: %s\n", ItemName);
-    return false;
-  }
-  currentState->player->inventory[Item->name] = REMOVED;
-  currentState->curr_room_node->Items[Item->name] = Item;
-  printf("%s has been dropped!\n", ItemName);
-  return true;
-}
-
-// Todo:
 bool buyItem(state *currentState, char *ItemName) { return false; }

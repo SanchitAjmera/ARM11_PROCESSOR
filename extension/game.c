@@ -19,5 +19,7 @@ int main(void) {
 
   freeBuilding(huxley);
 
+  printf("this works");
+
   exit(EXIT_SUCCESS);
 }

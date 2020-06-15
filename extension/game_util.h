@@ -78,7 +78,7 @@ typedef struct {
 
 } state;
 
-static Item_t gameItems[] = {
+static const Item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!", 0},
     {"keyboard", KEYBOARD, THROWABLE, "A keyboard. A programmer's best friend.",
      0},
@@ -94,17 +94,3 @@ extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
 extern void freeState(state *state1);
-
-/* Returns respective int value; -1 for failure */
-Item_t *lookup(Item_t table[], const int size, const char *key) {
-  for (int i = 0; i < size; i++) {
-    if (!strcmp(table[i].key, key)) {
-      return &table[i];
-    }
-  }
-  return LOOKUP_FAILURE;
-}
-
-bool hasProperty(Property property, Item_t *item) {
-  return (property & item->properties);
-}
