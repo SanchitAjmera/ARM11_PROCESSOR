@@ -105,4 +105,8 @@ static const item_t gameItems[] = {
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
+extern item_t *initialiseItem(item_t gameItem);
 extern void freeState(state *state1);
+
+extern int loadGameState(const char *fname, state *playerState);
+extern int saveGameState(const char *fname, state *playerState);

@@ -14,7 +14,7 @@
 #define TOTAL_CASH_COUNT (5)
 #define TOTAL_ROOM_COUNT (25)
 #define CASH_ITEM_INDEX (4)
-#define APPLE_ITEM_INDEX (0)
+#define APPLE_ITEM_INDEX (0) // I beg you dont change the _ITEM_INDEX's
 #define KEYBOARD_ITEM_INDEX (1)
 #define MOUSE_ITEM_INDEX (2)
 #define MONITOR_ITEM_INDEX (3)
@@ -30,6 +30,68 @@ int validatePtr(const void *ptr, const char *errorMsg) {
   if (ptr == NULL) {
     printf("Error: %s\n", errorMsg);
     return -1;
+  }
+  return 0;
+}
+
+/* loadGameState takes in a filename and a pointer to an uninitialised state.
+   If such file does not exist or cannot be opened, return -1.
+   Otherwise, it writes the file's contents to the state. */
+int loadGameState(const char *fname, state *playerState) {
+  assert(playerState);
+  if (access(fname, F_OK) == -1) { // File does not exist
+    printf("File does not exist.\n");
+    return -1;
+  } else {
+    FILE *file = fopen(fname, "rb");
+    if (validatePtr(file, "could not open this save file.") == -1) {
+      return -1;
+    } else {
+      fread(playerState, sizeof(state), 1, file);
+
+      playerState->player = malloc(sizeof(player_t));
+      fread(playerState->player, sizeof(player_t), 1, file);
+
+      /* Load inventory */
+      int itemCount = playerState->player->itemCount;
+      playerState->player->inventory = calloc(ITEM_NUM, sizeof(item_t));
+      for (int i = 0; i < itemCount; i++) {
+        Item item;
+        fread(&item, sizeof(Item), 1, file);
+        playerState->player->inventory[i] = initialiseItem(gameItems[item]);
+        int hash;
+        fread(&hash, sizeof(int), 1, file);
+        playerState->player->inventory[i]->hash = hash;
+      }
+
+      /* Load player's current location */
+      RoomName currentRoom;
+      fread(&currentRoom, sizeof(RoomName), 1, file);
+      RoomPosition currentPosition;
+      fread(&currentPosition, sizeof(RoomPosition), 1, file);
+      /* TODO: use currentRoom and currentPosition to somehow get a room_t
+          pointer to the corresonding room */
+
+      /* Load items in each room */
+      /* TODO: find a way to iterate through each room in the game? */
+    }
+    fclose(file);
+    return 0;
+  }
+}
+
+/* saveGameState takes in a filename and a pointer to the player's state.
+   returns -1 if the file could not be opened. Otherwise, it writes
+   the player's state to the file. */
+int saveGameState(const char *fname, state *playerState) {
+  FILE *fileOut = fopen(fname, "wb");
+  if (validatePtr(fileOut, "something went wrong mate idk wagwaan") == -1) {
+    return -1;
+  } else {
+    // TODO: rewrite this function to save the game's contents in the format
+    // that loadGameState expects.
+    fwrite(playerState, sizeof(state), 1, fileOut);
+    fclose(fileOut);
   }
   return 0;
 }
