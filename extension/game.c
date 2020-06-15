@@ -9,7 +9,17 @@
 #include <unistd.h>
 
 // TODO:
-void playGame(state *currentState) { printf("Playing!\n"); }
+
+void getCommand(char *command, char *argument) {
+  char input[30];
+  printf(" >> ");
+  fgets(input, sizeof(input), stdin);
+
+  command = strtok(input, " ");
+  argument = strtok(NULL, " ");
+}
+
+void playGame(state *currentState) {}
 
 int main(void) {
 
@@ -20,7 +30,7 @@ int main(void) {
   while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
 
     printf("Please enter a 1 (quit), 2 (new game) or 3 (load game)!\n");
-    printf("   >> ");
+    printf(" >> ");
 
     fgets(menuChoice, sizeof(menuChoice), stdin);
     choice = atoi(menuChoice);
