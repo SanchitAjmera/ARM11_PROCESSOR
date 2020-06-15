@@ -44,8 +44,6 @@ typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
 // enum for supported commands
 typedef enum { EXIT, PICKUP, DROP, BUY, MOVE } Command;
 
-typedef enum { ERROR_SUCC, ERR_FAIL, ERR_PASS } Error;
-
 // generic (string, enum) struct for lookups
 typedef struct {
   char *key;
