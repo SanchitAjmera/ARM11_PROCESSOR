@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-<<<<<<< HEAD
 #define ROOM_POSITION_NUMBER (5)
 #define TOTAL_ItemCount (14)
 #define TOTAL_APPLE_COUNT (5)
@@ -21,7 +20,6 @@
 #define PASS_Item_INDEX (5)
 
 // shows player their inventory of Items
-=======
 /* Returns respective int value; -1 for failure */
 item_t *lookup(item_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
@@ -37,7 +35,6 @@ bool hasProperty(Property property, item_t *item) {
 }
 
 // shows player their inventory of items
->>>>>>> extension-player
 void view_inventory() {}
 
 // shows player their character and username
@@ -124,11 +121,7 @@ Item_t *initialiseItem(Item_t gameItem) {
 }
 
 // initialises room
-<<<<<<< HEAD
 room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
-=======
-room_t *initialiseRoom(Room_name current_room) {
->>>>>>> extension-player
   // allocates memory to room and adjacent room array
   room_t *room = malloc(sizeof(*room));
 
