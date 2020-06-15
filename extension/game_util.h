@@ -17,6 +17,7 @@
 #define FIND_FAIL (-1)
 #define REMOVED (NULL)
 #define MAX_PROPERTY (8)
+#define PROPERTY_NUM (4)
 
 // enum for items stored by person in inventory
 typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH } Item;
@@ -29,6 +30,12 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } Room_name;
 
 // enum for character type
 typedef enum { BATMAN, UTA } Character;
+
+// generic (string, enum) struct for lookups
+typedef struct {
+  char *key;
+  int value;
+} pair_t;
 
 // struct for items and their properties
 typedef struct item_t {
@@ -76,6 +83,10 @@ typedef struct {
   Room_name room_history[MAX_ROOM_HISTORY];
 } state;
 
+static const pair_t propertyTable[] = {{"edible", EDIBLE},
+                                       {"throwable", THROWABLE},
+                                       {"valuable", VALUABLE},
+                                       {"buyable", BUYABLE}};
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
