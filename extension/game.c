@@ -10,6 +10,7 @@
 int main(void) {
 
   building_t *huxley = initialiseBuilding();
+  printf("%d\n", rand() % 5);
 
   printBuildingDetails(huxley);
 
