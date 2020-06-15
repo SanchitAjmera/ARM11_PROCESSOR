@@ -17,6 +17,10 @@ void getCommand(char *command, char *argument) {
   char *comm = strtok(input, " ");
   char *arg = strtok(NULL, " ");
 
+  // remove trailing new line characters
+  comm = strtok(comm, "\n");
+  arg = strtok(arg, "\n");
+
   // comm = lowercase(command);
   // arg = lowercase(argument);
 
