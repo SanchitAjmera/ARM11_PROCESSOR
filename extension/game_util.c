@@ -22,6 +22,7 @@
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
+  checkPtr(out);
   strcpy(out, in);
   return out;
 }
@@ -102,6 +103,8 @@ void randomiseArray(int randArray[], int length, int randMax) {
 void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
   int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
+  checkPtr(randomCashLocations);
+  checkPtr(randomAppleLocations);
   // array for random locations of apples and cash
   randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
   randomiseArray(randomCashLocations, TOTAL_CASH_COUNT, TOTAL_ROOM_COUNT);
@@ -117,6 +120,7 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   // 4 IS THE NUMBER OF OTHER ItemS APART FROM CASH & APPLES
   // added other Items randomly around lobby
   int *randomOtherItemLocations = malloc(sizeof(int) * 4);
+  checkPtr(randomOtherItemLocations);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
   for (int i = 10; i < TOTAL_ItemCount; i++) {
     rooms[randomOtherItemLocations[i - 10]]
@@ -151,6 +155,7 @@ void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
 // initialese Items
 item_t *initialiseItem(item_t gameItem) {
   item_t *Item = malloc(sizeof(*Item));
+  checkPtr(Item);
   Item->key = strptr(gameItem.key);
   Item->name = gameItem.name;
   Item->properties = gameItem.properties;
@@ -162,16 +167,17 @@ item_t *initialiseItem(item_t gameItem) {
 room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   // allocates memory to room and adjacent room array
   room_t *room = malloc(sizeof(*room));
+  checkPtr(room);
 
   room->current_room = current_room;
   room->position = initial_position;
 
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
-  assert(room->adjacent_rooms);
+  checkPtr(room->adjacent_rooms);
   room->ItemCount = 0;
   room->Items = malloc(sizeof(item_t) * 20);
-  assert(room->Items);
+  checkPtr(room->Items);
   return room;
 }
 
@@ -179,9 +185,10 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
 building_t *initialiseBuilding() {
 
   building_t *huxley = malloc(sizeof(*huxley));
+  checkPtr(huxley);
 
   huxley->start_room = malloc(sizeof(room_t));
-  assert(huxley->start_room);
+  checkPtr(huxley->start_room);
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
@@ -348,16 +355,18 @@ void changeRoom(state *person, room_t dest_room) {}
 // need ptr checks
 player_t *initialisePlayer() {
   player_t *newPlayer = malloc(sizeof(*newPlayer));
+  checkPtr(newPlayer);
   newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t));
+  checkPtr(inventory);
   newPlayer->health = MAX_HEALTH;
   newPlayer->cash = INITIAL_CASH;
   newPlayer->itemCount = 0;
-  assert(newPlayer && newPlayer->inventory);
   return newPlayer;
 }
 
 state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
+  checkPtr(initialState);
   initialState->player = initialisePlayer();
   initialState->curr_room_node = initialRoom;
   char *username = "sanchit";
