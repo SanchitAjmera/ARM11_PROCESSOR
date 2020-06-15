@@ -113,7 +113,7 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
   assert(room->adjacent_rooms);
   room->Item_count = 0;
-  room->Items = malloc(sizeof(Item_t) * 10);
+  room->Items = malloc(sizeof(Item_t) * 20);
   assert(room->Items);
   return room;
 }
@@ -235,6 +235,7 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     for (int i = 0; i < room1->Item_count; i++) {
       free(room1->Items[i]);
     }
+    free(room1->Items);
   }
 
   free(room1);
