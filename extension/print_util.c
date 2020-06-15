@@ -10,7 +10,7 @@
 
 #define CLEAR ("clear")
 
-void printMenu() {
+void printMenu(void) {
   printf("Welcome to the ICL Text Adventure!\n");
   printf("What would you like to do?\n");
   printf("    1. Quit\n");
