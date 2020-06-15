@@ -9,16 +9,16 @@
 #include <unistd.h>
 
 #define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ItemCount (14)
+#define TOTAL_ITEM_COUNT (14)
 #define TOTAL_APPLE_COUNT (5)
 #define TOTAL_CASH_COUNT (5)
 #define TOTAL_ROOM_COUNT (25)
-#define CASH_Item_INDEX (4)
-#define APPLE_Item_INDEX (0)
-#define KEYBOARD_Item_INDEX (1)
-#define MOUSE_Item_INDEX (2)
-#define MONITOR_Item_INDEX (3)
-#define PASS_Item_INDEX (5)
+#define CASH_ITEM_INDEX (4)
+#define APPLE_ITEM_INDEX (0)
+#define KEYBOARD_ITEM_INDEX (1)
+#define MOUSE_ITEM_INDEX (2)
+#define MONITOR_ITEM_INDEX (3)
+#define PASS_ITEM_INDEX (5)
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -32,24 +32,6 @@ int validatePtr(const void *ptr, const char *errorMsg) {
     return -1;
   }
   return 0;
-}
-
-/* loadGameState takes in a filename and a pointer to the player's state.
-   If such file does not exist or cannot be opened, return -1. */
-int loadGameState(const char *fname, state *playerState) {
-  if (access(fname, F_OK) == -1) { // File does not exist
-    printf("File does not exist.\n");
-    return -1;
-  } else {
-    FILE *file = fopen(fname, "rb");
-    if (validatePtr(file, "could not open this save file.") == -1) {
-      return -1;
-    } else {
-      fread(playerState, sizeof(state), 1, file);
-      fclose(file);
-    }
-    return 0;
-  }
 }
 
 // shows player their inventory of Items
@@ -113,7 +95,7 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   // added other Items randomly around lobby
   int *randomOtherItemLocations = malloc(sizeof(int) * 4);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
-  for (int i = 10; i < TOTAL_ItemCount; i++) {
+  for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
         ->Items[rooms[randomOtherItemLocations[i - 10]]->ItemCount] = Items[i];
     rooms[randomOtherItemLocations[i - 10]]->ItemCount++;
@@ -180,25 +162,25 @@ building_t *initialiseBuilding() {
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
-  item_t *apple1 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple2 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple3 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple4 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple5 = initialiseItem(gameItems[APPLE_Item_INDEX]);
+  item_t *apple1 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple2 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple3 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple4 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   // initialising 5 game cash bundles
-  item_t *cash1 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash2 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash3 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash4 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash5 = initialiseItem(gameItems[CASH_Item_INDEX]);
+  item_t *cash1 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash2 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash3 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash4 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash5 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
   // initialising keyboard
-  item_t *keyboard = initialiseItem(gameItems[KEYBOARD_Item_INDEX]);
+  item_t *keyboard = initialiseItem(gameItems[KEYBOARD_ITEM_INDEX]);
   // initialising mouse
-  item_t *mouse = initialiseItem(gameItems[MOUSE_Item_INDEX]);
+  item_t *mouse = initialiseItem(gameItems[MOUSE_ITEM_INDEX]);
   // initialing monitor
-  item_t *monitor = initialiseItem(gameItems[MONITOR_Item_INDEX]);
+  item_t *monitor = initialiseItem(gameItems[MONITOR_ITEM_INDEX]);
   // initialising pass to lab
-  item_t *pass = initialiseItem(gameItems[PASS_Item_INDEX]);
+  item_t *pass = initialiseItem(gameItems[PASS_ITEM_INDEX]);
 
   // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
@@ -270,11 +252,9 @@ building_t *initialiseBuilding() {
       fusionWest,      fusionSouth,      fusionCentre,     lectureHallEast,
       lectureHallWest, lectureHallNorth, lectureHallSouth, lectureHallCentre,
       harrodsSouth,    harrodsEast,      harrodsWest,      harrodsCentre,
-      harrodsNorth
+      harrodsNorth};
 
-  };
-
-  item_t *ItemArray[TOTAL_ItemCount] = {
+  item_t *ItemArray[TOTAL_ITEM_COUNT] = {
       cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
       apple3, apple4, apple5, keyboard, mouse, monitor, pass};
 
