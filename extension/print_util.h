@@ -12,4 +12,5 @@ void printKonstantinosMouthOpen(void);
 void printKonstantinosIndent(void);
 void printKonstantinosMouthOpenIndent(void);
 void printRemaining(void);
+void printStateDetails(state *state1);
 #endif
