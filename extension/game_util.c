@@ -131,13 +131,17 @@ building_t *initialiseBuilding() {
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
-  Item_t *apple1, *apple2, *apple3, *apple4, *apple5;
-  apple1 = apple2 = apple3 = apple4 = apple5 =
-      initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple1 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple2 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple3 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple4 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  Item_t *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   // initialising 5 game cash bundles
-  Item_t *cash1, *cash2, *cash3, *cash4, *cash5;
-  cash1 = cash2 = cash3 = cash4 = cash5 =
-      initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  Item_t *cash1 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  Item_t *cash2 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  Item_t *cash3 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  Item_t *cash4 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  Item_t *cash5 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
   // initialising keyboard
   Item_t *keyboard = initialiseItem(gameItems[KEYBOARD_ITEM_INDEX]);
   // initialising mouse
