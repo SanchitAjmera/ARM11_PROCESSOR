@@ -1,3 +1,6 @@
+#ifndef GAME_UTIL_H
+#define GAME_UTIL_H
+
 #include "characters/player/player.h"
 #include <math.h>
 #include <stdbool.h>
@@ -23,7 +26,7 @@
 typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
-typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
+typedef enum { APPLE = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
 typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
@@ -102,11 +105,14 @@ static const item_t gameItems[] = {
     {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
     {"pass", PASS, THROWABLE, "You shall not pass"}};
 
-extern building_t *initialiseBuilding();
+extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
 extern item_t *initialiseItem(item_t gameItem);
 extern void freeState(state *state1);
 
-extern int loadGameState(const char *fname, state *playerState);
+extern int loadGameState(const char *fname, state *playerState,
+                         room_t **worldMap);
 extern int saveGameState(const char *fname, state *playerState);
+
+#endif
