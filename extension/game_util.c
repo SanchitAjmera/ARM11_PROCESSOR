@@ -29,19 +29,29 @@ char *strptr(const char *in) {
 // converts a string to lowercase
 void lowercase(char *in) {
   for (char *string = in; *string; string++) {
-    *string = toLower(*string);
+    *string = tolower(*string);
   }
 }
 
 // shows player their inventory of Items
 /* Returns respective int value; -1 for failure */
-item_t *lookup(item_t table[], const int size, const char *key) {
+item_t *itemLookup(item_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
       return &table[i];
     }
   }
   return LOOKUP_FAILURE;
+}
+
+// general lookup
+int lookup(const pair_t table[], const int size, const char *key) {
+  for (int i = 0; i < size; i++) {
+    if (!strcmp(table[i].key, key)) {
+      return table[i].value;
+    }
+  }
+  return -1;
 }
 
 // Checks if an item has a certain property
@@ -62,7 +72,7 @@ void current_room() {}
 // possibly a map (like the lego land map)
 void display_rooms() {}
 
-// quits game
+// quits game - TODO: free all resources in this function;
 void quit() {
   printf("Thanks for playing!\n");
   exit(EXIT_SUCCESS);
