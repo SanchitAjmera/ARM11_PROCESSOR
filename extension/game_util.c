@@ -50,7 +50,7 @@ void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
   int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
   // array for random locations of apples and cash
   randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
-  randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
+  randomiseArray(randomCashLocations, TOTAL_CASH_COUNT, TOTAL_ROOM_COUNT);
   // dynamically addes apple and cash items into random rooms
   for (int i = 0; i < 5; i++) {
     rooms[randomCashLocations[i]]
