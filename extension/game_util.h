@@ -101,6 +101,12 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
 
+static const pair_t commandsTable[] = {{"exit", EXIT},
+                                       {"pickup", PICKUP},
+                                       {"drop", DROP},
+                                       {"buy", BUY},
+                                       {"move", MOVE}};
+
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
