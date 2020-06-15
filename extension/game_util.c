@@ -39,7 +39,7 @@ void lowercase(char *in) {
 void checkPtr(const void *ptr) {
   if (ptr == NULL) {
     printf("A memory error occurred. The game must end!");
-    exit();
+    quit();
   }
 }
 
