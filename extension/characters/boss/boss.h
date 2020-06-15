@@ -1,6 +1,7 @@
 #ifndef BOSS_H
 #define BOSS_H
 
+#include "../player/player.h"
 #include "boss_constants.h"
 #include <stdbool.h>
 #include <string.h>
@@ -53,5 +54,17 @@ static const aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
 static const lookupBoss_t bossTable[] = {
     {"Konstantinos", kgkQuestions, kgkAnswers, kgkBattle},
     {"Tony", tonyQuestions, tonyAnswers, tonyBattle}};
+
+extern boss_t *createBoss(const char *name);
+// for testing
+extern passive_t *createPassive(const char **questions, const char **answers,
+                                int num);
+extern boss_t *initBoss(const char *name);
+extern void freeBossFighting(aggressive_t *aggressive);
+extern void freeBossTeaching(passive_t *passive);
+extern void freeBoss(boss_t *boss);
+extern void initBattle(boss_t *boss, player_t *player);
+extern void processResult(boss_t *boss, player_t *player);
+extern void quiz(boss_t *boss, player_t *player);
 
 #endif
