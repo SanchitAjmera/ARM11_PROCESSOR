@@ -14,7 +14,8 @@ bool playerWon(boss_t *boss, player_t *player) {
 }
 
 void printAttack(const char *name, int damage, const char *attackName) {
-  printf("%s used %s...\n...and dealt %d damage!\n", name, attackName, damage);
+  printf("%s used '%s'...\n...and dealt %d damage!\n", name, attackName,
+         damage);
 }
 
 // deals damage to opponent
@@ -36,11 +37,17 @@ void playerTurn(boss_t *boss, player_t *player) {
 
 // boss's turn in battle
 void bossTurn(boss_t *boss, player_t *player) {
+  int damage;
+  const char *name;
   if (FIGHT(boss)->health < BOSS_LOW_HEALTH(boss)) {
-    attackPlayer(boss, player, FIGHT(boss)->special, FIGHT(boss)->specialName);
-    return;
+    printf("%s is enraged...\n", boss->name);
+    damage = FIGHT(boss)->special;
+    name = FIGHT(boss)->specialName;
+  } else {
+    damage = FIGHT(boss)->attack;
+    name = FIGHT(boss)->attackName;
   }
-  attackPlayer(boss, player, FIGHT(boss)->attack, FIGHT(boss)->attackName);
+  attackPlayer(boss, player, damage, name);
 }
 
 // function to start the battle with the boss
