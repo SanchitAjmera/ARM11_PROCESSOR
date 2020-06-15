@@ -1,6 +1,7 @@
 #include "battle.h"
 #include "../characters/boss/boss.h"
 #include "../characters/player/player.h"
+#include "battle_constants.h"
 #include <stdio.h>
 #include <stdlib.h>
 
