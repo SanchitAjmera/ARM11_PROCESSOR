@@ -1,20 +1,17 @@
 #include "file_lines.h"
+#include "../common/util.h"
 #include "assemble_constants.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Adding new line into file line structure */
-void addLine(file_lines *fl, char *line) {
-  printf("new line: %s\n", line);
+void addLine(file_lines *fl, const char *line) {
   if (fl->lineCount == fl->maxLines) {
     fl->lines = realloc(fl->lines, fl->maxLines *= 2);
   }
   // Have to allocate memory on heap for each string
-  fl->lines[fl->lineCount] = malloc(sizeof(char) * (strlen(line) + 1));
-  strncpy(fl->lines[fl->lineCount], line, strlen(line));
-  fl->lineCount++;
+  fl->lines[fl->lineCount++] = strptr(line);
 }
 
 /* Adds each line into file line structure from string array */

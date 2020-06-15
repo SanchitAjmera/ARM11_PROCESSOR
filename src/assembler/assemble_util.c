@@ -29,11 +29,12 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   // Will be used to store expressions found during the scan
   file_lines *expressions = newFileLines();
 
-  // Scan file for labels and expressions
-  char line[LINE_CHAR_LIM];
+  /* Scan file for labels and expressions */
+  char *line = malloc(LINE_CHAR_LIM);
   while (fgets(line, LINE_CHAR_LIM, armFile) != NULL) {
     // Iterate through chars in line
     bool isLabel = false;
+    char *lineCopy = strptr(line);
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
         char *label = strtok(line, ":");
@@ -44,10 +45,11 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
         *labelSymbol = temp;
         addSymbol(symbolTable, labelSymbol);
         isLabel = true;
-        break;                     // Line contains only one label
-      } else if (line[i] == '=') { // Line contains an =0x expression
+        break;                         // Line contains only one label
+      } else if (lineCopy[i] == '=') { // Line contains an =0x expression
         char *expression =
-            strtok(line + i - 1, " ],\n"); // Pulls expression out
+            strtok(lineCopy + i - 1, " ],\n"); // Pulls expression out
+        // =0x........ is only added to end of file if greater than 0xFF
         if (parseImmediate(expression + 1) > MAX_BYTE) {
           addLine(expressions, expression);
         }
@@ -60,7 +62,9 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
         addLine(output, lineStripped); // Adds line stripped of \n
       }
     }
+    free(lineCopy);
   }
+  free(line);
 
   /* Now that we have added all lines to output, we can add all expressions
      to the symbol table and calculate their address using lineCount */
@@ -74,6 +78,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
     addSymbol(symbolTable, exprSymbol);
   }
 
+  // Add expressions to the end of the file
   addLines(output, expressions->lines, expressions->lineCount);
 
   freeFileLines(expressions);
@@ -90,10 +95,11 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     int fieldCount = 0;
     char *token = strtok_r(line, " ,", &rest);
     while (token != NULL) {
-      fields[fieldCount++] = token;
       if (rest[0] == ' ') {
         REMOVE_FIRST_CHAR(rest);
+        continue;
       }
+      fields[fieldCount++] = token;
       if (rest[0] == '[') { // If the next token starts with a [
         token = strtok_r(rest, "]", &rest);
       } else {
@@ -111,16 +117,11 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     if (instrSymbol->type == INSTR) {
       binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
     } else {
+      // Parse expression
       binLine = parseImmediate(in->lines[i] + 1);
     }
-    printf("output: %x\n", binLine);
 
     fwrite(&binLine, sizeof(word), 1, out);
-
-    for (int j = 0; j < fieldCount; j++) {
-      printf("token: %s\n", fields[j]);
-    }
-    printf("\n");
   }
 }
 
@@ -338,21 +339,19 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
 
 /* Removes bracketing around string
 converts remaining strings into unsigned int values
-returns array containing register address and expression address
-along with bits set (U and I) based on those values */
-static word *remBracket(char *string) {
-  word *addresses = malloc(sizeof(*addresses));
-
-  // Removing preceding bracket
-  char unbracketed[strlen(string) - 1];
-  strcpy(unbracketed, REMOVE_FIRST_CHAR(string));
-
-  // Separator
+returns array containing register address and expression address */
+word *remBracket(const char *string) {
+  word *addresses = malloc(sizeof(word) * 4);
+  char *unbracketed = strptr(string + 1);
+  // separator
   char *delim = ", ";
   // Gets Rn
   char *token = strtok(unbracketed, delim);
-  // Gets address of register rn
-  addresses[0] = REM_INT(token);
+  // gets address of register rn
+  if (token[0] == 'r') { // rn could either be a register or immediate const
+    REMOVE_FIRST_CHAR(token);
+  }
+  addresses[0] = parseImmediate(token);
   token = strtok(NULL, delim);
   // If expression exists in address
   if (token != NULL) {
@@ -363,6 +362,7 @@ static word *remBracket(char *string) {
     addresses[2] = secondLetter == '-' ? 0 : 1;
     addresses[1] = parseImmediate(token);
   }
+  free(unbracketed);
   return addresses;
 }
 
@@ -424,6 +424,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     if (parseImmediate(input.fields[1] + 1) <= SDTI_EXP_BOUND) {
       input.opcode = "mov";
       input.mnemonic = MOV;
+      free(addresses);
       return assembleDPI(symbolTable, input);
     } else {
       // offset

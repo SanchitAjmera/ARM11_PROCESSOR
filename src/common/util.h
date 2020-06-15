@@ -36,7 +36,7 @@ typedef enum { EQ, NE, GE = 10, LT, GT, LE, AL } Cond;
 // Shift types
 typedef enum { LSL, LSR, ASR, ROR } Shift;
 
-extern char *strptr(char *in);
+extern char *strptr(const char *in);
 extern Error validatePtr(const void *ptr, const char *errorMsg);
 extern void errorExit(Error error);
 
