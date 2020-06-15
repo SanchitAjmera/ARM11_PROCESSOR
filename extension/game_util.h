@@ -31,7 +31,7 @@ typedef struct Item_t {
   Item name;
   Property properties;
   char *description;
-  int dummy;
+  int hash;
 } Item_t;
 
 // structure for rooms
