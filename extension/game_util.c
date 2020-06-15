@@ -46,8 +46,8 @@ void randomiseArray(int randArray[], int length, int randMax) {
 
 // randomly places items in room
 void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
-  int randomCashLocations[TOTAL_CASH_COUNT],
-      randomAppleLocations[TOTAL_APPLE_COUNT];
+  int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
+  int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
   // array for random locations of apples and cash
   randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
   randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
@@ -60,12 +60,15 @@ void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
   }
   // 4 IS THE NUMBER OF OTHER ITEMS APART FROM CASH & APPLES
   // added other items randomly around lobby
-  int randomOtherItemLocations[4];
+  int *randomOtherItemLocations = malloc(sizeof(int) * 4);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
   for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
         ->Items[rooms[randomOtherItemLocations[i - 10]]->Item_count] = items[i];
   }
+  free(randomCashLocations);
+  free(randomAppleLocations);
+  free(randomOtherItemLocations);
 }
 
 // connects first room to second room
@@ -207,7 +210,8 @@ building_t *initialiseBuilding() {
   randomlyPlaceItems(itemArray, roomArray);
 
   huxley->start_room = lobbySouth;
-
+  //  free(itemArray);
+  //  free(roomArray);
   return huxley;
 }
 
