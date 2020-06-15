@@ -68,13 +68,6 @@ typedef struct building_t {
 } building_t;
 
 typedef struct {
-  item_t **inventory;
-  int itemCount;
-  int health;
-  int cash;
-} player_t;
-
-typedef struct {
   player_t *player;
   room_t *curr_room_node; // struct for room_t structure
 
