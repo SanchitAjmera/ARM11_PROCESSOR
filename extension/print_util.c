@@ -494,6 +494,7 @@ void printAdjacentRooms(room_t *room1) {
 void printRoomDetails(room_t *room1) {
   printRoomPosition(room1);
   printRoomName(room1);
+  printf("number of items in the room %d\n", room1->Item_count);
   printf("Items in the room: ");
   printItemDetails(room1);
   printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
