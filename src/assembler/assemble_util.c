@@ -39,7 +39,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
         char *label = strtok(line, ":");
         symbol *labelSymbol = malloc(sizeof(*labelSymbol));
         validatePtr(labelSymbol, "NULL pointer.");
-        symbol temp = {strptr(label), LABEL,
+        symbol temp = {strptr(label), LABEL, 0,
                        .body.address = output->lineCount * WORD_SIZE_BYTES};
         *labelSymbol = temp;
         addSymbol(symbolTable, labelSymbol);
@@ -69,7 +69,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
     word address = (output->lineCount + i) * WORD_SIZE_BYTES;
     symbol *exprSymbol = malloc(sizeof(*exprSymbol));
     validatePtr(exprSymbol, "Null pointer.");
-    symbol temp = {strptr(expr), LABEL, .body.address = address};
+    symbol temp = {strptr(expr), LABEL, 0, .body.address = address};
     *exprSymbol = temp;
     addSymbol(symbolTable, exprSymbol);
   }
