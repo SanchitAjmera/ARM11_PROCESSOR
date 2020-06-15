@@ -125,6 +125,6 @@ extern state *initialiseState(room_t *initialRoom);
 extern void freeState(state *state1);
 extern void quit();
 extern int lookup(const pair_t table[], const int size, const char *key);
-extern char *lowercase(char *in);
+extern void lowercase(char *in);
 
 #endif
