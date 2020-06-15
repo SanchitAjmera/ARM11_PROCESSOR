@@ -306,7 +306,6 @@ player_t *initialisePlayer() {
 state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
   initialState->player = initialisePlayer();
-  initialState->curr_room_node = malloc(sizeof(room_t));
   initialState->curr_room_node = initialRoom;
   char *username = "sanchit";
   // scanf("%s\n", username);
@@ -330,7 +329,6 @@ void freePlayer(player_t *player) {
 
 void freeState(state *state1) {
   freePlayer(state1->player);
-  free(state1->curr_room_node);
   free(state1);
 }
 
