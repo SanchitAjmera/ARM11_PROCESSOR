@@ -55,8 +55,10 @@ void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
   for (int i = 0; i < 5; i++) {
     rooms[randomCashLocations[i]]
         ->Items[rooms[randomCashLocations[i]]->Item_count] = items[i];
+    rooms[randomCashLocations[i]]->Item_count++;
     rooms[randomAppleLocations[i]]
         ->Items[rooms[randomAppleLocations[i]]->Item_count] = items[i + 5];
+    rooms[randomAppleLocations[i]]->Item_count++;
   }
   // 4 IS THE NUMBER OF OTHER ITEMS APART FROM CASH & APPLES
   // added other items randomly around lobby
@@ -65,6 +67,7 @@ void randomlyPlaceItems(Item_t *items[], room_t *rooms[]) {
   for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
         ->Items[rooms[randomOtherItemLocations[i - 10]]->Item_count] = items[i];
+    rooms[randomOtherItemLocations[i - 10]]->Item_count++;
   }
   free(randomCashLocations);
   free(randomAppleLocations);
