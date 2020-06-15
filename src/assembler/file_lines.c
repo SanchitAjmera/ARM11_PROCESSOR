@@ -1,18 +1,17 @@
 #include "file_lines.h"
+#include "../common/util.h"
 #include "assemble_constants.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void addLine(file_lines *fl, char *line) {
+void addLine(file_lines *fl, const char *line) {
   if (fl->lineCount == fl->maxLines) {
     fl->lines = realloc(fl->lines, fl->maxLines *= 2);
   }
   // Have to allocate memory on heap for each string
-  fl->lines[fl->lineCount] = calloc((strlen(line) + 1), sizeof(char));
-  strncpy(fl->lines[fl->lineCount], line, strlen(line));
-  fl->lineCount++;
+  fl->lines[fl->lineCount++] = strptr(line);
 }
 
 void addLines(file_lines *fl, char **lines, uint n) {
