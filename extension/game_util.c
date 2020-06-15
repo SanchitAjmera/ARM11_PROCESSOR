@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define ROOM_POSITION_NUMBER (5)
 #define TOTAL_ItemCount (14)
@@ -23,6 +24,32 @@ char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
   strcpy(out, in);
   return out;
+}
+
+int validatePtr(const void *ptr, const char *errorMsg) {
+  if (ptr == NULL) {
+    printf("Error: %s\n", errorMsg);
+    return -1;
+  }
+  return 0;
+}
+
+/* loadGameState takes in a filename and a pointer to the player's state.
+   If such file does not exist or cannot be opened, return -1. */
+int loadGameState(const char *fname, state *playerState) {
+  if (access(fname, F_OK) == -1) { // File does not exist
+    printf("File does not exist.\n");
+    return -1;
+  } else {
+    FILE *file = fopen(fname, "rb");
+    if (validatePtr(file, "could not open this save file.") == -1) {
+      return -1;
+    } else {
+      fread(playerState, sizeof(state), 1, file);
+      fclose(file);
+    }
+    return 0;
+  }
 }
 
 // shows player their inventory of Items
