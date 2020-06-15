@@ -306,7 +306,6 @@ player_t *initialisePlayer() {
 state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
   initialState->player = initialisePlayer();
-
   initialState->curr_room_node = initialRoom;
   char *username = "";
   printf("enter a username\n");
@@ -319,8 +318,14 @@ state *initialiseState(room_t *initialRoom) {
 }
 
 void freePlayer(player_t *player) {
-  for (int i = 0; i < player->ItemCount; i++) {
+  // TODO: add a freeItem function
+  if (player->inventory != NULL) {
+    for (int i = 0; i < player->ItemCount; i++) {
+      free(player->inventory[i]);
+    }
+    free(inventory);
   }
+  free(player);
 }
 
 //--------------------------Start of Prints-----------------------------------
