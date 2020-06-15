@@ -308,9 +308,8 @@ state *initialiseState(room_t *initialRoom) {
   initialState->player = initialisePlayer();
   initialState->curr_room_node = malloc(sizeof(room_t));
   initialState->curr_room_node = initialRoom;
-  char *username = "";
-  printf("enter a username\n");
-  scanf("%s\n", username);
+  char *username = "sanchit";
+  // scanf("%s\n", username);
   initialState->profile.username = username;
   initialState->profile.character = UTA;
   initialState->profile.score = 0;
