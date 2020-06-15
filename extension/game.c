@@ -16,15 +16,19 @@ int main(void) {
 
   printf("Welcome to the ICL Text Adventure!\n");
   printf("What would you like to do?\n");
-  printf("    0. Quit\n");
-  printf("    1. Start a new game\n");
-  printf("    2. Load a previously saved game\n");
+  printf("    1. Quit\n");
+  printf("    2. Start a new game\n");
+  printf("    3. Load a previously saved game\n");
 
-  while (choice != NEW_GAME || choice != LOAD_GAME) {
-    printf(
-        "Please enter a 0 (to quit), 1 (for new game) or 2 (for load game)!\n");
-    printf(">> ");
-    scanf("%d", &choice);
+  while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
+    char menuChoice[100];
+
+    printf("Please enter a 1 (quit), 2 (new game) or 3 (load game)!\n");
+    printf("   >> ");
+
+    fgets(menuChoice, sizeof(menuChoice), stdin);
+
+    choice = atoi(menuChoice);
 
     switch (choice) {
     case QUIT:
@@ -59,6 +63,7 @@ int main(void) {
       break;
     }
   }
+  printf("Done\n");
   // printBuildingDetails(huxley);
   //
   // printf("\n");
