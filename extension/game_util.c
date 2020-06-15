@@ -192,6 +192,21 @@ building_t *initialiseBuilding() {
   connectRoom(lobbyNorth, fusionSouth);
   connectRoom(fusionNorth, harrodsSouth);
 
+  cash1->dummy = 1;
+  cash2->dummy = 1;
+  cash3->dummy = 1;
+  cash4->dummy = 1;
+  cash5->dummy = 1;
+  apple1->dummy = 1;
+  apple2->dummy = 1;
+  apple3->dummy = 1;
+  apple4->dummy = 1;
+  apple5->dummy = 1;
+  keyboard->dummy = 1;
+  mouse->dummy = 1;
+  monitor->dummy = 1;
+  pass->dummy = 1;
+
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
       lobbySouth,      lobbyEast,        lobbyWest,        lobbyNorth,
       lobbyCentre,     labEast,          labNorth,         labWest,

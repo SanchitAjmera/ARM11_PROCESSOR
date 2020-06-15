@@ -31,6 +31,7 @@ typedef struct Item_t {
   Item name;
   Property properties;
   char *description;
+  int dummy;
 } Item_t;
 
 // structure for rooms
@@ -66,15 +67,16 @@ typedef struct {
 } state;
 
 static const Item_t gameItems[] = {
-    {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
-    {"keyboard", KEYBOARD, THROWABLE,
-     "A keyboard. A programmer's best friend."},
-    {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days."},
+    {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!", 0},
+    {"keyboard", KEYBOARD, THROWABLE, "A keyboard. A programmer's best friend.",
+     0},
+    {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days.", 0},
     {"monitor", MONITOR, THROWABLE,
-     "A monitor. Can't see your seg faults without it!"},
-    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
+     "A monitor. Can't see your seg faults without it!", 0},
+    {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here...",
+     0},
     {"pass", PASS, THROWABLE,
-     "pass which lets you access the lab and battle the BOSSMAN"}};
+     "pass which lets you access the lab and battle the BOSSMAN", 0}};
 
 extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
