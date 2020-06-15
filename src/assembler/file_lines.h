@@ -3,7 +3,7 @@
 
 #include "../common/util.h"
 
-/* Structure that stores the ARM file's lines as an array of strings */
+// Structure that stores the ARM file's lines as an array of strings
 typedef struct {
   char **lines;
   uint lineCount, maxLines;

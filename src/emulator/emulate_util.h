@@ -10,13 +10,13 @@
 // ARM instruction set
 typedef enum { DPI, MULT, BR, SDTI, IGNR } InstructionType;
 
-// struct for the result and carry out from shift/arithmetic operation
+// Struct for the result and carry out from shift/arithmetic operation
 typedef struct {
   word result;
   uint carryOut;
 } operation_t;
 
-// struct for the decoding of Data Processing instructions
+// Struct for the decoding of Data Processing instructions
 typedef struct {
   uint i;
   OpcodeDP opcode;
@@ -27,7 +27,7 @@ typedef struct {
   word op2;
 } dp_t;
 
-// struct for the decoding of Multiply instructions
+// Struct for the decoding of Multiply instructions
 typedef struct {
   uint a;
   uint s;
@@ -37,7 +37,7 @@ typedef struct {
   int regM;
 } multiply_t;
 
-// struct for the decoding of Single Data Transfer instructions
+// Struct for the decoding of Single Data Transfer instructions
 typedef struct {
   uint i;
   uint p;
@@ -48,12 +48,12 @@ typedef struct {
   word offset;
 } sdt_t;
 
-// struct for the decoding of Branch instructions
+// Struct for the decoding of Branch instructions
 typedef struct {
   int offset;
 } branch_t;
 
-// union for the decoded instruction types
+// Union for the decoded instruction types
 typedef union {
   dp_t *dp;
   multiply_t *multiply;
@@ -61,14 +61,14 @@ typedef union {
   branch_t *branch;
 } decoded_t;
 
-// struct for state of the instruction
+// Struct for state of the instruction
 typedef struct {
   bool isSet;
   word instruction;
   InstructionType instructionType;
 } instructionState_t;
 
-// struct for the state of the ARM
+// Struct for the state of the ARM
 typedef struct {
   byte *memory;
   // 0-12 general purpose, 13 SP, 14 LR, 15 PC, 16 CPSR

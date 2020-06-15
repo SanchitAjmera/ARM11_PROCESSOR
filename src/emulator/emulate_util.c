@@ -7,19 +7,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-uint shiftByConstant(uint shiftPart) {
+/* Constant shift if operand 2 is a register (bit 4 = 0) */
+static uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
   return shiftPart >> GET_SHIFT_CONSTANT;
 }
 
-uint shiftByRegister(arm_t *state, uint shiftPart) {
+/* Shift by value in another register (bit 4 = 1) */
+static uint shiftByRegister(arm_t *state, uint shiftPart) {
   // Rs (register) can be any general purpose register except the PC
   uint rs = shiftPart >> GET_RS_SHIFT;
   // bottom byte of value in Rs specifies the amount to be shifted
   return state->registers[rs] & LEAST_BYTE_MASK;
 }
 
-word arithShift(word value, uint shiftNum) {
+/* Returns the result of an arithmetic right shift on value by shiftNum */
+static word arithShift(word value, uint shiftNum) {
   word msb = value & MSB_MASK;
   word msbs = msb;
   for (int i = 0; i < shiftNum; i++) {
@@ -29,26 +32,31 @@ word arithShift(word value, uint shiftNum) {
   return msbs | (value >> shiftNum);
 }
 
-word rotateRight(word value, uint rotateNum) {
+/* Circular bitwise right rotation of value by rotateNum */
+static word rotateRight(word value, uint rotateNum) {
   uint lsbs = value & ((1 << rotateNum) - 1);
   return (value >> rotateNum) | (lsbs << (WORD_SIZE - rotateNum));
 }
 
-uint leftCarryOut(word value, uint shiftNum) {
+/* Calculates the carry out bit from a logical left shift */
+static uint leftCarryOut(word value, uint shiftNum) {
   if (shiftNum == 0) {
     return NO_ROTATION;
   }
   return (value << (shiftNum - 1)) >> (WORD_SIZE - 1);
 }
 
-uint rightCarryOut(word value, uint shiftNum) {
+/* Calculates carry out bit from a right rotation or shift */
+static uint rightCarryOut(word value, uint shiftNum) {
   if (shiftNum == 0) {
     return NO_ROTATION;
   }
   return (value >> (shiftNum - 1)) & LSB_MASK;
 }
 
-operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
+/* Calculates the shift type and amount, return value and carry outs from a
+supported shift operation */
+static operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   // bit to determine what to shift by
   bool shiftByReg = shiftPart & LSB_MASK;
   // number to shift by
@@ -87,7 +95,8 @@ operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   return shiftedOp2;
 }
 
-operation_t *opRegister(arm_t *state, uint op2) {
+/* Sets up barrel shifter to perform shift ops as op2 is a register */
+static operation_t *opRegister(arm_t *state, uint op2) {
   // register that holds the value to be shifted
   uint rm = op2 & LEAST_NIBBLE_MASK;
   // value to be shifted
@@ -97,7 +106,8 @@ operation_t *opRegister(arm_t *state, uint op2) {
   return barrelShifter(state, value, shiftPart);
 }
 
-operation_t *opImmediate(arm_t *state, uint op2) {
+/* Returns the immediate value rotated right by the given rotation amount */
+static operation_t *opImmediate(arm_t *state, uint op2) {
   // 8-bit immediate value zero-extended to 32 bits
   word imm = op2 & LEAST_BYTE_MASK;
   // number to rotate by
@@ -112,8 +122,8 @@ operation_t *opImmediate(arm_t *state, uint op2) {
   return shiftedOp2;
 }
 
-// carry out from arithmetic opertaion
-word getCarryOut(word op1, word op2, bool isAddition) {
+/* Carry out from arithmetic opertaion */
+static word getCarryOut(word op1, word op2, bool isAddition) {
   if (isAddition) {
     return (op1 <= UINT32_MAX - op2) ? 0 : 1;
   }
@@ -121,19 +131,21 @@ word getCarryOut(word op1, word op2, bool isAddition) {
   return op1 < op2 ? 0 : 1;
 }
 
-void setCPSR(arm_t *state, word result, uint carryOut) {
+/* Sets the values of the CPSR depending on the result of an operation */
+static void setCPSR(arm_t *state, word result, uint carryOut) {
   // set to the logical value of bit 31 of the result
   word n = result & CPSR_N_MASK;
   // set only if the result is all zeros
   word z = result ? 0 : CPSR_Z_MASK;
   // carry out from the instruction
-  word c = carryOut ? SET_CPSR_C : 0;
+  word c = carryOut ? CPSR_C_MASK : 0;
   // v is unaffected
   word v = state->registers[CPSR] & CPSR_V_MASK;
   // updated flag bits
   state->registers[CPSR] = n | z | c | v;
 }
 
+/* Executes supported Data Processing instructions from opcode */
 void executeDPI(arm_t *state, dp_t *decoded) {
   // if i is set, op2 is an immediate const, otherwise it's a shifted register
   operation_t *shiftedOp2 = decoded->i ? opImmediate(state, decoded->op2)
@@ -198,9 +210,9 @@ void executeDPI(arm_t *state, dp_t *decoded) {
   free(decoded);
 }
 
-// function for checking if word is within MEMORY_CAPACITY
-// prints error if memory is out of bounds
-bool checkValidAddress(word address) {
+/* function for checking if word is within MEMORY_CAPACITY
+   prints error if memory is out of bounds */
+static bool checkValidAddress(word address) {
   if (address > MEMORY_CAPACITY) {
     printf("Error: Out of bounds memory access at address 0x%08x\n", address);
     return false;
@@ -208,8 +220,8 @@ bool checkValidAddress(word address) {
   return true;
 }
 
-// function which stores address inside source register Rd into the the memory
-void store(arm_t *state, word sourceReg, word baseReg) {
+/* Stores address, found in source register Rd, into the the memory */
+static void store(arm_t *state, word sourceReg, word baseReg) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (!checkValidAddress(baseReg)) {
     return;
@@ -222,8 +234,8 @@ void store(arm_t *state, word sourceReg, word baseReg) {
   }
 }
 
-// function which loads address inside base register Rn into the memory
-void load(arm_t *state, word destReg, word sourceAddr) {
+/* Function which loads address inside base register Rn into the memory */
+static void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
   if (checkValidAddress(sourceAddr)) {
     // value inside base register
@@ -233,6 +245,7 @@ void load(arm_t *state, word destReg, word sourceAddr) {
   }
 }
 
+/* Executes all supported Single Data Transfer instructions */
 void executeSDTI(arm_t *state, sdt_t *decoded) {
   uint l = decoded->l;
   uint rd = decoded->rd;
@@ -257,6 +270,7 @@ void executeSDTI(arm_t *state, sdt_t *decoded) {
   free(decoded);
 }
 
+/* Executes all supported Multiply instructions */
 void executeMultiply(arm_t *state, multiply_t *decoded) {
   int regS = decoded->regS;
   int regM = decoded->regM;
@@ -275,13 +289,14 @@ void executeMultiply(arm_t *state, multiply_t *decoded) {
   free(decoded);
 }
 
-// pipeline flush required for a branch instruction
+/* Pipeline flush required for a branch instruction */
 void flushPipeline(arm_t *state) {
   state->fetched = 0;
   state->decoded.instruction = 0;
   state->decoded.isSet = false;
 }
 
+/* Execution of a branch instruction */
 void executeBranch(arm_t *state, branch_t *decoded) {
   flushPipeline(state);
   int offset = decoded->offset;
