@@ -42,7 +42,7 @@ typedef enum { BATMAN, UTA } Character;
 typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
 
 // enum for supported commands
-typedef enum { EXIT, PICKUP, DROP, BUY, MOVE } Commands;
+typedef enum { EXIT, PICKUP, DROP, BUY, MOVE } Command;
 
 // generic (string, enum) struct for lookups
 typedef struct {
@@ -124,5 +124,7 @@ extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
 extern void freeState(state *state1);
 extern void quit();
+extern int lookup(const pair_t table[], const int size, const char *key);
+extern void lowercase(char *string);
 
 #endif
