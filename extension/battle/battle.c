@@ -1,35 +1,36 @@
 #include "battle.h"
 #include "../characters/boss/boss.h"
+#include "../characters/player/player.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 // determines if the game is finished
-bool battleOver(boss_t *boss, player_t *player) {
+static bool battleOver(boss_t *boss, player_t *player) {
   return FIGHT(boss)->health <= 0;
   || player->health <= 0;
 }
 
 // determines if the player won
-bool playerWon(boss_t *boss, player_t *player) {
+static bool playerWon(boss_t *boss, player_t *player) {
   // PRE: gamover() returns true
   return FIGHT(boss)->health < player->health;
 }
 
-void printAttack(const char *name, int damage, const char *attackName) {
+static void printAttack(const char *name, int damage, const char *attackName) {
   printf("%s used '%s'...\n...and dealt %d damage!\n", name, attackName,
          damage);
 }
 
 // deals damage to the player
-void attackPlayer(boss_t *boss, player_t *player, int damage,
-                  const char *attackName) {
+static void attackPlayer(boss_t *boss, player_t *player, int damage,
+                         const char *attackName) {
   player->health -= damage;
   printAttack(boss->name, damage, attackName);
 }
 
 // deals damage to the boss
-void attackBoss(boss_t *boss, player_t *player, int damage,
-                const char *attackName) {
+static void attackBoss(boss_t *boss, player_t *player, int damage,
+                       const char *attackName) {
   if (IS_CRIT(rand())) {
     damage *= CRIT_FACTOR;
   }
@@ -38,12 +39,12 @@ void attackBoss(boss_t *boss, player_t *player, int damage,
 }
 
 // player's turn in battle
-void playerTurn(boss_t *boss, player_t *player) {
+static void playerTurn(boss_t *boss, player_t *player) {
   // TODO: @Luqman to code...
 }
 
 // boss's turn in battle
-void bossTurn(boss_t *boss, player_t *player) {
+static void bossTurn(boss_t *boss, player_t *player) {
   int damage;
   const char *name;
   if (FIGHT(boss)->health < BOSS_LOW_HEALTH(boss)) {
