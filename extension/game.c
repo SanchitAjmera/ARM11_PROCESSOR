@@ -25,6 +25,7 @@ void getCommand(char *command, char *argument) {
   lowercase(comm);
   lowercase(arg);
 
+  // Copy results into given pointers
   strcpy(command, comm);
   if (arg) {
     strcpy(argument, arg);
@@ -54,6 +55,7 @@ void playGame(state *currentState) {
     case BUY:
       break;
     default:
+      printf("I'm not sure how to '%s'?\n", command);
       break;
     }
   }
