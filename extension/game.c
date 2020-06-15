@@ -12,19 +12,25 @@ void playGame(state *currentState) { printf("Playing!\n"); }
 
 int main(void) {
 
-  Menu choice = NONE;
+  int choice = NONE;
 
   printf("Welcome to the ICL Text Adventure!\n");
   printf("What would you like to do?\n");
+  printf("    0. Quit\n");
   printf("    1. Start a new game\n");
   printf("    2. Load a previously saved game\n");
 
   while (choice != NEW_GAME || choice != LOAD_GAME) {
-    printf("Please enter a 1 (for new game) or 2 (for load game)!\n");
+    printf(
+        "Please enter a 0 (to quit), 1 (for new game) or 2 (for load game)!\n");
     printf(">> ");
     scanf("%d", &choice);
 
     switch (choice) {
+    case QUIT:
+      printf("Thanks for playing!\n");
+      exit(EXIT_SUCCESS);
+
     case NEW_GAME:
       printf("Prepare for a new adventure...\n");
       building_t *huxley = initialiseBuilding();
@@ -35,10 +41,11 @@ int main(void) {
       break;
 
     case LOAD_GAME:
-      char[100] fileName;
       printf("Enter the load file name: ");
-      fgets(fileName, sizeof(fileName), STDIN);
-      // result = loadGame(fileName); // to be checked
+      char fileName[100];
+      fgets(fileName, sizeof(fileName), stdin);
+      printf("File loaded: %s\n", fileName);
+      int result = -1; // loadGame(fileName); // to be checked
 
       if (result == -1) {
         printf("File loading failed!\n");
