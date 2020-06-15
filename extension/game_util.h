@@ -21,6 +21,7 @@
 #define REMOVED (NULL)
 #define MAX_PROPERTY (8)
 #define PROPERTY_NUM (4)
+#define COMMAND_NUM (5)
 
 // enum for position in rooms
 typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
