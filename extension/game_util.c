@@ -27,13 +27,12 @@ char *strptr(const char *in) {
 }
 
 // converts a string to lowercase
-char *lowercase(char *in) {
+void lowercase(char *in) {
   if (in) {
     for (char *string = in; *string; string++) {
       *string = tolower(*string);
     }
   }
-  return in;
 }
 
 // shows player their inventory of Items
