@@ -36,70 +36,71 @@ char *getPropertyStr(Property property) {
     }
     return LOOKUP_FAILURE;
   }
+}
 
-  void printProperties(state * currentState, char *itemName) {
-    item_t *item = lookup(gameItems, ITEM_NUM, itemName);
-    if (!item || !currentState->player->inventory[item->name]) {
-      printf("%s is not in your inventory!\n", itemName);
-      return;
-    }
-    for (int i = 1; i <= MAX_PROPERTY; i << 1) {
-      if (hasProperty(i, item)) {
-        printf(" %s |", getPropertyStr(i));
-      }
-    }
-    printf("\n");
+void printProperties(state *currentState, char *itemName) {
+  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  if (!item || !currentState->player->inventory[item->name]) {
+    printf("%s is not in your inventory!\n", itemName);
+    return;
   }
-
-  void printPlayer(state * currentState) {
-    printHealth(currentState);
-    printCash(currentState);
-    printInventory(currentState);
+  for (int i = 1; i <= MAX_PROPERTY; i << 1) {
+    if (hasProperty(i, item)) {
+      printf(" %s |", getPropertyStr(i));
+    }
   }
+  printf("\n");
+}
 
-  //--------------------------End of Prints--------------------------------
+void printPlayer(state *currentState) {
+  printHealth(currentState);
+  printCash(currentState);
+  printInventory(currentState);
+}
 
-  // returns index of item if it is in the list. TODO: remove magic numbers
-  int findItem(item_t * *inventory, int item_count, char *itemName) {
-    for (int i = 0; i < item_count; i++) {
-      if (!strcmp(inventory[i]->key, itemName)) {
-        return i;
-      }
+//--------------------------End of Prints--------------------------------
+
+// returns index of item if it is in the list. TODO: remove magic numbers
+int findItem(item_t **inventory, int item_count, char *itemName) {
+  for (int i = 0; i < item_count; i++) {
+    if (!strcmp(inventory[i]->key, itemName)) {
+      return i;
     }
-    return FIND_FAIL;
   }
+  return FIND_FAIL;
+}
 
-  bool pickUpItem(state * currentState, char *itemName) {
-    item_t *item = lookup(gameItems, ITEM_NUM, itemName);
-    if (!item || !currentState->curr_room_node->items[item->name]) {
-      printf("This item could not be found here!\n");
-      return false;
-    }
-    if (currentState->player->inventory[item->name] == item) {
-      printf("%s is already in your inventory!", itemName);
-    } else {
-      currentState->curr_room_node->items[item->name] = REMOVED;
-      currentState->curr_room_node->item_count--;
-      currentState->player->inventory[item->name] = item;
-      currentState->player->itemCount++;
-      printf("%s has been picked up\n", itemName);
-    }
-    return true;
+bool pickUpItem(state *currentState, char *itemName) {
+  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  if (!item || !currentState->curr_room_node->items[item->name]) {
+    printf("This item could not be found here!\n");
+    return false;
   }
-
-  bool dropItem(state * currentState, char *itemName) {
-    item_t *item = lookup(gameItems, ITEM_NUM, itemName);
-    if (!item || !currentState->player->inventory[item->name]) {
-      printf("You do not have this item to drop: %s\n", itemName);
-      return false;
-    }
-    currentState->player->inventory[item->name] = REMOVED;
-    currentState->player->itemCount--;
-    currentState->curr_room_node->items[item->name] = item;
-    currentState->curr_room_node->item_count++;
-    printf("%s has been dropped!\n", itemName);
+  if (currentState->player->inventory[item->name] == item) {
+    printf("%s is already in your inventory!", itemName);
+  } else {
+    currentState->curr_room_node->items[item->name] = REMOVED;
+    currentState->curr_room_node->item_count--;
+    currentState->player->inventory[item->name] = item;
+    currentState->player->itemCount++;
+    printf("%s has been picked up\n", itemName);
   }
   return true;
+}
 
-  // Todo:
-  bool buyItem(state * currentState, char *itemName) {}
+bool dropItem(state *currentState, char *itemName) {
+  item_t *item = lookup(gameItems, ITEM_NUM, itemName);
+  if (!item || !currentState->player->inventory[item->name]) {
+    printf("You do not have this item to drop: %s\n", itemName);
+    return false;
+  }
+  currentState->player->inventory[item->name] = REMOVED;
+  currentState->player->itemCount--;
+  currentState->curr_room_node->items[item->name] = item;
+  currentState->curr_room_node->item_count++;
+  printf("%s has been dropped!\n", itemName);
+
+  return true;
+}
+// Todo:
+bool buyItem(state *currentState, char *itemName) {}
