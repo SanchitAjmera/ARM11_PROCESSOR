@@ -84,11 +84,15 @@ void freeBoss(boss_t *boss) {
 }
 
 void initBattle(boss_t *boss, player_t *player) {
-  boss->isPassive = false;
   freeBossTeaching(boss->teaching);
+  boss->isPassive = false;
   boss->fighting = malloc(sizeof(*boss->fighting));
   NULL_POINTER(boss->fighting);
-  *boss->fighting = lookup(boss->name).fightingState;
+  if (strcmp(boss->name, "Tony")) {
+    *boss->fighting = tonyBattle;
+  } else {
+    *boss->fighting = kgkBattle;
+  }
   battle(boss, player);
 }
 
