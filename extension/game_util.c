@@ -357,7 +357,7 @@ player_t *initialisePlayer() {
   player_t *newPlayer = malloc(sizeof(*newPlayer));
   checkPtr(newPlayer);
   newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t));
-  checkPtr(inventory);
+  checkPtr(newPlayer->inventory);
   newPlayer->health = MAX_HEALTH;
   newPlayer->cash = INITIAL_CASH;
   newPlayer->itemCount = 0;
