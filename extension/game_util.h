@@ -1,3 +1,6 @@
+#ifndef GAME_UTIL_H
+#define GAME_UTIL_H
+
 #include "characters/player/player.h"
 #include <math.h>
 #include <stdbool.h>
@@ -35,7 +38,7 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 typedef enum { BATMAN, UTA } Character;
 
 // enum for menu choices
-typedef enum { NEW_GAME = 1, LOAD_GAME, NONE } Menu;
+typedef enum { QUIT, NEW_GAME, LOAD_GAME, NONE } Menu;
 
 // generic (string, enum) struct for lookups
 typedef struct {
@@ -52,6 +55,13 @@ typedef struct {
   int hash;
 } item_t;
 
+// Struct to store details about player;
+typedef struct {
+  item_t **inventory;
+  int itemCount;
+  int health;
+  int cash;
+} player_t;
 // structure for rooms
 // valid for non cyclical room structure
 typedef struct room_t {
@@ -102,3 +112,5 @@ extern building_t *initialiseBuilding();
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
 extern void freeState(state *state1);
+
+#endif
