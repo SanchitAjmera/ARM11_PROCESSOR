@@ -17,9 +17,39 @@ void getCommand(char *command, char *argument) {
 
   command = strtok(input, " ");
   argument = strtok(NULL, " ");
+
+  lowercase(command);
+  lowercase(argument);
 }
 
-void playGame(state *currentState) {}
+void playGame(state *currentState) {
+  bool play = true;
+  // TODO: validate ptr on these
+  char *command = malloc(sizeof(char) * 30);
+  char *argument = malloc(sizeof(char) * 30);
+
+  while (play) {
+    getCommand(command, argument);
+    Command type = lookup(commandsTable, COMMAND_NUM, command);
+    switch (type) {
+    case QUIT:
+      free(command);
+      free(argument);
+      quit();
+    case PICKUP:
+      break;
+    case DROP:
+      break;
+    case MOVE:
+      break;
+    case BUY:
+      break;
+    }
+  }
+
+  free(command);
+  free(argument);
+}
 
 int main(void) {
 
