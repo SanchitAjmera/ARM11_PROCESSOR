@@ -8,4 +8,6 @@
 #define CRIT_MAX_CHANCE (10)
 #define IS_CRIT(num) ((num % CRIT_MAX_CHANCE) > CRIT_CHANCE)
 
+extern void battle(boss_t *boss, player_t *player);
+
 #endif
