@@ -266,7 +266,6 @@ void freeBuilding(building_t *huxley) {
   }
   // calling recursive function to traverse through and free all the rooms
   freeRoom(NULL, huxley->start_room);
-  free(huxley->start_room);
   free(huxley);
 }
 // changes room of person and pushes current room into room histroy of player
