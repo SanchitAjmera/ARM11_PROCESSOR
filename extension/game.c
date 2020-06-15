@@ -15,12 +15,7 @@ int main(void) {
 
   int choice = NONE;
   char menuChoice[100];
-
-  printf("Welcome to the ICL Text Adventure!\n");
-  printf("What would you like to do?\n");
-  printf("    1. Quit\n");
-  printf("    2. Start a new game\n");
-  printf("    3. Load a previously saved game\n");
+  printMenu();
 
   while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
 
