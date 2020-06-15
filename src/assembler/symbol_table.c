@@ -14,6 +14,7 @@ symbol **createSymbols(int num, int size) {
   for (int i = 0; i < num; i++) {
     symbols[i] = malloc(sizeof(*symbols[i]));
     validatePtr(symbols[i], "Not enough memory.");
+    symbols[i][0].collisions = 0;
   }
   return symbols;
 }
@@ -37,7 +38,7 @@ void freeList(symbol *symbols, int size) {
 
 void freeSymbols(symbol **symbols, int size) {
   for (int i = 0; i < size; i++) {
-    freeList(symbols[i], sizeof(symbols[i]) / sizeof(symbols[i][0]));
+    freeList(symbols[i], symbols[i][0].collisions);
   }
   free(symbols);
 }
@@ -57,10 +58,10 @@ static int hash(const symbol_table *s, const char *key) {
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
   int index1 = hash(s, name);
-  int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
+  int size = s->symbols[index1][0].collisions;
   if (size > 1) {
     for (int i = 0; i < size; i++) {
-      if (s->symbols[index1][i].name == name) {
+      if (!strcmp(s->symbols[index1][i].name, name)) {
         return s->symbols[index1] + i;
       }
     }
@@ -80,27 +81,33 @@ static void rehash(symbol_table *s) {
   }
   symbol **symbols = createSymbols(s->symbolCount, sizeof(*symbols));
   int index = 0;
+  symbol temp = {NULL, LABEL, 0, .body.assembleFunc = NULL};
   for (int i = 0; i < s->size; i++) {
-    for (int j = 0; j < s->size; j++) {
+    for (int j = 0; j < s->symbols[i][0].collisions; j++) {
       symbols[index++][0] = s->symbols[i][j];
+      s->symbols[i][j] = temp;
     }
   }
-  freeSymbols(s->symbols, s->size);
+  // freeSymbols(s->symbols, s->size);
   s->size *= 2;
+  s->symbols = realloc(s->symbols, sizeof(*s->symbols) * s->size);
   addSymbols(s, symbols, s->symbolCount);
-  freeSymbols(symbols, s->symbolCount);
+  // freeSymbols(symbols, s->symbolCount);
+  free(symbols);
 }
 
 void addSymbol(symbol_table *s, symbol *entry) {
   if (getSymbol(s, entry->name)->name != NULL) {
+    if (!strcmp(getSymbol(s, entry->name)->name, entry->name)) {
+      return;
+    }
     // label already defined
-    return;
   }
 
   int index1 = hash(s, entry->name);
   int index2 = 0;
-  int size = sizeof(s->symbols[index1]) / sizeof(s->symbols[index1][0]);
-  if (size > 1) {
+  int size = s->symbols[index1][0].collisions;
+  if (size >= 1) {
     s->symbols[index1] =
         realloc(s->symbols[index1], sizeof(*s->symbols[index1]) * (++size));
     validatePtr(s->symbols[index1], "Not enough memory.");
@@ -108,6 +115,7 @@ void addSymbol(symbol_table *s, symbol *entry) {
   }
   s->symbols[index1][index2] = *entry;
   s->symbolCount++;
+  s->symbols[index1][0].collisions++;
   rehash(s);
 }
 
@@ -115,4 +123,13 @@ void addSymbol(symbol_table *s, symbol *entry) {
 
 void printSymbol(symbol s) {}
 
-void printSymbolTable(symbol_table *s) {}
+void printSymbolTable(symbol_table *s) {
+  for (int i = 0; i < s->size; i++) {
+    if (s->symbols[i] == NULL) {
+      continue;
+    }
+    for (int j = 0; j < s->symbols[i][0].collisions; j++) {
+      printf("key:%s\n", s->symbols[i][j].name);
+    }
+  }
+}

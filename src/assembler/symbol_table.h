@@ -28,6 +28,7 @@ struct symbol_table {
 struct symbol {
   char *name;
   SymbolType type;
+  int collisions;
   union {
     word address;                                      // LABEL
     word (*assembleFunc)(symbol_table *, instruction); // INSTR
