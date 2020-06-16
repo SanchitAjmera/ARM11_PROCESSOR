@@ -65,7 +65,7 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 typedef enum { BATMAN, UTA } Character;
 
 // enum for menu choices
-typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
+typedef enum { NONE, NEW_GAME, LOAD_GAME, QUIT } Menu;
 
 // enum for supported commands
 typedef enum { EXIT, PICKUP, DROP, BUY, MOVE, VIEW, SAVE, HELP } Command;

@@ -98,23 +98,21 @@ int main(void) {
   // loadGameState("sanchizzle", playerState, worldMap);
   int choice = NONE;
   char menuChoice[100];
-  printMenu();
 
   while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
-
-    printf("Please enter a 1 (quit), 2 (new game) or 3 (load game)!\n");
-    printf(" >> ");
-
+    printMenu();
     fgets(menuChoice, sizeof(menuChoice), stdin);
     choice = atoi(menuChoice);
+
+    // printMenu();
 
     switch (choice) {
     case QUIT:
       quit();
 
     case NEW_GAME:
-      printf("Prepare for a new adventure...\n");
-      printf("dummy: %s\n", gameItems[0].key);
+      printPreparingGame();
+
       // TODO: validate huxley ptr
       room_t **rooms = malloc(sizeof(*rooms) * ROOM_COUNT);
       building_t *huxley = initialiseBuilding(rooms);
@@ -149,10 +147,9 @@ int main(void) {
       printf("Invalid choice entered!\n");
       break;
     }
-  }
-  printf("Done\n");
+    printf("Done\n");
 
-  freeBuilding(huxley);
-  free(worldMap);
-  exit(EXIT_SUCCESS);
-}
+    freeBuilding(huxley);
+    free(worldMap);
+    exit(EXIT_SUCCESS);
+  }

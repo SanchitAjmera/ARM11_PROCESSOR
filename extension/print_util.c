@@ -10,12 +10,51 @@
 
 #define CLEAR ("clear")
 
+void printPreparingGame(void) {
+
+  for (int i = 0; i < 35; i++) {
+    system(CLEAR);
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("                       Prepare for a new adventure...");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("                       ");
+    for (int j = 0; j < i; j++) {
+      printf("#");
+    }
+    for (int j = 33; j >= i; j--) {
+      printf("-");
+    }
+    printf("\n");
+    fflush(stdout);
+    usleep(80000);
+  }
+  printf("\n");
+  printf("\n");
+}
+
 void printMenu(void) {
-  printf("Welcome to the ICL Text Adventure!\n");
-  printf("What would you like to do?\n");
-  printf("    1. Quit\n");
-  printf("    2. Start a new game\n");
-  printf("    3. Load a previously saved game\n");
+  system(CLEAR);
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("                          Welcome to the ICL Text Adventure!\n\n");
+  printf("                          What would you like to do?\n\n");
+  usleep(500000);
+  fflush(stdout);
+  printf("                              [1] NEW GAME\n");
+  printf("                              [2] LOAD GAME\n");
+  printf("                              [3] QUIT\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("                          >> ");
+  return;
 }
 
 // funcion to print Room position
