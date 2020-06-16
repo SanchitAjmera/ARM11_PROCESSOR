@@ -42,6 +42,7 @@ static void attackBoss(boss_t *boss, player_t *player, int damage,
 // player's turn in battle
 static void playerTurn(boss_t *boss, player_t *player) {
   // TODO: @Luqman to code...
+  printHealth();
 }
 
 // boss's turn in battle
