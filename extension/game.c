@@ -72,7 +72,7 @@ int main(void) {
   room_t **worldMap = malloc(sizeof(room_t *) * 25);
   building_t *huxley = initialiseBuilding(worldMap);
 
-  state *playerState = initialiseState(huxley->start_room);
+  state *playerState = initialiseState(huxley->startRoom);
   // state *playerState = malloc(sizeof(state));
   saveGameState("sanchizzle", playerState, worldMap);
   // loadGameState("sanchizzle", playerState, worldMap);
@@ -94,17 +94,18 @@ int main(void) {
 
     case NEW_GAME:
       printf("Prepare for a new adventure...\n");
+      printf("dummy: %s", gameItems[0].key);
       // TODO: validate huxley ptr
-      building_t *huxley = initialiseBuilding();
-      state *playerState = initialiseState(huxley->start_room);
-      playGame(playerState);
-
-      printBuildingDetails(huxley);
-      printf("\n");
-      printStateDetails(playerState);
-
-      freeState(playerState);
-      freeBuilding(huxley);
+      // building_t *huxley = initialiseBuilding();
+      // state *playerState = initialiseState(huxley->startRoom);
+      // playGame(playerState);
+      //
+      // printBuildingDetails(huxley);
+      // printf("\n");
+      // printStateDetails(playerState);
+      //
+      // freeState(playerState);
+      // freeBuilding(huxley);
 
       break;
 

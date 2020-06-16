@@ -83,7 +83,7 @@ void printRoomDetails(room_t *room1) {
   printRoomPosition(room1);
   printRoomName(room1);
   printf("Items in the room: ");
-  printItemDetails(room1->Items, room1->ItemCount);
+  printItemDetails(room1->items, room1->itemCount);
   printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
   printf("adjacent rooms:\n");
   printAdjacentRooms(room1);
@@ -117,7 +117,7 @@ void roomTraverser(room_t *entranceRoom, room_t *room1,
 
 // prints details of all rooms in the building
 void printBuildingDetails(building_t *huxley) {
-  roomTraverser(NULL, huxley->start_room, printRoomDetails);
+  roomTraverser(NULL, huxley->startRoom, printRoomDetails);
 }
 
 void printStateDetails(state *state1) {
@@ -128,7 +128,7 @@ void printStateDetails(state *state1) {
   printf("Items in inventory: ");
   printItemDetails(state1->player->inventory, state1->player->itemCount);
   printf("currently in room: ");
-  printRoomDetails(state1->curr_room_node);
+  printRoomDetails(state1->currentRoom);
 }
 
 //-------------------------Konstantinos-----------------------------------------

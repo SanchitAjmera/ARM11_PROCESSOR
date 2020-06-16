@@ -1,6 +1,7 @@
 #ifndef GAME_UTIL_H
 #define GAME_UTIL_H
 
+typedef struct item_t item_t;
 #include "characters/player/player.h"
 #include <math.h>
 #include <stdbool.h>
@@ -24,6 +25,7 @@
 #define USERNAME_CHAR_LIMIT (20)
 #define TOTAL_ROOM_COUNT (25)
 #define COMMAND_NUM (5)
+#define DIR_NUM (4)
 
 // enum for position in rooms
 
@@ -68,14 +70,14 @@ typedef struct {
 } pair_t;
 
 // struct for Items and their properties
-typedef struct {
+struct item_t {
   char *key;
   Item name;
   uint8_t properties;
   char *description;
   int hash;
   int cost;
-} item_t;
+};
 
 // structure for rooms
 // valid for non cyclical room structure
@@ -85,19 +87,19 @@ typedef struct room_t {
   RoomPosition position;
   int adjacent_room_count;
   char *description;
-  item_t **Items;
-  int ItemCount;
+  item_t **items;
+  int itemCount;
   int id;
 } room_t;
 
 // structure for building consisting of room_history
 typedef struct building_t {
-  room_t *start_room;
+  room_t *startRoom;
 } building_t;
 
 typedef struct {
   player_t *player;
-  room_t *curr_room_node; // struct for room_t structure
+  room_t *currentRoom; // struct for room_t structure
 
   struct {
     char *username;
@@ -124,7 +126,7 @@ static const pair_t commandsTable[] = {{"exit", EXIT},
                                        {"move", MOVE}};
 
 // Supported Items
-static const item_t gameItems[] = {
+static item_t gameItems[] = {
     {"apple", FOOD, EDIBLE, "An apple. Increases health by 5 when eaten!"},
     {"keyboard", KEYBOARD, THROWABLE,
      "A keyboard. A programmer's best friend."},
@@ -149,7 +151,9 @@ extern state *initialiseState(room_t *initialRoom);
 extern item_t *initialiseItem(item_t gameItem);
 extern void freeState(state *state1);
 extern void quit();
+extern bool hasProperty(Property property, item_t *item);
 extern int lookup(const pair_t table[], const int size, const char *key);
+extern item_t *itemLookup(item_t table[], const int size, const char *key);
 extern void lowercase(char *in);
 extern void checkPtr(const void *ptr);
 extern int loadGameState(const char *fname, state *playerState,
