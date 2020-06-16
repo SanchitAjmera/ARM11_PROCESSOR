@@ -22,6 +22,10 @@
 #define MONITOR_ITEM_INDEX (3)
 #define PASS_ITEM_INDEX (5)
 #define BUYABLE_APPLE_ITEM_INDEX (6)
+// start position of buyable apples in the item array
+#define BUYABLE_APPLE_START_INDEX (14)
+// start position of fusion rooms in room array
+#define FUSION_START_INDEX (14)
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -186,7 +190,13 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   free(randomOtherItemLocations);
 }
 
-void placeBuyableItems(item_t *Items[], room_t *rooms[]) {}
+void placeBuyableItems(item_t *items[], room_t *rooms[]) {
+  for (int i = BUYABLE_APPLE_START_INDEX; i < TOTAL_ITEM_COUNT; i++) {
+    rooms[FUSION_START_INDEX]->Items[rooms[FUSION_START_INDEX]->ItemCount] =
+        items[i];
+    rooms[FUSION_START_INDEX]->ItemCount++;
+  }
+}
 
 // connects first room to second room
 void connectRoom(room_t *first, room_t *second) {
@@ -354,12 +364,14 @@ building_t *initialiseBuilding(room_t **out) {
     out[i] = roomArray[i];
   }
 
-  item_t *ItemArray[TOTAL_ITEM_COUNT] = {
+  item_t *itemArray[TOTAL_ITEM_COUNT] = {
       cash1,     cash2,     cash3,     cash4,     cash5,    apple1,  apple2,
       apple3,    apple4,    apple5,    keyboard,  mouse,    monitor, pass,
       buyApple1, buyApple2, buyApple3, buyApple4, buyApple5};
 
-  randomlyPlaceItems(ItemArray, roomArray);
+  randomlyPlaceItems(itemArray, roomArray);
+
+  placeBuyableItems(itemArray, roomArray);
 
   huxley->start_room = lobbySouth;
   //  free(roomArray);
