@@ -16,5 +16,6 @@ struct player_t {
 
 extern player_t *initialisePlayer();
 extern bool moveRoom(state *currentState, char *dirName);
+extern bool pickUpItem(state *currentState, char *argument);
 
 #endif

@@ -49,6 +49,8 @@ void playGame(state *currentState) {
       free(argument);
       quit();
     case PICKUP:
+      pickUpItem(currentState, argument);
+      printStateDetails(currentState);
       break;
     case DROP:
       break;
