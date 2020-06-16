@@ -103,7 +103,8 @@ static const item_t gameItems[] = {
     {"monitor", MONITOR, THROWABLE,
      "A monitor. Can't see your seg faults without it!"},
     {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
-    {"pass", PASS, THROWABLE, "You shall not pass"}};
+    {"pass", PASS, THROWABLE, "You shall not pass"},
+    {"apple", APPLE, BUYABLE, "Pay 5 HuxCoins to get an apple!"}};
 
 extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);

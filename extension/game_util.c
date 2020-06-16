@@ -396,6 +396,8 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
 
   if (room1->Items != NULL) {
     for (int i = 0; i < room1->ItemCount; i++) {
+      free(room1->Items[i]->description);
+      free(room1->Items[i]->key);
       free(room1->Items[i]);
     }
     free(room1->Items);
