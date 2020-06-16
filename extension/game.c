@@ -45,6 +45,7 @@ void playGame(state *currentState) {
     Command type = lookup(commandsTable, COMMAND_NUM, command);
     switch (type) {
     case EXIT:
+      // TODO: free all possible resources taken up by the game
       free(command);
       free(argument);
       quit();
@@ -53,6 +54,8 @@ void playGame(state *currentState) {
       printStateDetails(currentState);
       break;
     case DROP:
+      dropItem(currentState, argument);
+      printStateDetails(currentState);
       break;
     case MOVE:
       moveRoom(currentState, argument);
@@ -63,6 +66,14 @@ void playGame(state *currentState) {
       // printInventory(currentState);
       break;
     case BUY:
+      buyItem(currentState, argument);
+      printStateDetails(currentState);
+      break;
+    case SAVE:
+      //  saveGameState(argument, currentState, );
+      break;
+    case HELP:
+      printf("Help is on its way -- need function\n");
       break;
 
     default:
