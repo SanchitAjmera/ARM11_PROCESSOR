@@ -21,9 +21,10 @@
 #define REMOVED (NULL)
 #define MAX_PROPERTY (8)
 #define PROPERTY_NUM (4)
+#define USERNAME_CHAR_LIMIT (20)
 
 // enum for position in rooms
-typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
+typedef enum { EAST = 0, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
 typedef enum { APPLE = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
@@ -113,6 +114,7 @@ extern void freeState(state *state1);
 
 extern int loadGameState(const char *fname, state *playerState,
                          room_t **worldMap);
-extern int saveGameState(const char *fname, state *playerState);
+extern int saveGameState(const char *fname, state *playerState,
+                         room_t **worldMap);
 
 #endif
