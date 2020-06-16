@@ -368,11 +368,11 @@ building_t *initialiseBuilding(room_t **out) {
     out[i] = roomArray[i];
   }
 
-  // item_t *ItemArray[TOTAL_ITEM_COUNT] = {
-  //    cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
-  //    apple3, apple4, apple5, keyboard, mouse, monitor, pass};
+  item_t *ItemArray[TOTAL_ITEM_COUNT] = {
+      cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
+      apple3, apple4, apple5, keyboard, mouse, monitor, pass};
 
-  // randomlyPlaceItems(ItemArray, roomArray);
+  randomlyPlaceItems(ItemArray, roomArray);
 
   huxley->start_room = lobbySouth;
   //  free(roomArray);
