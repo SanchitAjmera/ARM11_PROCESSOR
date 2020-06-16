@@ -1,6 +1,9 @@
 #include "common/constants.h"
+#include "emulator/decode/emulate_decode.h"
 #include "emulator/emulate_constants.h"
 #include "emulator/emulate_util.h"
+#include "emulator/execute/emulate_execute.h"
+#include "emulator/fetch/emulate_fetch.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -2,7 +2,9 @@
 #include "../../common/util.h"
 #include "../emulate_constants.h"
 #include "../emulate_util.h"
-#include "emulate_execute.h"
+#include "../execute/emulate_execute.h"
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
