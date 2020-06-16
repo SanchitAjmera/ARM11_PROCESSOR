@@ -15,7 +15,6 @@
 #define TOTAL_BUYABLE_APPLE_COUNT (5)
 #define TOTAL_SHOP_COUNT (10)
 #define TOTAL_CASH_COUNT (5)
-#define TOTAL_ROOM_COUNT (25)
 #define CASH_ITEM_INDEX (4)
 #define APPLE_ITEM_INDEX (0) // I beg you dont change the _ITEM_INDEX's
 #define KEYBOARD_ITEM_INDEX (1)
@@ -46,7 +45,8 @@ int validatePtr(const void *ptr, const char *errorMsg) {
   return 0;
 }
 
-/* loadGameState takes in a filename and a pointer to an uninitialised state.
+/* loadGameState takes in a filename, a pointer to an uninitialised state,
+   and an array of pointers to every room in the game.
    If such file does not exist or cannot be opened, return -1.
    Otherwise, it writes the file's contents to the state. */
 int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
@@ -66,6 +66,12 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
 
       playerState->player = malloc(sizeof(player_t));
       fread(playerState->player, sizeof(player_t), 1, file);
+
+      /* Load player's username */
+      playerState->profile.username =
+          malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
+      fread(playerState->profile.username, sizeof(char), USERNAME_CHAR_LIMIT,
+            file);
 
       /* Load inventory */
       int itemCount = playerState->player->itemCount;
@@ -88,9 +94,10 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
           worldMap[(currentRoom * 5) + currentPosition];
 
       /* Load items in each room */
-      for (int i = 0; i < 25; i++) { // For each room in the map
+      for (int i = 0; i < TOTAL_ROOM_COUNT; i++) { // For each room in the map
         int itemCount;
         fread(&itemCount, sizeof(int), 1, file);
+        worldMap[i]->ItemCount = itemCount;
         for (int j = 0; j < itemCount; j++) {
           Item item;
           fread(&item, sizeof(Item), 1, file);
@@ -106,17 +113,42 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
   }
 }
 
-/* saveGameState takes in a filename and a pointer to the player's state.
-   returns -1 if the file could not be opened. Otherwise, it writes
+/* saveGameState takes in a filename, a pointer to the player's state,
+   and an array of pointers to every room in the game.
+   Returns -1 if the file could not be opened. Otherwise, it writes
    the player's state to the file. */
-int saveGameState(const char *fname, state *playerState) {
+int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
   FILE *fileOut = fopen(fname, "wb");
   if (validatePtr(fileOut, "something went wrong mate idk wagwaan") == -1) {
     return -1;
   } else {
-    // TODO: rewrite this function to save the game's contents in the format
-    // that loadGameState expects.
+    // Save state
     fwrite(playerState, sizeof(state), 1, fileOut);
+    // Save player struct
+    fwrite(playerState->player, sizeof(player_t), 1, fileOut);
+    // Save username
+    fwrite(playerState->profile.username, sizeof(char), USERNAME_CHAR_LIMIT,
+           fileOut);
+    // Save each item in player's inventory
+    for (int i = 0; i < playerState->player->itemCount; i++) {
+      item_t *item = playerState->player->inventory[i];
+      fwrite(&item->name, sizeof(Item), 1, fileOut);
+      fwrite(&item->hash, sizeof(int), 1, fileOut);
+    }
+    // Save player's location
+    room_t *currentRoom = playerState->curr_room_node;
+    fwrite(&currentRoom->current_room, sizeof(RoomName), 1, fileOut);
+    fwrite(&currentRoom->position, sizeof(RoomPosition), 1, fileOut);
+    // Save items in each room
+    for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
+      room_t *room = worldMap[i];
+      fwrite(&room->ItemCount, sizeof(int), 1, fileOut);
+      for (int j = 0; j < room->ItemCount; j++) {
+        item_t *item = room->Items[j];
+        fwrite(&item->name, sizeof(Item), 1, fileOut);
+        fwrite(&item->hash, sizeof(Item), 1, fileOut);
+      }
+    }
     fclose(fileOut);
   }
   return 0;
@@ -496,7 +528,8 @@ state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
   initialState->player = initialisePlayer();
   initialState->curr_room_node = initialRoom;
-  char *username = "sanchit";
+  char *username = malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
+  strcpy(username, "sanchit");
   // scanf("%s\n", username);
   initialState->profile.username = username;
   initialState->profile.character = UTA;

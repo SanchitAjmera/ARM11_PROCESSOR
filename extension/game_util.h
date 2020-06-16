@@ -21,6 +21,8 @@
 #define REMOVED (NULL)
 #define MAX_PROPERTY (8)
 #define PROPERTY_NUM (4)
+#define USERNAME_CHAR_LIMIT (20)
+#define TOTAL_ROOM_COUNT (25)
 
 // enum for position in rooms
 
@@ -144,6 +146,7 @@ extern void freeState(state *state1);
 
 extern int loadGameState(const char *fname, state *playerState,
                          room_t **worldMap);
-extern int saveGameState(const char *fname, state *playerState);
+extern int saveGameState(const char *fname, state *playerState,
+                         room_t **worldMap);
 
 #endif
