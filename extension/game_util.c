@@ -34,7 +34,8 @@ int validatePtr(const void *ptr, const char *errorMsg) {
   return 0;
 }
 
-/* loadGameState takes in a filename and a pointer to an uninitialised state.
+/* loadGameState takes in a filename, a pointer to an uninitialised state,
+   and an array of pointers to every room in the game.
    If such file does not exist or cannot be opened, return -1.
    Otherwise, it writes the file's contents to the state. */
 int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
@@ -85,6 +86,7 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
       for (int i = 0; i < TOTAL_ROOM_COUNT; i++) { // For each room in the map
         int itemCount;
         fread(&itemCount, sizeof(int), 1, file);
+        worldMap[i]->ItemCount = itemCount;
         for (int j = 0; j < itemCount; j++) {
           Item item;
           fread(&item, sizeof(Item), 1, file);
@@ -100,8 +102,9 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
   }
 }
 
-/* saveGameState takes in a filename and a pointer to the player's state.
-   returns -1 if the file could not be opened. Otherwise, it writes
+/* saveGameState takes in a filename, a pointer to the player's state,
+   and an array of pointers to every room in the game.
+   Returns -1 if the file could not be opened. Otherwise, it writes
    the player's state to the file. */
 int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
   FILE *fileOut = fopen(fname, "wb");
@@ -366,11 +369,11 @@ building_t *initialiseBuilding(room_t **out) {
     out[i] = roomArray[i];
   }
 
-  item_t *ItemArray[TOTAL_ITEM_COUNT] = {
-      cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
-      apple3, apple4, apple5, keyboard, mouse, monitor, pass};
+  // item_t *ItemArray[TOTAL_ITEM_COUNT] = {
+  //    cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
+  //    apple3, apple4, apple5, keyboard, mouse, monitor, pass};
 
-  randomlyPlaceItems(ItemArray, roomArray);
+  // randomlyPlaceItems(ItemArray, roomArray);
 
   huxley->start_room = lobbySouth;
   //  free(roomArray);
