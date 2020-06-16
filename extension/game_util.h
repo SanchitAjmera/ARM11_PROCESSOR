@@ -61,6 +61,50 @@ typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 
+/* LOBBY -> {"The begginning of the end...",
+             "This leads to the empty LAB."
+             "This stairway leads to the LECTURE HALL."
+              "Just a plain wall.",
+              "There's a DOCSOC notice board but that should be the least of
+               your worries."
+              (Centre) "Every game needs a spawn point right?"}
+LAB -> {"The screens are red... prepare yourself for a LEXIS
+        test!",
+        "Just some dusty computers.",
+        "You see a computer running Windows and the sight nearly blinds you with
+        disgust!",
+        "You see printers, shame they never work.",
+        "A DOCSOC social event poster... you choose to ignore it.",
+        "Just more computer screens..."}
+LECTURE HALL -> {"Huxley 308 is quiet... a bit too quiet.",
+                 "Just empty seats...",
+                 "There's crisp packets underneath the seats.",
+                 "You see the bars on the windows... reminds you why no one
+                 likes Huxley.",
+                 "You see board pens that aren't feint... a truely rare item in
+                 Huxley!",
+                 "The stairway to the back of the lecture hall."}
+
+FUSION -> {"Pot noodles... a life support for any student. Replesnigh your
+           health here!".
+           "You see the sofas in the JCR. It reminds you to rest (save)".
+           "There's a broken vending machine - wait for part II to use.",
+           "The food on display looks wonderful... shame you can't eat it all.",
+           "You see the imperial gift shop. Maybe you should buy an Imperial
+            hoodie? ... On second thought, maybe not.",
+           ""}
+
+HARRODS -> {"Cosmetic DLC coming soon!",
+            "Gucci belt on sale!",
+            "You see Fredo through a window, eating pasta.",
+            "You see a Supreme coat to battle the coldness.",
+            "You see the ugliest top but its stat buffs are amazing! Come back
+            when the devs have implemented a gear system.",
+            "Just some more over priced clothing..."}
+
+
+*/
+
 // enum for character type
 typedef enum { BATMAN, UTA } Character;
 
