@@ -30,6 +30,7 @@ static const pair_t opcodeTable[] = {
     {"bgt", BGT}, {"ble", BLE}, {"b", B}};
 
 // Assemble functions for all instruction types
+extern word assemble(symbol_table *symbolTable, instruction input);
 extern word assembleDPI(symbol_table *symbolTable, instruction input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction input);
 extern word assembleMultiply(symbol_table *symbolTable, instruction input);

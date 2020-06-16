@@ -79,6 +79,19 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   freeFileLines(expressions);
 }
 
+word assemble(symbol_table *symbolTable, instruction input) {
+  symbol *instrSymbol = getSymbol(symbolTable, input.opcode);
+  assert(instrSymbol != NULL);
+  word binLine;
+  if (instrSymbol->type == INSTR) {
+    binLine = instrSymbol->body.assembleFunc(symbolTable, input);
+  } else {
+    // Parse expression
+    binLine = parseImmediate(input.opcode + 1);
+  }
+  return binLine;
+}
+
 /* Performs the second pass on fileLines */
 void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   assert(out);
@@ -106,16 +119,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
     instruction instr = {
         fields[0], lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]),
         fields + 1, fieldCount - 1, i * WORD_SIZE_BYTES};
-    symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
-    assert(instrSymbol != NULL);
-    word binLine;
-    if (instrSymbol->type == INSTR) {
-      binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
-    } else {
-      // Parse expression
-      binLine = parseImmediate(in->lines[i] + 1);
-    }
-
+    word binLine = assemble(symbolTable, instr);
     fwrite(&binLine, sizeof(word), 1, out);
   }
 }
