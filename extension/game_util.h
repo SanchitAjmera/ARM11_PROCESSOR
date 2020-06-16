@@ -25,10 +25,25 @@
 #define TOTAL_ROOM_COUNT (25)
 
 // enum for position in rooms
-typedef enum { EAST = 0, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
+
+// enum for
+typedef enum {
+  APPLE = 0,
+  KEYBOARD = 0,
+  MOUSE = 0,
+  MONITOR = 4,
+  CASH = 5,
+  PASS = 6,
+  BUYAPPLE = 7,
+  TESCO = 8,
+  COFFEE = 8,
+  RUM = 9
+} Index;
+
+typedef enum { EAST = 0, WEST = 1, NORTH = 2, SOUTH = 3, CENTRE } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
-typedef enum { APPLE = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
+typedef enum { FOOD = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
 typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
@@ -52,6 +67,7 @@ typedef struct {
   uint8_t properties;
   char *description;
   int hash;
+  int cost;
 } item_t;
 
 // structure for rooms
@@ -64,7 +80,7 @@ typedef struct room_t {
   char *description;
   item_t **Items;
   int ItemCount;
-
+  int id;
 } room_t;
 
 // structure for building consisting of room_history
@@ -97,16 +113,30 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
 
+static const pair_t propertyTable[] = {
+    {"north", NORTH}, {"south", SOUTH}, {"east", EAST}, {"west", WEST}};
+
+//
+
 // Supported Items
 static const item_t gameItems[] = {
-    {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
+    {"apple", FOOD, EDIBLE, "An apple. Increases health by 5 when eaten!"},
     {"keyboard", KEYBOARD, THROWABLE,
      "A keyboard. A programmer's best friend."},
     {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days."},
     {"monitor", MONITOR, THROWABLE,
      "A monitor. Can't see your seg faults without it!"},
     {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
-    {"pass", PASS, THROWABLE, "You shall not pass"}};
+    {"pass", PASS, THROWABLE, "You shall not pass"},
+    {"apple", FOOD, (BUYABLE | EDIBLE),
+     "Pay 5 HuxCoins to get an apple! (Health += 5)"},
+    {"Tesco Meal Deal", FOOD, (BUYABLE | EDIBLE),
+     "Pay 20 HuxCoins for a Tesco meal deal! (Health += 20)"},
+    {"Coffee", FOOD, (BUYABLE | EDIBLE),
+     "Pay 10 HuxCoins for some coffee to get through those lectures! (Health "
+     "+= 10)"},
+    {"Rum & Coke", FOOD, (BUYABLE | EDIBLE),
+     "Pay 50 HuxCoins and get drunk ;) ! (Health += 50)"}};
 
 extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);
