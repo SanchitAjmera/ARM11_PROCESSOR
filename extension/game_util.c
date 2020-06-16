@@ -1,5 +1,6 @@
 #include "game_util.h"
 #include <assert.h>
+#include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -33,16 +34,26 @@
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
+  checkPtr(out);
   strcpy(out, in);
   return out;
 }
 
-int validatePtr(const void *ptr, const char *errorMsg) {
-  if (ptr == NULL) {
-    printf("Error: %s\n", errorMsg);
-    return -1;
+// converts a string to lowercase
+void lowercase(char *in) {
+  if (in) {
+    for (char *string = in; *string; string++) {
+      *string = tolower(*string);
+    }
   }
-  return 0;
+}
+
+/* Checks for failed memory allocation */
+void checkPtr(const void *ptr) {
+  if (ptr == NULL) {
+    printf("A memory error occurred. The game must end!");
+    quit();
+  }
 }
 
 /* loadGameState takes in a filename, a pointer to an uninitialised state,
@@ -156,7 +167,7 @@ int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
 
 // shows player their inventory of Items
 /* Returns respective int value; -1 for failure */
-item_t *lookup(item_t table[], const int size, const char *key) {
+item_t *itemLookup(item_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
       return &table[i];
@@ -165,6 +176,17 @@ item_t *lookup(item_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
+// general lookup
+int lookup(const pair_t table[], const int size, const char *key) {
+  for (int i = 0; i < size; i++) {
+    if (!strcmp(table[i].key, key)) {
+      return table[i].value;
+    }
+  }
+  return -1;
+}
+
+// Checks if an item has a certain property
 bool hasProperty(Property property, item_t *item) {
   return (property & item->properties);
 }
@@ -182,8 +204,11 @@ void current_room() {}
 // possibly a map (like the lego land map)
 void display_rooms() {}
 
-// quits game also saving game into some history file
-void quit() {}
+// quits game - TODO: free all resources in this function;
+void quit() {
+  printf("Thanks for playing!\n");
+  exit(EXIT_SUCCESS);
+}
 
 // displays introduction to player
 void introduction() {}
@@ -199,6 +224,8 @@ void randomiseArray(int randArray[], int length, int randMax) {
 void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
   int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
+  checkPtr(randomCashLocations);
+  checkPtr(randomAppleLocations);
   // array for random locations of apples and cash
   randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT,
                  TOTAL_ROOM_COUNT - TOTAL_SHOP_COUNT);
@@ -216,6 +243,7 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   // 4 IS THE NUMBER OF OTHER ItemS APART FROM CASH & APPLES
   // added other Items randomly around lobby
   int *randomOtherItemLocations = malloc(sizeof(int) * 4);
+  checkPtr(randomOtherItemLocations);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
   for (int i = 10; i < TOTAL_ITEM_COUNT - TOTAL_BUYABLE_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
@@ -270,6 +298,7 @@ void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
 // initialese Items
 item_t *initialiseItem(item_t gameItem) {
   item_t *Item = malloc(sizeof(*Item));
+  checkPtr(Item);
   Item->key = strptr(gameItem.key);
   Item->name = gameItem.name;
   Item->properties = gameItem.properties;
@@ -336,16 +365,17 @@ void initialiseBuyableItem(item_t *items[]) {
 room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   // allocates memory to room and adjacent room array
   room_t *room = malloc(sizeof(*room));
+  checkPtr(room);
 
   room->current_room = current_room;
   room->position = initial_position;
 
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
-  assert(room->adjacent_rooms);
+  checkPtr(room->adjacent_rooms);
   room->ItemCount = 0;
   room->Items = malloc(sizeof(item_t) * 20);
-  assert(room->Items);
+  checkPtr(room->Items);
   return room;
 }
 
@@ -355,9 +385,10 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
 building_t *initialiseBuilding(room_t **out) {
 
   building_t *huxley = malloc(sizeof(*huxley));
+  checkPtr(huxley);
 
   huxley->start_room = malloc(sizeof(room_t));
-  assert(huxley->start_room);
+  checkPtr(huxley->start_room);
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
@@ -516,16 +547,18 @@ void changeRoom(state *person, room_t dest_room) {}
 // need ptr checks
 player_t *initialisePlayer() {
   player_t *newPlayer = malloc(sizeof(*newPlayer));
+  checkPtr(newPlayer);
   newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t));
+  checkPtr(newPlayer->inventory);
   newPlayer->health = MAX_HEALTH;
   newPlayer->cash = INITIAL_CASH;
   newPlayer->itemCount = 0;
-  assert(newPlayer && newPlayer->inventory);
   return newPlayer;
 }
 
 state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
+  checkPtr(initialState);
   initialState->player = initialisePlayer();
   initialState->curr_room_node = initialRoom;
   char *username = malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
@@ -553,7 +586,3 @@ void freeState(state *state1) {
   freePlayer(state1->player);
   free(state1);
 }
-
-//--------------------------Start of Prints-----------------------------------
-/* Prints To be moved into print_utils maybe */
-//--------------------------End of Prints--------------------------------
