@@ -15,4 +15,5 @@ void printKonstantinosMouthOpenIndent(void);
 void printRemaining(void);
 void printStateDetails(state *state1);
 void printMenu(void);
+void printInventory(state *currentState);
 #endif

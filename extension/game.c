@@ -56,6 +56,7 @@ void playGame(state *currentState) {
       break;
     case VIEW:
       printInventory(currentState);
+      break;
     case BUY:
       break;
 
