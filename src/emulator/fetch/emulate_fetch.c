@@ -1,7 +1,7 @@
-#inlcude "../emulate_constants.h"
+#include "../../common/constants.h"
+#include "../../common/util.h"
+#include "../emulate_constants.h"
 #include "../emulate_util.h"
-#inlcude "../../common/constants.h"
-#inlcude "../../common/util.h"
 #include "emulate_execute.h"
 #include <stdlib.h>
 

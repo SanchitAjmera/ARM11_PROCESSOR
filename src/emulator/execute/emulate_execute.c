@@ -1,8 +1,8 @@
-#inlcude "../emulate_constants.h"
-#include "../emulate_util.h"
-#inlcude "../../common/constants.h"
-#inlcude "../../common/util.h"
 #include "emulate_execute.h"
+#include "../../common/constants.h"
+#include "../../common/util.h"
+#include "../emulate_constants.h"
+#include "../emulate_util.h"
 
 /* Constant shift if operand 2 is a register (bit 4 = 0) */
 static uint shiftByConstant(uint shiftPart) {
