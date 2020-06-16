@@ -24,7 +24,7 @@ typedef struct item_t item_t;
 #define PROPERTY_NUM (4)
 #define USERNAME_CHAR_LIMIT (20)
 #define TOTAL_ROOM_COUNT (25)
-#define COMMAND_NUM (5)
+#define COMMAND_NUM (6)
 #define DIR_NUM (4)
 
 // enum for position in rooms
