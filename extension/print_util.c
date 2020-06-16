@@ -107,9 +107,11 @@ void roomTraverser(room_t *entranceRoom, room_t *room1,
     return;
   }
   if (room1->adjacent_rooms != NULL) {
-    for (int i = 0; i < room1->adjacent_room_count; i++) {
-      if (room1->adjacent_rooms[i] != entranceRoom) {
-        roomTraverser(room1, room1->adjacent_rooms[i], funcRooms);
+    for (int i = 0; i < 5; i++) {
+      if (room1->adjacent_rooms[i]) {
+        if (room1->adjacent_rooms[i] != entranceRoom) {
+          roomTraverser(room1, room1->adjacent_rooms[i], funcRooms);
+        }
       }
     }
   }
