@@ -11,55 +11,6 @@ player_t *initialisePlayer() {
   return newPlayer;
 }
 
-//--------------------------Start of Prints-----------------------------------
-/* Prints To be moved into print_utils maybe */
-void printHealth(state *currentState) {
-  printf("Your current health is: %d\n", currentState->player->health);
-}
-
-void printCash(state *currentState) {
-  printf("You have £%d cash to spend\n", currentState->player->cash);
-}
-
-void printInventory(state *currentState) {
-  printf("The items in your inventory are:");
-  for (int i = 0; i < currentState->player->itemCount; i++) {
-    printf(" %s|", currentState->player->inventory[i]->key);
-  }
-  printf("\n");
-}
-
-char *getPropertyStr(Property property) {
-  for (int i = 1; i < PROPERTY_NUM; i++) {
-    if (propertyTable[i].value == property) {
-      return propertyTable[i].key;
-    }
-  }
-  return LOOKUP_FAILURE;
-}
-
-void printProperties(state *currentState, char *itemName) {
-  item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
-  if (!item || !currentState->player->inventory[item->name]) {
-    printf("%s is not in your inventory!\n", itemName);
-    return;
-  }
-  for (int i = 1; i <= MAX_PROPERTY; i <<= 1) {
-    if (hasProperty(i, item)) {
-      printf(" %s |", getPropertyStr(i));
-    }
-  }
-  printf("\n");
-}
-
-void printPlayer(state *currentState) {
-  printHealth(currentState);
-  printCash(currentState);
-  printInventory(currentState);
-}
-
-//--------------------------End of Prints--------------------------------
-
 // returns index of item if it is in the list. TODO: remove magic numbers
 int findItem(item_t **inventory, int itemCount, char *itemName) {
   for (int i = 0; i < itemCount; i++) {

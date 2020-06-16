@@ -120,17 +120,65 @@ void printBuildingDetails(building_t *huxley) {
   roomTraverser(NULL, huxley->startRoom, printRoomDetails);
 }
 
+//--------------------------Start of Player-----------------------------------
+
+void printHealth(state *currentState) {
+  printf("Your current health is: %d\n", currentState->player->health);
+}
+
+void printCash(state *currentState) {
+  printf("You have £%d cash to spend\n", currentState->player->cash);
+}
+
+void printInventory(state *currentState) {
+  printf("The items in your inventory are:");
+  for (int i = 0; i < currentState->player->itemCount; i++) {
+    printf(" %s|", currentState->player->inventory[i]->key);
+  }
+  printf("\n");
+}
+
+char *getPropertyStr(Property property) {
+  for (int i = 1; i < PROPERTY_NUM; i++) {
+    if (propertyTable[i].value == property) {
+      return propertyTable[i].key;
+    }
+  }
+  return LOOKUP_FAILURE;
+}
+
+void printProperties(state *currentState, char *itemName) {
+  item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
+  if (!item || !currentState->player->inventory[item->name]) {
+    printf("%s is not in your inventory!\n", itemName);
+    return;
+  }
+  for (int i = 1; i <= MAX_PROPERTY; i <<= 1) {
+    if (hasProperty(i, item)) {
+      printf(" %s |", getPropertyStr(i));
+    }
+  }
+  printf("\n");
+}
+
+void printPlayer(state *currentState) {
+  printHealth(currentState);
+  printCash(currentState);
+  printInventory(currentState);
+}
+
+//--------------------------End of Player--------------------------------
+
 void printStateDetails(state *state1) {
   printf("hi I am %s\n", state1->profile.username);
-  printf("score: %d\n", state1->profile.score);
-  printf("Health: %d\n", state1->player->health);
-  printf("Cash: %d\n", state1->player->cash);
-  printf("Items in inventory: ");
-  printItemDetails(state1->player->inventory, state1->player->itemCount);
+  printf("Score: %d\n", state1->profile.score);
+  printHealth(state1);
+  printCash(state1);
+  printInventory(state1);
   printf("currently in room: ");
   printRoomDetails(state1->currentRoom);
 }
-
+// TO BE MOVED:
 //-------------------------Konstantinos-----------------------------------------
 
 void printRemaining(void) {
@@ -140,7 +188,7 @@ void printRemaining(void) {
   fflush(stdout);
   printf("       10");
   fflush(stdout);
-  printf("       MEEEENATES");
+  printf("       MINUTES");
   fflush(stdout);
   printf("      REMAINING");
   fflush(stdout);

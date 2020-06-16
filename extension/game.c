@@ -54,8 +54,11 @@ void playGame(state *currentState) {
       break;
     case MOVE:
       break;
+    case VIEW:
+      printInventory(currentState);
     case BUY:
       break;
+
     default:
       printf("I'm not sure how to '%s'?\n", command);
       break;
@@ -94,19 +97,19 @@ int main(void) {
 
     case NEW_GAME:
       printf("Prepare for a new adventure...\n");
-      printf("dummy: %s", gameItems[0].key);
+      printf("dummy: %s\n", gameItems[0].key);
       // TODO: validate huxley ptr
-      // building_t *huxley = initialiseBuilding();
-      // state *playerState = initialiseState(huxley->startRoom);
-      // playGame(playerState);
-      //
+      room_t **rooms = malloc(sizeof(*rooms) * ROOM_COUNT);
+      building_t *huxley = initialiseBuilding(rooms);
+      state *playerState = initialiseState(huxley->startRoom);
       // printBuildingDetails(huxley);
       // printf("\n");
-      // printStateDetails(playerState);
-      //
-      // freeState(playerState);
-      // freeBuilding(huxley);
+      printStateDetails(playerState);
+      playGame(playerState);
 
+      freeState(playerState);
+      freeBuilding(huxley);
+      free(rooms);
       break;
 
     case LOAD_GAME:
