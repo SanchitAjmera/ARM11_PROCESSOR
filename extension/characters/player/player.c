@@ -11,23 +11,13 @@ player_t *initialisePlayer() {
   return newPlayer;
 }
 
-// returns index of item if it is in the list. TODO: remove magic numbers
-int findItem(item_t **inventory, int itemCount, char *itemName) {
-  for (int i = 0; i < itemCount; i++) {
-    if (!strcmp(inventory[i]->key, itemName)) {
-      return i;
-    }
-  }
-  return FIND_FAIL;
-}
-
 bool pickUpItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   if (!item || !currentState->currentRoom->items[item->name]) {
     printf("This item could not be found here!\n");
     return false;
   }
-  if (currentState->player->inventory[item->name] == item) {
+  if (currentState->player->inventory[item->name]) {
     printf("%s is already in your inventory!", itemName);
   } else {
     currentState->player->inventory[item->name] =
@@ -64,7 +54,7 @@ int roomItemTraversal(room_t *room, const item_t *item) {
   }
   return -1;
 }
-// Todo:
+
 bool buyItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   int index = roomItemTraversal(currentState->currentRoom, item);
