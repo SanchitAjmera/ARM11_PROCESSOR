@@ -15,6 +15,9 @@ int main(void) {
   building_t *huxley = initialiseBuilding(worldMap);
 
   state *playerState = initialiseState(huxley->start_room);
+  // state *playerState = malloc(sizeof(state));
+  saveGameState("sanchizzle", playerState, worldMap);
+  // loadGameState("sanchizzle", playerState, worldMap);
 
   printBuildingDetails(huxley);
 
