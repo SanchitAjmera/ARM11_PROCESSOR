@@ -96,3 +96,21 @@ bool moveRoom(state *currentState, char *dirName) {
   printf("sorry there is no room here\n");
   return false;
 }
+
+bool consume(state *currentState, char *itemName) {
+  const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
+  if (!currentState->player->inventory[item->name]) {
+    printf("You don't have '%s' to eat\n", itemName);
+    return false;
+  }
+  if (!hasProperty(EDIBLE, item)) {
+    printf("You can't eat that!\n");
+    return false;
+  }
+  int increase = 5;
+  printf("mmm... Tasty.\n");
+  printf("Your health has increased by %d!\n");
+  item *remove = currentState->player->inventory[item->name];
+  currentState->player->inventory[item->name] = REMOVED;
+  free(remove);
+}
