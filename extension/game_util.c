@@ -9,8 +9,9 @@
 #include <unistd.h>
 
 #define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ITEM_COUNT (14)
+#define TOTAL_ITEM_COUNT (19)
 #define TOTAL_APPLE_COUNT (5)
+#define TOTAL_BUYABLE_APPLE_COUNT (5)
 #define TOTAL_SHOP_COUNT (10)
 #define TOTAL_CASH_COUNT (5)
 #define TOTAL_ROOM_COUNT (25)
@@ -20,6 +21,7 @@
 #define MOUSE_ITEM_INDEX (2)
 #define MONITOR_ITEM_INDEX (3)
 #define PASS_ITEM_INDEX (5)
+#define BUYABLE_APPLE_ITEM_INDEX (6)
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -184,6 +186,8 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   free(randomOtherItemLocations);
 }
 
+void placeBuyableItems(item_t *Items[], room_t *rooms[]) {}
+
 // connects first room to second room
 void connectRoom(room_t *first, room_t *second) {
   // assigns room to each other's adjacent rooms array
@@ -248,6 +252,12 @@ building_t *initialiseBuilding(room_t **out) {
   item_t *apple3 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   item_t *apple4 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   item_t *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  // initialising Buyable apples
+  item_t *buyApple1 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple2 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple3 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple4 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple5 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
   // initialising 5 game cash bundles
   item_t *cash1 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
   item_t *cash2 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
@@ -325,6 +335,11 @@ building_t *initialiseBuilding(room_t **out) {
   mouse->hash = 12;
   monitor->hash = 13;
   pass->hash = 14;
+  buyApple1->hash = 15;
+  buyApple2->hash = 16;
+  buyApple3->hash = 17;
+  buyApple4->hash = 18;
+  buyApple5->hash = 19;
 
   // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
@@ -340,8 +355,9 @@ building_t *initialiseBuilding(room_t **out) {
   }
 
   item_t *ItemArray[TOTAL_ITEM_COUNT] = {
-      cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
-      apple3, apple4, apple5, keyboard, mouse, monitor, pass};
+      cash1,     cash2,     cash3,     cash4,     cash5,    apple1,  apple2,
+      apple3,    apple4,    apple5,    keyboard,  mouse,    monitor, pass,
+      buyApple1, buyApple2, buyApple3, buyApple4, buyApple5};
 
   randomlyPlaceItems(ItemArray, roomArray);
 
