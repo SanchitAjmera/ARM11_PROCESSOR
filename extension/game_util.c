@@ -388,7 +388,7 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     for (int i = 0; i < room1->adjacent_room_count; i++) {
       // check to stop function from repeatedly freeing the same rooms
       if (room1->adjacent_rooms[i] != entranceRoom) {
-        freeRoom(entranceRoom, room1->adjacent_rooms[i]);
+        freeRoom(room1, room1->adjacent_rooms[i]);
       }
     }
     free(room1->adjacent_rooms);
