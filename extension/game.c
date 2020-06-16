@@ -153,3 +153,4 @@ int main(void) {
     free(worldMap);
     exit(EXIT_SUCCESS);
   }
+}
