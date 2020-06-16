@@ -48,8 +48,8 @@ typedef enum {
   EAST = 1,
   WEST = 3,
   NORTH = 2,
-  SOUTH = 4,
-  CENTRE = 0
+  SOUTH = 0,
+  CENTRE = 4
 } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
@@ -68,7 +68,7 @@ typedef enum { BATMAN, UTA } Character;
 typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
 
 // enum for supported commands
-typedef enum { EXIT, PICKUP, DROP, BUY, MOVE, VIEW } Command;
+typedef enum { EXIT, PICKUP, DROP, BUY, MOVE, VIEW, SAVE, HELP } Command;
 
 // generic (string, enum) struct for lookups
 typedef struct {
@@ -126,9 +126,9 @@ static const pair_t directionTable[] = {
     {"north", NORTH}, {"south", SOUTH}, {"east", EAST}, {"west", WEST}};
 
 //
-static const pair_t commandsTable[] = {{"exit", EXIT}, {"pickup", PICKUP},
-                                       {"drop", DROP}, {"buy", BUY},
-                                       {"move", MOVE}, {"view", VIEW}};
+static const pair_t commandsTable[] = {
+    {"exit", EXIT}, {"pickup", PICKUP}, {"drop", DROP}, {"buy", BUY},
+    {"move", MOVE}, {"view", VIEW},     {"save", SAVE}, {"help", HELP}};
 
 // Supported Items
 static const item_t gameItems[] = {
