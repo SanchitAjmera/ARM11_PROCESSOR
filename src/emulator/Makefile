@@ -8,6 +8,7 @@ libs:
 	cd fetch; make;
 	cd decode; make;
 	cd execute; make;
+	ar rcs libemulator.a decode/emulate_decode.o execute/emulate_execute.o fetch/emulate_fetch.o
 
 clean:
 		rm -f $(wildcard *.o)

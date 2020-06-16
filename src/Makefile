@@ -9,8 +9,8 @@ ASSEMBLE 	= assembler/assemble_util.o assembler/file_lines.o assembler/symbol_ta
 
 all: libs assemble emulate testme
 
-assemble: assemble.o $(ASSEMBLE) common/util.o
-emulate: emulate.o $(EMULATE) common/util.o
+assemble: assemble.o assembler/libassembler.a common/util.o
+emulate: emulate.o emulator/libemulator.a common/util.o
 testme: testme.o $(EMULATE) common/util.o
 
 libs:
