@@ -28,9 +28,9 @@
 #define RUM_ITEM_INDEX (9)
 #define BUYABLE_ITEMS_IN_ROOM (5)
 #define FUSION_NORTH_INDEX (15)
-#define FUSION_WEST_INDEX (20)
-#define FUSION_SOUTH_INDEX (25)
-#define FUSION_EAST_INDEX (30)
+#define FUSION_WEST_INDEX (16)
+#define FUSION_SOUTH_INDEX (17)
+#define FUSION_EAST_INDEX (18)
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
