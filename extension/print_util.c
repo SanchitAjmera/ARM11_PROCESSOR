@@ -72,9 +72,11 @@ void printRoomName(room_t *room1) {
 
 // function for printing out names of adjacent rooms
 void printAdjacentRooms(room_t *room1) {
-  for (int i = 0; i < room1->adjacent_room_count; i++) {
-    printRoomPosition(room1->adjacent_rooms[i]);
-    printRoomName(room1->adjacent_rooms[i]);
+  for (int i = 0; i < 5; i++) {
+    if (room1->adjacent_rooms[i]) {
+      printRoomPosition(room1->adjacent_rooms[i]);
+      printRoomName(room1->adjacent_rooms[i]);
+    }
   }
 }
 
@@ -132,8 +134,10 @@ void printCash(state *currentState) {
 
 void printInventory(state *currentState) {
   printf("The items in your inventory are:");
-  for (int i = 0; i < currentState->player->itemCount; i++) {
-    printf(" %s|", currentState->player->inventory[i]->key);
+  for (int i = 0; i < 6; i++) {
+    if (currentState->player->inventory[i]) {
+      printf(" %s|", currentState->player->inventory[i]->key);
+    }
   }
   printf("\n");
 }

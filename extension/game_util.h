@@ -2,6 +2,7 @@
 #define GAME_UTIL_H
 
 typedef struct item_t item_t;
+typedef struct state state;
 #include "characters/player/player.h"
 #include <math.h>
 #include <stdbool.h>
@@ -43,7 +44,13 @@ typedef enum {
   RUM_INDEX = 9
 } Index;
 
-typedef enum { EAST = 0, WEST = 1, NORTH = 2, SOUTH = 3, CENTRE } RoomPosition;
+typedef enum {
+  EAST = 1,
+  WEST = 3,
+  NORTH = 2,
+  SOUTH = 4,
+  CENTRE = 0
+} RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
 typedef enum { FOOD = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
@@ -97,7 +104,7 @@ typedef struct building_t {
   room_t *startRoom;
 } building_t;
 
-typedef struct {
+struct state {
   player_t *player;
   room_t *currentRoom; // struct for room_t structure
 
@@ -106,9 +113,8 @@ typedef struct {
     Character character;
     int score;
   } profile;
-
-  // Room_name room_history[MAX_ROOM_HISTORY];
-} state;
+};
+// Room_name room_history[MAX_ROOM_HISTORY];
 
 static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"throwable", THROWABLE},

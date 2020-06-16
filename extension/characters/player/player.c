@@ -85,7 +85,7 @@ bool buyItem(state *currentState, char *itemName) {
 }
 
 bool moveRoom(state *currentState, char *dirName) {
-  int direction = lookup(propertyTable, DIR_NUM, dirName);
+  int direction = lookup(directionTable, DIR_NUM, dirName);
 
   if (currentState->currentRoom->adjacent_rooms[direction]) {
     currentState->currentRoom =

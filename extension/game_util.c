@@ -277,11 +277,17 @@ void placeBuyableItems(item_t *items[], room_t *rooms[]) {
 
 // connects first room to second room
 void connectRoom(room_t *first, room_t *second) {
-  // assigns room to each other's adjacent rooms array
-  first->adjacent_rooms[first->adjacent_room_count] = second;
-  second->adjacent_rooms[second->adjacent_room_count] = first;
-
-  // increments count of adjacent rooms
+  switch (first->position) {
+  case CENTRE:
+    first->adjacent_rooms[second->position] = second;
+    second->adjacent_rooms[((second->position) + 2) % 4] = first;
+    break;
+  // first: north lobby second south fusion
+  default:
+    first->adjacent_rooms[first->position] = second;
+    second->adjacent_rooms[second->position] = first;
+    break;
+  }
   second->adjacent_room_count++;
   first->adjacent_room_count++;
 }
@@ -291,7 +297,7 @@ void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
                           room_t *r5) {
   room_t *roomArray[ROOM_POSITION_NUMBER - 1] = {r1, r2, r3, r4};
   for (int i = 0; i < ROOM_POSITION_NUMBER - 1; i++) {
-    connectRoom(roomArray[i], r5);
+    connectRoom(r5, roomArray[i]);
   }
 }
 
@@ -460,7 +466,7 @@ building_t *initialiseBuilding(room_t **out) {
   // connecting rooms which link to each other
   connectRoom(lobbyWest, labEast);
   connectRoom(lobbyNorth, lectureHallSouth);
-  connectRoom(lobbyNorth, fusionSouth);
+  connectRoom(lobbyEast, fusionWest);
   connectRoom(fusionNorth, harrodsSouth);
 
   // Keep it in this order I beg
