@@ -242,6 +242,7 @@ item_t *initialiseItem(item_t gameItem) {
   Item->name = gameItem.name;
   Item->properties = gameItem.properties;
   Item->description = strptr(gameItem.description);
+  Item->cost = 0;
   return Item;
 }
 
@@ -270,27 +271,6 @@ void initialiseBuyableItem(item_t *items[]) {
   item_t *rum4 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
   item_t *rum5 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
 
-  buyApple1->hash = 15;
-  buyApple2->hash = 16;
-  buyApple3->hash = 17;
-  buyApple4->hash = 18;
-  buyApple5->hash = 19;
-  coffee1->hash = 20;
-  coffee2->hash = 21;
-  coffee3->hash = 22;
-  coffee4->hash = 23;
-  coffee5->hash = 24;
-  tescoMD1->hash = 25;
-  tescoMD2->hash = 26;
-  tescoMD3->hash = 27;
-  tescoMD4->hash = 28;
-  tescoMD5->hash = 29;
-  rum1->hash = 30;
-  rum2->hash = 30;
-  rum3->hash = 30;
-  rum4->hash = 30;
-  rum5->hash = 30;
-
   items[0] = buyApple1;
   items[1] = buyApple2;
   items[2] = buyApple3;
@@ -311,6 +291,13 @@ void initialiseBuyableItem(item_t *items[]) {
   items[17] = rum3;
   items[18] = rum4;
   items[19] = rum5;
+
+  for (int i = 0; i < BUYABLE_ITEMS_IN_ROOM; i++) {
+    items[i]->cost = 5;
+    items[i + 5]->cost = 10;
+    items[i + 10]->cost = 20;
+    items[i + 15]->cost = 50;
+  }
 }
 
 // initialises room
@@ -412,21 +399,6 @@ building_t *initialiseBuilding(room_t **out) {
   connectRoom(lobbyNorth, lectureHallSouth);
   connectRoom(lobbyNorth, fusionSouth);
   connectRoom(fusionNorth, harrodsSouth);
-
-  cash1->hash = 1;
-  cash2->hash = 2;
-  cash3->hash = 3;
-  cash4->hash = 4;
-  cash5->hash = 5;
-  apple1->hash = 6;
-  apple2->hash = 7;
-  apple3->hash = 8;
-  apple4->hash = 9;
-  apple5->hash = 10;
-  keyboard->hash = 11;
-  mouse->hash = 12;
-  monitor->hash = 13;
-  pass->hash = 14;
 
   // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
@@ -552,6 +524,3 @@ void freeState(state *state1) {
 //--------------------------Start of Prints-----------------------------------
 /* Prints To be moved into print_utils maybe */
 //--------------------------End of Prints--------------------------------
-
-// returns index of Item if it is in the list. TODO: remove magic numbers
-bool buyItem(state *currentState, char *ItemName) { return false; }

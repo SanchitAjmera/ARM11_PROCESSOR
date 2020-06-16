@@ -23,7 +23,22 @@
 #define PROPERTY_NUM (4)
 
 // enum for position in rooms
-typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
+
+// enum for
+typedef enum {
+  APPLE = 0,
+  KEYBOARD = 0,
+  MOUSE = 0,
+  MONITOR = 4,
+  CASH = 5,
+  PASS = 6,
+  BUYAPPLE = 7,
+  TESCO = 8,
+  COFFEE = 8,
+  RUM = 9
+} Index;
+
+typedef enum { EAST = 0, WEST = 1, NORTH = 2, SOUTH = 3, CENTRE } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
 typedef enum { FOOD = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
@@ -50,6 +65,7 @@ typedef struct {
   uint8_t properties;
   char *description;
   int hash;
+  int cost;
 } item_t;
 
 // structure for rooms
@@ -62,7 +78,7 @@ typedef struct room_t {
   char *description;
   item_t **Items;
   int ItemCount;
-
+  int id;
 } room_t;
 
 // structure for building consisting of room_history
@@ -94,6 +110,12 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"throwable", THROWABLE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
+
+static const pair_t propertyTable[] = {
+    {"north", NORTH}, {"south", SOUTH}, {"east", EAST}, {"west", WEST}};
+
+//
+
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", FOOD, EDIBLE, "An apple. Increases health by 5 when eaten!"},
