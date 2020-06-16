@@ -180,7 +180,7 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   // added other Items randomly around lobby
   int *randomOtherItemLocations = malloc(sizeof(int) * 4);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
-  for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
+  for (int i = 10; i < TOTAL_ITEM_COUNT - TOTAL_SHOP_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
         ->Items[rooms[randomOtherItemLocations[i - 10]]->ItemCount] = Items[i];
     rooms[randomOtherItemLocations[i - 10]]->ItemCount++;
