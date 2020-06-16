@@ -1,5 +1,25 @@
 #include "../../game_util.h"
 
+int roomItemTraversal(room_t *room, const item_t *item) {
+  for (int i = 0; i < ITEM_NUM; i++) {
+    if (room->items[i]) {
+      if (room->items[i]->name == item->name) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+int findSpace(room_t *room, const item_t *item) {
+  for (int i = 0; i < ITEM_NUM; i++) {
+    if (!room->items[i]) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 player_t *initialisePlayer() {
   player_t *newPlayer = malloc(sizeof(*newPlayer));
   checkPtr(newPlayer);
@@ -13,7 +33,8 @@ player_t *initialisePlayer() {
 
 bool pickUpItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
-  if (!item || !currentState->currentRoom->items[item->name]) {
+  int index = roomItemTraversal(currentState->currentRoom, item);
+  if (!item || !currentState->currentRoom->items[index]) {
     printf("This item could not be found here!\n");
     return false;
   }
@@ -21,10 +42,8 @@ bool pickUpItem(state *currentState, char *itemName) {
     printf("%s is already in your inventory!", itemName);
   } else {
     currentState->player->inventory[item->name] =
-        currentState->currentRoom->items[item->name];
-    currentState->currentRoom->items[item->name] = REMOVED;
-    currentState->currentRoom->itemCount--;
-    currentState->player->itemCount++;
+        currentState->currentRoom->items[index];
+    currentState->currentRoom->items[index] = REMOVED;
     printf("%s has been picked up\n", itemName);
   }
   return true;
@@ -32,27 +51,17 @@ bool pickUpItem(state *currentState, char *itemName) {
 
 bool dropItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
+  int index = findSpace(currentState->currentRoom, item);
   if (!item || !currentState->player->inventory[item->name]) {
     printf("You do not have this item to drop: %s\n", itemName);
     return false;
   }
-  currentState->currentRoom->items[item->name] =
+  currentState->currentRoom->items[index] =
       currentState->player->inventory[item->name];
   currentState->player->inventory[item->name] = REMOVED;
-  currentState->player->itemCount--;
-  currentState->currentRoom->itemCount++;
   printf("%s has been dropped!\n", itemName);
 
   return true;
-}
-
-int roomItemTraversal(room_t *room, const item_t *item) {
-  for (int i = 0; i < room->itemCount; i++) {
-    if (room->items[i]->name == item->name) {
-      return i;
-    }
-  }
-  return -1;
 }
 
 bool buyItem(state *currentState, char *itemName) {
