@@ -1,9 +1,9 @@
-#include <stdlib.h>
-#inlcude "../emulate_constants.h"
-#include "../emulate_util.h"
-#inlcude "../../common/constants.h"
-#inlcude "../../common/util.h"
 #include "emulate_decode.h"
+#include "../../common/constants.h"
+#include "../../common/util.h"
+#include "../emulate_constants.h"
+#include "../emulate_util.h"
+#include <stdlib.h>
 
 dp_t *decodeDPI(arm_t *state, word instruction) {
   dp_t *decoded = malloc(sizeof(dp_t));
