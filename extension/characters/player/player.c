@@ -107,10 +107,15 @@ bool consume(state *currentState, char *itemName) {
     printf("You can't eat that!\n");
     return false;
   }
+  // TODO: calculate health increase
   int increase = 5;
   printf("mmm... Tasty.\n");
   printf("Your health has increased by %d!\n");
   item *remove = currentState->player->inventory[item->name];
   currentState->player->inventory[item->name] = REMOVED;
   free(remove);
+}
+
+bool hasItem(state *currentState, Item index) {
+  return currentState->player->inventory[index] != NULL;
 }
