@@ -636,3 +636,11 @@ void printKonstantinosTalking(void) {
     }
   }
 }
+
+void view(state *currentState, char *argument) {
+  if (strcmp(argument, "room") == 0) {
+    printRoomDetails(currentState->currentRoom);
+  } else if (strcmp(argument, "inventory") == 0) {
+    printInventory(currentState);
+  }
+}

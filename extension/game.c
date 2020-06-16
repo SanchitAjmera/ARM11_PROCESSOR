@@ -53,9 +53,10 @@ void playGame(state *currentState) {
     case DROP:
       break;
     case MOVE:
-      break;
+      moveRoom(currentState, ) break;
     case VIEW:
-      printInventory(currentState);
+      view(currentState, argument);
+      // printInventory(currentState);
       break;
     case BUY:
       break;
