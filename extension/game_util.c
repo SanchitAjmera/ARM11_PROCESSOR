@@ -12,7 +12,6 @@
 #define TOTAL_ITEM_COUNT (14)
 #define TOTAL_APPLE_COUNT (5)
 #define TOTAL_CASH_COUNT (5)
-#define TOTAL_ROOM_COUNT (25)
 #define CASH_ITEM_INDEX (4)
 #define APPLE_ITEM_INDEX (0) // I beg you dont change the _ITEM_INDEX's
 #define KEYBOARD_ITEM_INDEX (1)

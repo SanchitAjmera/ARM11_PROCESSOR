@@ -22,6 +22,7 @@
 #define MAX_PROPERTY (8)
 #define PROPERTY_NUM (4)
 #define USERNAME_CHAR_LIMIT (20)
+#define TOTAL_ROOM_COUNT (25)
 
 // enum for position in rooms
 typedef enum { EAST = 0, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
@@ -95,6 +96,7 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"throwable", THROWABLE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
+
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
