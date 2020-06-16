@@ -3,6 +3,9 @@
 #include "../../common/util.h"
 #include "../emulate_constants.h"
 #include "../emulate_util.h"
+#include "../fetch/emulate_fetch.h"
+#include <assert.h>
+#include <stdio.h>
 
 /* Constant shift if operand 2 is a register (bit 4 = 0) */
 static uint shiftByConstant(uint shiftPart) {
