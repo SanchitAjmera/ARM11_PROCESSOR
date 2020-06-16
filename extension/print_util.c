@@ -152,7 +152,7 @@ char *getPropertyStr(Property property) {
 }
 
 void printProperties(state *currentState, char *itemName) {
-  item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
+  const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   if (!item || !currentState->player->inventory[item->name]) {
     printf("%s is not in your inventory!\n", itemName);
     return;

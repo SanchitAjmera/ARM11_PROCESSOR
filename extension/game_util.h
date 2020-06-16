@@ -130,7 +130,7 @@ static const pair_t commandsTable[] = {{"exit", EXIT}, {"pickup", PICKUP},
                                        {"move", MOVE}, {"view", VIEW}};
 
 // Supported Items
-static item_t gameItems[] = {
+static const item_t gameItems[] = {
     {"apple", FOOD, EDIBLE, "An apple. Increases health by 5 when eaten!"},
     {"keyboard", KEYBOARD, THROWABLE,
      "A keyboard. A programmer's best friend."},
@@ -155,9 +155,10 @@ extern state *initialiseState(room_t *initialRoom);
 extern item_t *initialiseItem(item_t gameItem);
 extern void freeState(state *state1);
 extern void quit();
-extern bool hasProperty(Property property, item_t *item);
+extern bool hasProperty(Property property, const item_t *item);
 extern int lookup(const pair_t table[], const int size, const char *key);
-extern item_t *itemLookup(item_t table[], const int size, const char *key);
+extern const item_t *itemLookup(const item_t table[], const int size,
+                                const char *key);
 extern void lowercase(char *in);
 extern void checkPtr(const void *ptr);
 extern int loadGameState(const char *fname, state *playerState,

@@ -167,10 +167,11 @@ int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
 //--------------Possible const error---------------------
 // shows player their inventory of Items
 /* Returns respective int value; -1 for failure */
-item_t *itemLookup(item_t table[], const int size, const char *key) {
+const item_t *itemLookup(const item_t table[], const int size,
+                         const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
-      return &table[i];
+      return table + i;
     }
   }
   return LOOKUP_FAILURE;
@@ -187,7 +188,7 @@ int lookup(const pair_t table[], const int size, const char *key) {
 }
 
 // Checks if an item has a certain property
-bool hasProperty(Property property, item_t *item) {
+bool hasProperty(Property property, const item_t *item) {
   return (property & item->properties);
 }
 
