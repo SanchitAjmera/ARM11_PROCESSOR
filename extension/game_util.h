@@ -23,6 +23,7 @@
 #define PROPERTY_NUM (4)
 #define USERNAME_CHAR_LIMIT (20)
 #define TOTAL_ROOM_COUNT (25)
+#define COMMAND_NUM (5)
 
 // enum for position in rooms
 
@@ -54,6 +55,12 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 // enum for character type
 typedef enum { BATMAN, UTA } Character;
 
+// enum for menu choices
+typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
+
+// enum for supported commands
+typedef enum { EXIT, PICKUP, DROP, BUY, MOVE } Command;
+
 // generic (string, enum) struct for lookups
 typedef struct {
   char *key;
@@ -70,6 +77,13 @@ typedef struct {
   int cost;
 } item_t;
 
+// Struct to store details about player;
+typedef struct {
+  item_t **inventory;
+  int itemCount;
+  int health;
+  int cash;
+} player_t;
 // structure for rooms
 // valid for non cyclical room structure
 typedef struct room_t {
@@ -89,13 +103,6 @@ typedef struct building_t {
 } building_t;
 
 typedef struct {
-  item_t **inventory;
-  int itemCount;
-  int health;
-  int cash;
-} player_t;
-
-typedef struct {
   player_t *player;
   room_t *curr_room_node; // struct for room_t structure
 
@@ -113,10 +120,15 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
 
-static const pair_t propertyTable[] = {
+static const pair_t directionTable[] = {
     {"north", NORTH}, {"south", SOUTH}, {"east", EAST}, {"west", WEST}};
 
 //
+static const pair_t commandsTable[] = {{"exit", EXIT},
+                                       {"pickup", PICKUP},
+                                       {"drop", DROP},
+                                       {"buy", BUY},
+                                       {"move", MOVE}};
 
 // Supported Items
 static const item_t gameItems[] = {
@@ -143,7 +155,10 @@ extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
 extern item_t *initialiseItem(item_t gameItem);
 extern void freeState(state *state1);
-
+extern void quit();
+extern int lookup(const pair_t table[], const int size, const char *key);
+extern void lowercase(char *in);
+extern void checkPtr(const void *ptr);
 extern int loadGameState(const char *fname, state *playerState,
                          room_t **worldMap);
 extern int saveGameState(const char *fname, state *playerState,
