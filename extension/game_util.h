@@ -29,16 +29,16 @@
 
 // enum for
 typedef enum {
-  APPLE = 0,
-  KEYBOARD = 0,
-  MOUSE = 0,
-  MONITOR = 4,
-  CASH = 5,
-  PASS = 6,
-  BUYAPPLE = 7,
-  TESCO = 8,
-  COFFEE = 8,
-  RUM = 9
+  APPLE_INDEX = 0,
+  KEYBOARD_INDEX = 1,
+  MOUSE_INDEX = 2,
+  MONITOR_INDEX = 3,
+  CASH_INDEX = 4,
+  PASS_INDEX = 5,
+  BUYAPPLE_INDEX = 6,
+  TESCO_INDEX = 7,
+  COFFEE_INDEX = 8,
+  RUM_INDEX = 9
 } Index;
 
 typedef enum { EAST = 0, WEST = 1, NORTH = 2, SOUTH = 3, CENTRE } RoomPosition;
@@ -77,13 +77,6 @@ typedef struct {
   int cost;
 } item_t;
 
-// Struct to store details about player;
-typedef struct {
-  item_t **inventory;
-  int itemCount;
-  int health;
-  int cash;
-} player_t;
 // structure for rooms
 // valid for non cyclical room structure
 typedef struct room_t {
