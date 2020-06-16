@@ -1,4 +1,8 @@
 #include "boss.h"
+#include "../../battle/battle.h"
+#include "../player/player.h"
+#include "boss_constants.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +10,7 @@
 // dummy pre-processor function
 #define NULL_POINTER(pointer) (validatePtr(pointer, "NULL pointer."))
 // dummy function
-void validatePtr(void *pointer, const char *) {}
+void validatePtr(const void *pointer, const char *msg) {}
 
 lookupBoss_t lookup(const char *name) {
   for (int i = 0; i < BOSSES; i++) {
@@ -14,11 +18,11 @@ lookupBoss_t lookup(const char *name) {
       return bossTable[i];
     }
   }
-  return NULL;
+  assert(false);
 }
 
-static passive_t *createPassive(const char **questions, const char **answers,
-                                int num) {
+passive_t *createPassive(const char **questions, const char **answers,
+                         int num) {
   passive_t *passive = malloc(sizeof(*passive));
   NULL_POINTER(passive);
   NULL_POINTER(questions);
@@ -29,40 +33,44 @@ static passive_t *createPassive(const char **questions, const char **answers,
 }
 
 // function to create and initialise a pointer to boss_t on the heap
-static boss_t *initBoss(const char *name) {
+boss_t *initBoss(const char *name) {
   boss_t *boss = malloc(sizeof(*boss));
   NULL_POINTER(boss);
   NULL_POINTER(name);
   boss->name = name;
   // defaults to true
   boss->isPassive = true;
-  boss->teaching = NULL;
+  boss->state = malloc(sizeof(*boss->state));
+  NULL_POINTER(boss->state);
+  boss->state->teaching = NULL;
   return boss;
 }
 
 boss_t *createBoss(const char *name) {
+  // PRE: name is one of the pre-defined bosses
   lookupBoss_t table = lookup(name);
-  NULL_POINTER(table);
-  boss_t *boss = initBoss(table.name);
-  boss->teaching = createPassive(table.questions, table.answers, MAX_QUESTIONS);
+  boss_t *boss = initBoss(table.key);
+  boss->state->teaching =
+      createPassive(table.questions, table.answers, MAX_QUESTIONS);
+  return boss;
 }
 
-static void freeBossFighting(aggressive_t *aggressive) {
+void freeBossFighting(aggressive_t *aggressive) {
   if (aggressive == NULL) {
     return;
   }
-  free(attackName);
-  free(specialName);
+  free((void *)aggressive->attackName);
+  free((void *)aggressive->specialName);
   free(aggressive);
 }
 
-static void freeBossTeaching(passive_t *passive) {
+void freeBossTeaching(passive_t *passive) {
   if (passive == NULL) {
     return;
   }
   for (int i = 0; i < passive->num; i++) {
-    free(passive->questions[i]);
-    free(passive->answers[i]);
+    free((void *)passive->questions[i]);
+    free((void *)passive->answers[i]);
   }
   free(passive->questions);
   free(passive->answers);
@@ -70,18 +78,29 @@ static void freeBossTeaching(passive_t *passive) {
 }
 
 void freeBoss(boss_t *boss) {
-  freeBossTeaching(boss->teaching);
-  freeBossFighting(boss->fighting);
-  free(boss->name);
+  freeBossTeaching(boss->state->teaching);
+  freeBossFighting(boss->state->fighting);
+  free((void *)boss->name);
   free(boss);
 }
 
-static void initBattle(boss_t *boss, player_t *player) {
+void initBattle(boss_t *boss, player_t *player) {
+  freeBossTeaching(boss->state->teaching);
   boss->isPassive = false;
-  freeBossTeaching(boss->teaching);
-  boss->fighting = malloc(sizeof(*boss->fighting));
-  NULL_POINTER(boss->fighting);
-  *boss->fighting = lookup(boss->name).fightingState;
+  boss->state->fighting = malloc(sizeof(*boss->state->fighting));
+  NULL_POINTER(boss->state->fighting);
+  boss->state->fighting = malloc(sizeof(*boss->state->fighting));
+  NULL_POINTER(boss->state->fighting);
+  if (strcmp(boss->name, "Tony")) {
+    aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
+                               TONY_ATTACK_NAME, TONY_SPECIAL_NAME,
+                               TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
+    *(boss->state->fighting) = tonyBattle;
+  } else {
+    aggressive_t kgkBattle = {KGK_ATTACK,       KGK_SPECIAL,    KGK_ATTACK_NAME,
+                              KGK_SPECIAL_NAME, KGK_MAX_HEALTH, KGK_MAX_HEALTH};
+    *(boss->state->fighting) = kgkBattle;
+  }
   battle(boss, player);
 }
 
@@ -89,12 +108,13 @@ static void initBattle(boss_t *boss, player_t *player) {
 static char *getAnswer(void) {
   // TODO: get answer from user as input
   printf(">");
+  return "";
 }
 
-static void processResult(boss_t *boss, player_t *player) {
+void processResult(boss_t *boss, player_t *player, int correct) {
   // TODO: special KGK case
   printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
-  if (pass) {
+  if (correct > MIN_QUESTIONS_CORRECT) {
     printf("%s is happy you scored well!\n", boss->name);
     return;
   }
@@ -110,12 +130,12 @@ void quiz(boss_t *boss, player_t *player) {
   int correct = 0;
   printf("Wild %s appeared!\n%s starts asking you assembly questions!",
          boss->name, boss->name);
-  for (int i = 0; i < boss->teaching->num; i++) {
-    printf("Question %d: %s\n", i + 1, boss->teaching->questions[i]);
+  for (int i = 0; i < boss->state->teaching->num; i++) {
+    printf("Question %d: %s\n", i + 1, boss->state->teaching->questions[i]);
     const char *input = getAnswer();
-    if (strcmp(input, boss->teaching->answers[i]) == 0) {
+    if (strcmp(input, boss->state->teaching->answers[i]) == 0) {
       correct++;
     }
   }
-  processResult(correct);
+  processResult(boss, player, correct);
 }
