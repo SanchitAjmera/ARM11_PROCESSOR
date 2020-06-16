@@ -11,6 +11,7 @@
 #define ROOM_POSITION_NUMBER (5)
 #define TOTAL_ITEM_COUNT (14)
 #define TOTAL_APPLE_COUNT (5)
+#define TOTAL_SHOP_COUNT (10)
 #define TOTAL_CASH_COUNT (5)
 #define TOTAL_ROOM_COUNT (25)
 #define CASH_ITEM_INDEX (4)
@@ -156,8 +157,10 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
   int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
   // array for random locations of apples and cash
-  randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT, TOTAL_ROOM_COUNT);
-  randomiseArray(randomCashLocations, TOTAL_CASH_COUNT, TOTAL_ROOM_COUNT);
+  randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT,
+                 TOTAL_ROOM_COUNT - TOTAL_SHOP_COUNT);
+  randomiseArray(randomCashLocations, TOTAL_CASH_COUNT,
+                 TOTAL_ROOM_COUNT - TOTAL_SHOP_COUNT);
   // dynamically addes apple and cash Items into random rooms
   for (int i = 0; i < 5; i++) {
     rooms[randomCashLocations[i]]
