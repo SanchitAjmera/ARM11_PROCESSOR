@@ -15,7 +15,7 @@ typedef struct state state;
 #define MAX_ROOM_HISTORY (5)
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
-#define ITEM_NUM (5)
+#define ITEM_NUM (10)
 #define LOOKUP_FAILURE (NULL)
 #define INITIAL_CASH (0)
 #define MAX_HEALTH (100)
@@ -53,7 +53,7 @@ typedef enum {
 } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
-typedef enum { FOOD = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
+typedef enum { FOOD, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
 typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
