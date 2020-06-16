@@ -8,8 +8,9 @@ CFLAGS 	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 all: libs assemble emulate testme
 
 assemble: assemble.o assembler/assemble_util.o assembler/file_lines.o assembler/symbol_table.o common/util.o
-emulate: emulate.o emulator/emulate_util.o common/util.o
+emulate: emulate.o emulator/emulate_fetch.o emulator/emulate_decode.o emulator/emulate_execute.o common/util.o
 testme: testme.o emulator/emulate_util.o common/util.o
+
 libs:
 	cd assembler; make
 	cd emulator; make
