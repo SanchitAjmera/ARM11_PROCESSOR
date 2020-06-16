@@ -9,7 +9,8 @@
 #include <unistd.h>
 
 #define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ITEM_COUNT (19)
+#define TOTAL_ITEM_COUNT (34)
+#define TOTAL_BUYABLE_ITEM_COUNT (20)
 #define TOTAL_APPLE_COUNT (5)
 #define TOTAL_BUYABLE_APPLE_COUNT (5)
 #define TOTAL_SHOP_COUNT (10)
@@ -22,10 +23,14 @@
 #define MONITOR_ITEM_INDEX (3)
 #define PASS_ITEM_INDEX (5)
 #define BUYABLE_APPLE_ITEM_INDEX (6)
-// start position of buyable apples in the item array
-#define BUYABLE_APPLE_START_INDEX (14)
-// start position of fusion rooms in room array
-#define FUSION_START_INDEX (14)
+#define COFFEE_ITEM_INDEX (8)
+#define TESCOMD_ITEM_INDEX (9)
+#define RUM_ITEM_INDEX (10)
+#define BUYABLE_ITEMS_IN_ROOM (5)
+#define FUSION_NORTH_INDEX (15)
+#define FUSION_WEST_INDEX (20)
+#define FUSION_SOUTH_INDEX (25)
+#define FUSION_EAST_INDEX (30)
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -180,7 +185,7 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   // added other Items randomly around lobby
   int *randomOtherItemLocations = malloc(sizeof(int) * 4);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
-  for (int i = 10; i < TOTAL_ITEM_COUNT - TOTAL_SHOP_COUNT; i++) {
+  for (int i = 10; i < TOTAL_ITEM_COUNT - TOTAL_BUYABLE_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
         ->Items[rooms[randomOtherItemLocations[i - 10]]->ItemCount] = Items[i];
     rooms[randomOtherItemLocations[i - 10]]->ItemCount++;
@@ -191,10 +196,22 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
 }
 
 void placeBuyableItems(item_t *items[], room_t *rooms[]) {
-  for (int i = BUYABLE_APPLE_START_INDEX; i < TOTAL_ITEM_COUNT; i++) {
-    rooms[FUSION_START_INDEX]->Items[rooms[FUSION_START_INDEX]->ItemCount] =
+  for (int i = 0; i < BUYABLE_ITEMS_IN_ROOM; i++) {
+    rooms[FUSION_WEST_INDEX]->Items[rooms[FUSION_WEST_INDEX]->ItemCount] =
         items[i];
-    rooms[FUSION_START_INDEX]->ItemCount++;
+    rooms[FUSION_WEST_INDEX]->ItemCount++;
+
+    rooms[FUSION_EAST_INDEX]->Items[rooms[FUSION_EAST_INDEX]->ItemCount] =
+        items[5 + i];
+    rooms[FUSION_EAST_INDEX]->ItemCount++;
+
+    rooms[FUSION_SOUTH_INDEX]->Items[rooms[FUSION_SOUTH_INDEX]->ItemCount] =
+        items[10 + i];
+    rooms[FUSION_SOUTH_INDEX]->ItemCount++;
+
+    rooms[FUSION_NORTH_INDEX]->Items[rooms[FUSION_NORTH_INDEX]->ItemCount] =
+        items[15 + i];
+    rooms[FUSION_NORTH_INDEX]->ItemCount++;
   }
 }
 
@@ -226,6 +243,74 @@ item_t *initialiseItem(item_t gameItem) {
   Item->properties = gameItem.properties;
   Item->description = strptr(gameItem.description);
   return Item;
+}
+
+void initialiseBuyableItem(item_t *items[]) {
+  item_t *buyApple1 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple2 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple3 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple4 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple5 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+
+  item_t *coffee1 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
+  item_t *coffee2 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
+  item_t *coffee3 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
+  item_t *coffee4 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
+  item_t *coffee5 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
+
+  item_t *tescoMD1 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
+  item_t *tescoMD2 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
+  item_t *tescoMD3 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
+  item_t *tescoMD4 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
+  item_t *tescoMD5 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
+
+  item_t *rum1 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
+  item_t *rum2 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
+  item_t *rum3 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
+  item_t *rum4 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
+  item_t *rum5 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
+
+  buyApple1->hash = 15;
+  buyApple2->hash = 16;
+  buyApple3->hash = 17;
+  buyApple4->hash = 18;
+  buyApple5->hash = 19;
+  coffee1->hash = 20;
+  coffee2->hash = 21;
+  coffee3->hash = 22;
+  coffee4->hash = 23;
+  coffee5->hash = 24;
+  tescoMD1->hash = 25;
+  tescoMD2->hash = 26;
+  tescoMD3->hash = 27;
+  tescoMD4->hash = 28;
+  tescoMD5->hash = 29;
+  rum1->hash = 30;
+  rum2->hash = 30;
+  rum3->hash = 30;
+  rum4->hash = 30;
+  rum5->hash = 30;
+
+  items[0] = buyApple1;
+  items[1] = buyApple2;
+  items[2] = buyApple3;
+  items[3] = buyApple4;
+  items[4] = buyApple5;
+  items[5] = coffee1;
+  items[6] = coffee2;
+  items[7] = coffee3;
+  items[8] = coffee4;
+  items[9] = coffee5;
+  items[10] = tescoMD1;
+  items[11] = tescoMD2;
+  items[12] = tescoMD3;
+  items[13] = tescoMD4;
+  items[14] = tescoMD5;
+  items[15] = rum1;
+  items[16] = rum2;
+  items[17] = rum3;
+  items[18] = rum4;
+  items[19] = rum5;
 }
 
 // initialises room
@@ -262,12 +347,9 @@ building_t *initialiseBuilding(room_t **out) {
   item_t *apple3 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   item_t *apple4 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   item_t *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  // initialising Buyable apples
-  item_t *buyApple1 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple2 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple3 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple4 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple5 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  // initialising Buyable items
+  item_t *buyableItemArray[TOTAL_BUYABLE_ITEM_COUNT];
+  initialiseBuyableItem(buyableItemArray);
   // initialising 5 game cash bundles
   item_t *cash1 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
   item_t *cash2 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
@@ -345,11 +427,6 @@ building_t *initialiseBuilding(room_t **out) {
   mouse->hash = 12;
   monitor->hash = 13;
   pass->hash = 14;
-  buyApple1->hash = 15;
-  buyApple2->hash = 16;
-  buyApple3->hash = 17;
-  buyApple4->hash = 18;
-  buyApple5->hash = 19;
 
   // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
@@ -364,17 +441,16 @@ building_t *initialiseBuilding(room_t **out) {
     out[i] = roomArray[i];
   }
 
-  item_t *itemArray[TOTAL_ITEM_COUNT] = {
-      cash1,     cash2,     cash3,     cash4,     cash5,    apple1,  apple2,
-      apple3,    apple4,    apple5,    keyboard,  mouse,    monitor, pass,
-      buyApple1, buyApple2, buyApple3, buyApple4, buyApple5};
+  item_t *itemArray[TOTAL_ITEM_COUNT - TOTAL_BUYABLE_ITEM_COUNT] = {
+      cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
+      apple3, apple4, apple5, keyboard, mouse, monitor, pass};
 
   randomlyPlaceItems(itemArray, roomArray);
 
-  placeBuyableItems(itemArray, roomArray);
+  placeBuyableItems(buyableItemArray, roomArray);
 
   huxley->start_room = lobbySouth;
-  //  free(roomArray);
+
   return huxley;
 }
 

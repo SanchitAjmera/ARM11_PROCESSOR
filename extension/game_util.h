@@ -26,7 +26,7 @@
 typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
-typedef enum { APPLE = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
+typedef enum { FOOD = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
 typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
@@ -96,7 +96,7 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"buyable", BUYABLE}};
 // Supported Items
 static const item_t gameItems[] = {
-    {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
+    {"apple", FOOD, EDIBLE, "An apple. Increases health by 5 when eaten!"},
     {"keyboard", KEYBOARD, THROWABLE,
      "A keyboard. A programmer's best friend."},
     {"mouse", MOUSE, THROWABLE, "A mouse. Click and scroll for days."},
@@ -104,7 +104,15 @@ static const item_t gameItems[] = {
      "A monitor. Can't see your seg faults without it!"},
     {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
     {"pass", PASS, THROWABLE, "You shall not pass"},
-    {"apple", APPLE, BUYABLE, "Pay 5 HuxCoins to get an apple!"}};
+    {"apple", FOOD, (BUYABLE | EDIBLE),
+     "Pay 5 HuxCoins to get an apple! (Health += 5)"},
+    {"Tesco Meal Deal", FOOD, (BUYABLE | EDIBLE),
+     "Pay 20 HuxCoins for a Tesco meal deal! (Health += 20)"},
+    {"Coffee", FOOD, (BUYABLE | EDIBLE),
+     "Pay 10 HuxCoins for some coffee to get through those lectures! (Health "
+     "+= 10)"},
+    {"Rum & Coke", FOOD, (BUYABLE | EDIBLE),
+     "Pay 50 HuxCoins and get drunk ;) ! (Health += 50)"}};
 
 extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);
