@@ -1,3 +1,4 @@
+#include "game_util.h"
 #include "print_util.h"
 #include <math.h>
 #include <stdbool.h>
@@ -9,7 +10,9 @@
 
 int main(void) {
 
-  building_t *huxley = initialiseBuilding();
+  // pointer to a location on heap storing an array of room pointers
+  room_t **worldMap = malloc(sizeof(room_t *) * 25);
+  building_t *huxley = initialiseBuilding(worldMap);
 
   state *playerState = initialiseState(huxley->start_room);
 
@@ -21,6 +24,7 @@ int main(void) {
 
   freeState(playerState);
 
+  free(worldMap);
   freeBuilding(huxley);
 
   exit(EXIT_SUCCESS);

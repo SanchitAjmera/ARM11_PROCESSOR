@@ -1,3 +1,6 @@
+#ifndef GAME_UTIL_H
+#define GAME_UTIL_H
+
 #include "characters/player/player.h"
 #include <math.h>
 #include <stdbool.h>
@@ -18,12 +21,14 @@
 #define REMOVED (NULL)
 #define MAX_PROPERTY (8)
 #define PROPERTY_NUM (4)
+#define USERNAME_CHAR_LIMIT (20)
+#define TOTAL_ROOM_COUNT (25)
 
 // enum for position in rooms
-typedef enum { EAST, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
+typedef enum { EAST = 0, WEST, NORTH, SOUTH, CENTRE } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
-typedef enum { APPLE, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
+typedef enum { APPLE = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
 typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
@@ -91,6 +96,7 @@ static const pair_t propertyTable[] = {{"edible", EDIBLE},
                                        {"throwable", THROWABLE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
+
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", APPLE, EDIBLE, "An apple. Increases health by 5 when eaten!"},
@@ -102,7 +108,15 @@ static const item_t gameItems[] = {
     {"cash", CASH, VALUABLE, "Cash. I wonder what I could buy around here..."},
     {"pass", PASS, THROWABLE, "You shall not pass"}};
 
-extern building_t *initialiseBuilding();
+extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
+extern item_t *initialiseItem(item_t gameItem);
 extern void freeState(state *state1);
+
+extern int loadGameState(const char *fname, state *playerState,
+                         room_t **worldMap);
+extern int saveGameState(const char *fname, state *playerState,
+                         room_t **worldMap);
+
+#endif

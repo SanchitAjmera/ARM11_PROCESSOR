@@ -6,23 +6,140 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ItemCount (14)
+#define TOTAL_ITEM_COUNT (14)
 #define TOTAL_APPLE_COUNT (5)
 #define TOTAL_CASH_COUNT (5)
-#define TOTAL_ROOM_COUNT (25)
-#define CASH_Item_INDEX (4)
-#define APPLE_Item_INDEX (0)
-#define KEYBOARD_Item_INDEX (1)
-#define MOUSE_Item_INDEX (2)
-#define MONITOR_Item_INDEX (3)
-#define PASS_Item_INDEX (5)
+#define CASH_ITEM_INDEX (4)
+#define APPLE_ITEM_INDEX (0) // I beg you dont change the _ITEM_INDEX's
+#define KEYBOARD_ITEM_INDEX (1)
+#define MOUSE_ITEM_INDEX (2)
+#define MONITOR_ITEM_INDEX (3)
+#define PASS_ITEM_INDEX (5)
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
   strcpy(out, in);
   return out;
+}
+
+int validatePtr(const void *ptr, const char *errorMsg) {
+  if (ptr == NULL) {
+    printf("Error: %s\n", errorMsg);
+    return -1;
+  }
+  return 0;
+}
+
+/* loadGameState takes in a filename, a pointer to an uninitialised state,
+   and an array of pointers to every room in the game.
+   If such file does not exist or cannot be opened, return -1.
+   Otherwise, it writes the file's contents to the state. */
+int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
+  assert(playerState);
+  if (access(fname, F_OK) == -1) { // File does not exist
+    printf("File does not exist.\n");
+    return -1;
+  } else {
+    FILE *file = fopen(fname, "rb");
+    if (validatePtr(file, "could not open this save file.") == -1) {
+      return -1;
+    } else {
+      // TODO: add error checking to each fread to ensure that the end of the
+      // file isn't reached prematurely (save file must be corrupted in this
+      // case)
+      fread(playerState, sizeof(state), 1, file);
+
+      playerState->player = malloc(sizeof(player_t));
+      fread(playerState->player, sizeof(player_t), 1, file);
+
+      /* Load player's username */
+      playerState->profile.username =
+          malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
+      fread(playerState->profile.username, sizeof(char), USERNAME_CHAR_LIMIT,
+            file);
+
+      /* Load inventory */
+      int itemCount = playerState->player->itemCount;
+      playerState->player->inventory = calloc(ITEM_NUM, sizeof(item_t));
+      for (int i = 0; i < itemCount; i++) {
+        Item item;
+        fread(&item, sizeof(Item), 1, file);
+        playerState->player->inventory[i] = initialiseItem(gameItems[item]);
+        int hash;
+        fread(&hash, sizeof(int), 1, file);
+        playerState->player->inventory[i]->hash = hash;
+      }
+
+      /* Load player's current location */
+      RoomName currentRoom;
+      fread(&currentRoom, sizeof(RoomName), 1, file);
+      RoomPosition currentPosition;
+      fread(&currentPosition, sizeof(RoomPosition), 1, file);
+      playerState->curr_room_node =
+          worldMap[(currentRoom * 5) + currentPosition];
+
+      /* Load items in each room */
+      for (int i = 0; i < TOTAL_ROOM_COUNT; i++) { // For each room in the map
+        int itemCount;
+        fread(&itemCount, sizeof(int), 1, file);
+        worldMap[i]->ItemCount = itemCount;
+        for (int j = 0; j < itemCount; j++) {
+          Item item;
+          fread(&item, sizeof(Item), 1, file);
+          int hash;
+          fread(&hash, sizeof(int), 1, file);
+          worldMap[i]->Items[j] = initialiseItem(gameItems[item]);
+          worldMap[i]->Items[j]->hash = hash;
+        }
+      }
+    }
+    fclose(file);
+    return 0;
+  }
+}
+
+/* saveGameState takes in a filename, a pointer to the player's state,
+   and an array of pointers to every room in the game.
+   Returns -1 if the file could not be opened. Otherwise, it writes
+   the player's state to the file. */
+int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
+  FILE *fileOut = fopen(fname, "wb");
+  if (validatePtr(fileOut, "something went wrong mate idk wagwaan") == -1) {
+    return -1;
+  } else {
+    // Save state
+    fwrite(playerState, sizeof(state), 1, fileOut);
+    // Save player struct
+    fwrite(playerState->player, sizeof(player_t), 1, fileOut);
+    // Save username
+    fwrite(playerState->profile.username, sizeof(char), USERNAME_CHAR_LIMIT,
+           fileOut);
+    // Save each item in player's inventory
+    for (int i = 0; i < playerState->player->itemCount; i++) {
+      item_t *item = playerState->player->inventory[i];
+      fwrite(&item->name, sizeof(Item), 1, fileOut);
+      fwrite(&item->hash, sizeof(int), 1, fileOut);
+    }
+    // Save player's location
+    room_t *currentRoom = playerState->curr_room_node;
+    fwrite(&currentRoom->current_room, sizeof(RoomName), 1, fileOut);
+    fwrite(&currentRoom->position, sizeof(RoomPosition), 1, fileOut);
+    // Save items in each room
+    for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
+      room_t *room = worldMap[i];
+      fwrite(&room->ItemCount, sizeof(int), 1, fileOut);
+      for (int j = 0; j < room->ItemCount; j++) {
+        item_t *item = room->Items[j];
+        fwrite(&item->name, sizeof(Item), 1, fileOut);
+        fwrite(&item->hash, sizeof(Item), 1, fileOut);
+      }
+    }
+    fclose(fileOut);
+  }
+  return 0;
 }
 
 // shows player their inventory of Items
@@ -86,7 +203,7 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   // added other Items randomly around lobby
   int *randomOtherItemLocations = malloc(sizeof(int) * 4);
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
-  for (int i = 10; i < TOTAL_ItemCount; i++) {
+  for (int i = 10; i < TOTAL_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
         ->Items[rooms[randomOtherItemLocations[i - 10]]->ItemCount] = Items[i];
     rooms[randomOtherItemLocations[i - 10]]->ItemCount++;
@@ -143,8 +260,10 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   return room;
 }
 
-// initialises all rooms in building
-building_t *initialiseBuilding() {
+/* Initialises all rooms in building.
+    Takes in a pointer to an array of room_t pointers, and fills this
+    array with all the rooms in the building */
+building_t *initialiseBuilding(room_t **out) {
 
   building_t *huxley = malloc(sizeof(*huxley));
 
@@ -153,25 +272,25 @@ building_t *initialiseBuilding() {
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
-  item_t *apple1 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple2 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple3 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple4 = initialiseItem(gameItems[APPLE_Item_INDEX]);
-  item_t *apple5 = initialiseItem(gameItems[APPLE_Item_INDEX]);
+  item_t *apple1 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple2 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple3 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple4 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
   // initialising 5 game cash bundles
-  item_t *cash1 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash2 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash3 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash4 = initialiseItem(gameItems[CASH_Item_INDEX]);
-  item_t *cash5 = initialiseItem(gameItems[CASH_Item_INDEX]);
+  item_t *cash1 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash2 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash3 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash4 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash5 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
   // initialising keyboard
-  item_t *keyboard = initialiseItem(gameItems[KEYBOARD_Item_INDEX]);
+  item_t *keyboard = initialiseItem(gameItems[KEYBOARD_ITEM_INDEX]);
   // initialising mouse
-  item_t *mouse = initialiseItem(gameItems[MOUSE_Item_INDEX]);
+  item_t *mouse = initialiseItem(gameItems[MOUSE_ITEM_INDEX]);
   // initialing monitor
-  item_t *monitor = initialiseItem(gameItems[MONITOR_Item_INDEX]);
+  item_t *monitor = initialiseItem(gameItems[MONITOR_ITEM_INDEX]);
   // initialising pass to lab
-  item_t *pass = initialiseItem(gameItems[PASS_Item_INDEX]);
+  item_t *pass = initialiseItem(gameItems[PASS_ITEM_INDEX]);
 
   // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
@@ -236,22 +355,24 @@ building_t *initialiseBuilding() {
   monitor->hash = 13;
   pass->hash = 14;
 
+  // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
-      lobbySouth,      lobbyEast,        lobbyWest,        lobbyNorth,
-      lobbyCentre,     labEast,          labNorth,         labWest,
-      labSouth,        labCentre,        fusionNorth,      fusionEast,
-      fusionWest,      fusionSouth,      fusionCentre,     lectureHallEast,
-      lectureHallWest, lectureHallNorth, lectureHallSouth, lectureHallCentre,
-      harrodsSouth,    harrodsEast,      harrodsWest,      harrodsCentre,
-      harrodsNorth
+      lobbyEast,        lobbyWest,        lobbyNorth,        lobbySouth,
+      lobbyCentre,      labEast,          labWest,           labNorth,
+      labSouth,         labCentre,        lectureHallEast,   lectureHallWest,
+      lectureHallNorth, lectureHallSouth, lectureHallCentre, fusionEast,
+      fusionWest,       fusionNorth,      fusionSouth,       fusionCentre,
+      harrodsEast,      harrodsWest,      harrodsNorth,      harrodsSouth,
+      harrodsCentre};
+  for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
+    out[i] = roomArray[i];
+  }
 
-  };
+  // item_t *ItemArray[TOTAL_ITEM_COUNT] = {
+  //    cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
+  //    apple3, apple4, apple5, keyboard, mouse, monitor, pass};
 
-  item_t *ItemArray[TOTAL_ItemCount] = {
-      cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
-      apple3, apple4, apple5, keyboard, mouse, monitor, pass};
-
-  randomlyPlaceItems(ItemArray, roomArray);
+  // randomlyPlaceItems(ItemArray, roomArray);
 
   huxley->start_room = lobbySouth;
   //  free(roomArray);
@@ -328,7 +449,8 @@ state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
   initialState->player = initialisePlayer();
   initialState->curr_room_node = initialRoom;
-  char *username = "sanchit";
+  char *username = malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
+  strcpy(username, "sanchit");
   // scanf("%s\n", username);
   initialState->profile.username = username;
   initialState->profile.character = UTA;
