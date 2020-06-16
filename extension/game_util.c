@@ -56,6 +56,14 @@ void checkPtr(const void *ptr) {
   }
 }
 
+int validatePtr(const void *ptr, char *message) {
+  if (ptr == NULL) {
+    printf("Error: %s", message);
+    return -1;
+  }
+  return 0;
+}
+
 /* loadGameState takes in a filename, a pointer to an uninitialised state,
    and an array of pointers to every room in the game.
    If such file does not exist or cannot be opened, return -1.
@@ -88,9 +96,9 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
       int itemCount = playerState->player->itemCount;
       playerState->player->inventory = calloc(ITEM_NUM, sizeof(item_t));
       for (int i = 0; i < itemCount; i++) {
-        Item item;
-        fread(&item, sizeof(Item), 1, file);
-        playerState->player->inventory[i] = initialiseItem(gameItems[item]);
+        ItemIndex gameItemID;
+        fread(&gameItemID, sizeof(ItemIndex), 1, file);
+        playerState->player->inventory[i] = initialiseItem(gameItemID);
         int hash;
         fread(&hash, sizeof(int), 1, file);
         playerState->player->inventory[i]->hash = hash;
@@ -110,11 +118,11 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
         fread(&itemCount, sizeof(int), 1, file);
         worldMap[i]->ItemCount = itemCount;
         for (int j = 0; j < itemCount; j++) {
-          Item item;
-          fread(&item, sizeof(Item), 1, file);
+          ItemIndex gameItemID;
+          fread(&gameItemID, sizeof(ItemIndex), 1, file);
           int hash;
           fread(&hash, sizeof(int), 1, file);
-          worldMap[i]->Items[j] = initialiseItem(gameItems[item]);
+          worldMap[i]->Items[j] = initialiseItem(gameItemID);
           worldMap[i]->Items[j]->hash = hash;
         }
       }
@@ -143,7 +151,7 @@ int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
     // Save each item in player's inventory
     for (int i = 0; i < playerState->player->itemCount; i++) {
       item_t *item = playerState->player->inventory[i];
-      fwrite(&item->name, sizeof(Item), 1, fileOut);
+      fwrite(&item->gameItemID, sizeof(ItemIndex), 1, fileOut);
       fwrite(&item->hash, sizeof(int), 1, fileOut);
     }
     // Save player's location
@@ -156,8 +164,8 @@ int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
       fwrite(&room->ItemCount, sizeof(int), 1, fileOut);
       for (int j = 0; j < room->ItemCount; j++) {
         item_t *item = room->Items[j];
-        fwrite(&item->name, sizeof(Item), 1, fileOut);
-        fwrite(&item->hash, sizeof(Item), 1, fileOut);
+        fwrite(&item->gameItemID, sizeof(ItemIndex), 1, fileOut);
+        fwrite(&item->hash, sizeof(int), 1, fileOut);
       }
     }
     fclose(fileOut);
@@ -296,11 +304,13 @@ void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
 }
 
 // initialese Items
-item_t *initialiseItem(item_t gameItem) {
+item_t *initialiseItem(ItemIndex gameItemID) {
   item_t *Item = malloc(sizeof(*Item));
   checkPtr(Item);
+  item_t gameItem = gameItems[gameItemID];
   Item->key = strptr(gameItem.key);
   Item->name = gameItem.name;
+  Item->gameItemID = gameItemID;
   Item->properties = gameItem.properties;
   Item->description = strptr(gameItem.description);
   Item->cost = 0;
@@ -308,29 +318,29 @@ item_t *initialiseItem(item_t gameItem) {
 }
 
 void initialiseBuyableItem(item_t *items[]) {
-  item_t *buyApple1 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple2 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple3 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple4 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
-  item_t *buyApple5 = initialiseItem(gameItems[BUYABLE_APPLE_ITEM_INDEX]);
+  item_t *buyApple1 = initialiseItem(BUYAPPLE_INDEX);
+  item_t *buyApple2 = initialiseItem(BUYAPPLE_INDEX);
+  item_t *buyApple3 = initialiseItem(BUYAPPLE_INDEX);
+  item_t *buyApple4 = initialiseItem(BUYAPPLE_INDEX);
+  item_t *buyApple5 = initialiseItem(BUYAPPLE_INDEX);
 
-  item_t *coffee1 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
-  item_t *coffee2 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
-  item_t *coffee3 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
-  item_t *coffee4 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
-  item_t *coffee5 = initialiseItem(gameItems[COFFEE_ITEM_INDEX]);
+  item_t *coffee1 = initialiseItem(COFFEE_INDEX);
+  item_t *coffee2 = initialiseItem(COFFEE_INDEX);
+  item_t *coffee3 = initialiseItem(COFFEE_INDEX);
+  item_t *coffee4 = initialiseItem(COFFEE_INDEX);
+  item_t *coffee5 = initialiseItem(COFFEE_INDEX);
 
-  item_t *tescoMD1 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
-  item_t *tescoMD2 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
-  item_t *tescoMD3 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
-  item_t *tescoMD4 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
-  item_t *tescoMD5 = initialiseItem(gameItems[TESCOMD_ITEM_INDEX]);
+  item_t *tescoMD1 = initialiseItem(TESCO_INDEX);
+  item_t *tescoMD2 = initialiseItem(TESCO_INDEX);
+  item_t *tescoMD3 = initialiseItem(TESCO_INDEX);
+  item_t *tescoMD4 = initialiseItem(TESCO_INDEX);
+  item_t *tescoMD5 = initialiseItem(TESCO_INDEX);
 
-  item_t *rum1 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
-  item_t *rum2 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
-  item_t *rum3 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
-  item_t *rum4 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
-  item_t *rum5 = initialiseItem(gameItems[RUM_ITEM_INDEX]);
+  item_t *rum1 = initialiseItem(RUM_INDEX);
+  item_t *rum2 = initialiseItem(RUM_INDEX);
+  item_t *rum3 = initialiseItem(RUM_INDEX);
+  item_t *rum4 = initialiseItem(RUM_INDEX);
+  item_t *rum5 = initialiseItem(RUM_INDEX);
 
   items[0] = buyApple1;
   items[1] = buyApple2;
@@ -392,28 +402,28 @@ building_t *initialiseBuilding(room_t **out) {
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
-  item_t *apple1 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  item_t *apple2 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  item_t *apple3 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  item_t *apple4 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
-  item_t *apple5 = initialiseItem(gameItems[APPLE_ITEM_INDEX]);
+  item_t *apple1 = initialiseItem(APPLE_INDEX);
+  item_t *apple2 = initialiseItem(APPLE_INDEX);
+  item_t *apple3 = initialiseItem(APPLE_INDEX);
+  item_t *apple4 = initialiseItem(APPLE_INDEX);
+  item_t *apple5 = initialiseItem(APPLE_INDEX);
   // initialising Buyable items
   item_t *buyableItemArray[TOTAL_BUYABLE_ITEM_COUNT];
   initialiseBuyableItem(buyableItemArray);
   // initialising 5 game cash bundles
-  item_t *cash1 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  item_t *cash2 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  item_t *cash3 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  item_t *cash4 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
-  item_t *cash5 = initialiseItem(gameItems[CASH_ITEM_INDEX]);
+  item_t *cash1 = initialiseItem(CASH_INDEX);
+  item_t *cash2 = initialiseItem(CASH_INDEX);
+  item_t *cash3 = initialiseItem(CASH_INDEX);
+  item_t *cash4 = initialiseItem(CASH_INDEX);
+  item_t *cash5 = initialiseItem(CASH_INDEX);
   // initialising keyboard
-  item_t *keyboard = initialiseItem(gameItems[KEYBOARD_ITEM_INDEX]);
+  item_t *keyboard = initialiseItem(KEYBOARD_INDEX);
   // initialising mouse
-  item_t *mouse = initialiseItem(gameItems[MOUSE_ITEM_INDEX]);
+  item_t *mouse = initialiseItem(MOUSE_INDEX);
   // initialing monitor
-  item_t *monitor = initialiseItem(gameItems[MONITOR_ITEM_INDEX]);
+  item_t *monitor = initialiseItem(MONITOR_INDEX);
   // initialising pass to lab
-  item_t *pass = initialiseItem(gameItems[PASS_ITEM_INDEX]);
+  item_t *pass = initialiseItem(PASS_INDEX);
 
   // initialises all the rooms within the building
   room_t *lobbySouth = initialiseRoom(LOBBY, SOUTH);
