@@ -271,7 +271,11 @@ void printStateDetails(state *state1) {
   printAdjacentRooms(state1->currentRoom);
   printf("\n");
   printItemDetails(state1->currentRoom->items);
-  printf("\n\n\n\n\n");
+  int totalLines =
+      state1->currentRoom->adjacent_room_count + state1->currentRoom->itemCount;
+  for (int i = 0; i < (8 - totalLines); i++) {
+    printf("\n");
+  }
   printInventory(state1);
   printf("\n\n");
 }
