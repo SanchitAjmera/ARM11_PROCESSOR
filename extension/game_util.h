@@ -25,7 +25,7 @@ typedef struct state state;
 #define PROPERTY_NUM (4)
 #define USERNAME_CHAR_LIMIT (20)
 #define TOTAL_ROOM_COUNT (25)
-#define COMMAND_NUM (6)
+#define COMMAND_NUM (9)
 #define DIR_NUM (4)
 
 // enum for position in rooms
@@ -68,7 +68,7 @@ typedef enum { BATMAN, UTA } Character;
 typedef enum { NONE, NEW_GAME, LOAD_GAME, QUIT } Menu;
 
 // enum for supported commands
-typedef enum { EXIT, PICKUP, DROP, BUY, MOVE, VIEW, SAVE, HELP } Command;
+typedef enum { EXIT, PICKUP, DROP, BUY, MOVE, VIEW, SAVE, HELP, SKIP } Command;
 
 // generic (string, enum) struct for lookups
 typedef struct {
@@ -127,8 +127,9 @@ static const pair_t directionTable[] = {
 
 //
 static const pair_t commandsTable[] = {
-    {"exit", EXIT}, {"pickup", PICKUP}, {"drop", DROP}, {"buy", BUY},
-    {"move", MOVE}, {"view", VIEW},     {"save", SAVE}, {"help", HELP}};
+    {"exit", EXIT}, {"pickup", PICKUP}, {"drop", DROP},
+    {"buy", BUY},   {"move", MOVE},     {"view", VIEW},
+    {"save", SAVE}, {"help", HELP},     {"skip", SKIP}};
 
 // Supported Items
 static const item_t gameItems[] = {
