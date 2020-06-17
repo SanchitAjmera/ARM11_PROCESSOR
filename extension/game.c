@@ -8,7 +8,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
+#define EMPTY(string) (!strcmp(string, ""))
+
 char *reduceCommand(char *argument) {
+  if (!strcmp(argument, "")) {
+    return argument;
+  }
   char *reduced = malloc(sizeof(argument));
   strcpy(reduced, argument);
   reduced = strtok(reduced, " ");
@@ -36,11 +42,13 @@ void getCommand(char *command, char *argument) {
     strcpy(command, "skip");
     return;
   }
-
   strcpy(command, comm);
-  if (args) {
-    strcpy(argument, args);
+
+  if (!args) {
+    strcpy(argument, "");
+    return;
   }
+  strcpy(argument, args);
 }
 
 void playGame(state *currentState) {
@@ -55,6 +63,10 @@ void playGame(state *currentState) {
     getCommand(command, argument);
     char *reduced = reduceCommand(argument);
     Command type = lookup(commandsTable, COMMAND_NUM, command);
+    if (type != FIND_FAIL && !SINGLE(type) && EMPTY(argument)) {
+      printf("I think you need to type more for this command...\n");
+      continue;
+    }
     switch (type) {
     case SKIP:
       printf("It might be useful to type a command...\n");
