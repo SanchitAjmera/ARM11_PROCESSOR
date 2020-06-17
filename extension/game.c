@@ -107,9 +107,9 @@ void playGame(state *currentState) {
     case HELP:
       printf("Help is on its way -- need function\n");
       break;
-    case THROW:
-      break;
     case CONSUME:
+      break;
+    case FIGHT:
       break;
     default:
       printf("I'm not sure how to '%s'?\n", command);
