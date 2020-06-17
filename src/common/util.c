@@ -14,9 +14,8 @@ char *strptr(const char *in) {
 void validatePtr(const void *ptr) {
   if (ptr == NULL) {
     printf("Error: NULL pointer.");
-    errorExit(ERR_FAIL);
+    errorExit(MEM_ASSIGN);
   }
-  return ERR_SUCC;
 }
 
 /* Exits program if an error occurred */
