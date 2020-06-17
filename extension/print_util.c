@@ -12,8 +12,12 @@
 
 void printPreparingGame(void) {
 
-  for (int i = 0; i < 35; i++) {
+  for (int i = 0; i < 32; i++) {
     system(CLEAR);
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
     printf("\n");
     printf("\n");
     printf("\n");
@@ -26,32 +30,40 @@ void printPreparingGame(void) {
     for (int j = 0; j < i; j++) {
       printf("#");
     }
-    for (int j = 33; j >= i; j--) {
+    for (int j = 30; j >= i; j--) {
       printf("-");
     }
     printf("\n");
     fflush(stdout);
-    usleep(80000);
+    usleep(70000);
   }
   printf("\n");
   printf("\n");
 }
 
-void printMenu(void) {
+void printMenu(bool isInvalid) {
   system(CLEAR);
+  printf("\n");
+  printf("\n");
   printf("\n");
   printf("\n");
   printf("\n");
   printf("\n");
   printf("                          Welcome to the ICL Text Adventure!\n\n");
   printf("                          What would you like to do?\n\n");
-  usleep(500000);
+  if (!isInvalid) {
+    usleep(500000);
+  }
   fflush(stdout);
   printf("                              [1] NEW GAME\n");
   printf("                              [2] LOAD GAME\n");
   printf("                              [3] QUIT\n");
   printf("\n");
-  printf("\n");
+  if (isInvalid) {
+    printf("                          You have entered an invalid choice\n");
+  } else {
+    printf("\n");
+  }
   printf("\n");
   printf("                          >> ");
   return;
@@ -61,32 +73,33 @@ void printMenu(void) {
 void printRoomPosition(room_t *room) {
   switch (room->position) {
   case NORTH:
-    printf("NORTH ");
+    printf("North ");
     break;
   case SOUTH:
-    printf("SOUTH ");
+    printf("South ");
     break;
   case WEST:
-    printf("WEST ");
+    printf("West ");
     break;
   case EAST:
-    printf("EAST ");
+    printf("East ");
     break;
   case CENTRE:
-    printf("CENTRE ");
+    printf("Central ");
     break;
   }
 }
 
-void printItemDetails(item_t **items, int itemCount) {
-  if (items != NULL) {
-    for (int i = 0; i < ITEM_NUM; i++) {
-      if (items[i]) {
-        printf("%s ", items[i]->key);
-      }
+void printItemDetails(item_t **items) {
+  printf(
+      "                                                         ---ITEMS---\n");
+  printf("                                                            ");
+  for (int i = 0; i < ITEM_NUM; i++) {
+    if (items[i]) {
+      printf("%s ", items[i]->key);
     }
-    printf("\n");
   }
+  printf("\n");
 }
 
 // function for printing out name of room
@@ -94,19 +107,19 @@ void printRoomName(room_t *room1) {
 
   switch (room1->current_room) {
   case LOBBY:
-    printf("LOBBY\n");
+    printf(" Lobby");
     break;
   case LAB:
-    printf("LAB\n");
+    printf("  Lab");
     break;
   case HARRODS:
-    printf("HARRODS\n");
+    printf("Harrods");
     break;
   case FUSION:
-    printf("FUSION\n");
+    printf("Fusion");
     break;
   case LECTURE_HALL:
-    printf("LECTURE_HALL\n");
+    printf("Room 340");
     break;
   }
 }
@@ -117,6 +130,8 @@ void printAdjacentRooms(room_t *room1) {
     if (room1->adjacent_rooms[i]) {
       printRoomPosition(room1->adjacent_rooms[i]);
       printRoomName(room1->adjacent_rooms[i]);
+      printf("\n");
+      printf("                                                        ");
     }
   }
 }
@@ -126,11 +141,13 @@ void printRoomDetails(room_t *room1) {
   printRoomPosition(room1);
   printRoomName(room1);
   printf("Items in the room: ");
-  printItemDetails(room1->items, room1->itemCount);
+  printItemDetails(room1->items);
   printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
   printf("adjacent rooms:\n");
   printAdjacentRooms(room1);
 }
+
+// prints map of current and adjancent room on top right of terminal
 
 bool containsRoom(room_t *printedRooms[4], int size, room_t *room) {
   for (int i = 0; i < size; i++) {
@@ -168,11 +185,18 @@ void printBuildingDetails(building_t *huxley) {
 //--------------------------Start of Player-----------------------------------
 
 void printHealth(state *currentState) {
-  printf("Your current health is: %d\n", currentState->player->health);
+  for (int i = 0; i < currentState->player->health / 5; i++) {
+    printf("#");
+  }
+  for (int i = 20; i > currentState->player->health / 5; i--) {
+    printf("-");
+  }
+
+  printf("  %d", currentState->player->health);
 }
 
 void printCash(state *currentState) {
-  printf("You have £%d cash to spend\n", currentState->player->cash);
+  printf("HuxCoins: $%d", currentState->player->cash);
 }
 
 void printInventory(state *currentState) {
@@ -216,14 +240,76 @@ void printPlayer(state *currentState) {
 
 //--------------------------End of Player--------------------------------
 
-void printStateDetails(state *state1) {
-  printf("hi I am %s\n", state1->profile.username);
-  printf("Score: %d\n", state1->profile.score);
+void printStateDetails2(state *state1) {
+  system(CLEAR);
+  printf("\n");
+  //  printf("%s\n", state1->profile.username);
   printHealth(state1);
+  printf("                               ");
+  if (state1->currentRoom->adjacent_rooms[NORTH]) {
+    printRoomPosition(state1->currentRoom->adjacent_rooms[NORTH]);
+    printRoomName(state1->currentRoom->adjacent_rooms[NORTH]);
+  }
+  printf("\n");
+  printf("Score:     %d", state1->profile.score);
+  printf("                                       ");
+  printf("        |\n");
   printCash(state1);
+  printf("                                 ");
+  if (state1->currentRoom->adjacent_rooms[WEST]) {
+    printRoomPosition(state1->currentRoom->adjacent_rooms[WEST]);
+    printRoomName(state1->currentRoom->adjacent_rooms[WEST]);
+  } else {
+    printf("       ");
+  }
+  printf(" -- ");
+  printRoomPosition(state1->currentRoom);
+  printRoomName(state1->currentRoom);
+  printf(" -- ");
+  if (state1->currentRoom->adjacent_rooms[EAST]) {
+    printRoomPosition(state1->currentRoom->adjacent_rooms[EAST]);
+    printRoomName(state1->currentRoom->adjacent_rooms[EAST]);
+    printf("\n");
+  } else {
+    printf("      \n");
+  }
+  printf("                                                   ");
+  printf("        |\n");
+  printf("                                                        ");
+  if (state1->currentRoom->adjacent_rooms[SOUTH]) {
+    printRoomPosition(state1->currentRoom->adjacent_rooms[SOUTH]);
+    printRoomName(state1->currentRoom->adjacent_rooms[SOUTH]);
+  } else {
+    printf("      \n");
+  }
+  printf("\n\n\n\n\n\n\n");
   printInventory(state1);
   printf("currently in room: ");
   printRoomDetails(state1->currentRoom);
+}
+
+void printStateDetails(state *state1) {
+  system(CLEAR);
+  printf("\n");
+  // printing health
+  printHealth(state1);
+  printf("                               ");
+  // printing current room details
+  printRoomPosition(state1->currentRoom);
+  printRoomName(state1->currentRoom);
+  printf("\n");
+  // printing score
+  printf("Score:     %d", state1->profile.score);
+  printf("                                                   |\n");
+  // printing cash
+  printCash(state1);
+  printf("                                            ");
+  // printing adjacent rooms
+  printAdjacentRooms(state1->currentRoom);
+  printf("\n");
+  printItemDetails(state1->currentRoom->items);
+  printf("\n\n\n\n\n\n\n");
+  printInventory(state1);
 }
 // TO BE MOVED:
 //-------------------------Konstantinos-----------------------------------------
