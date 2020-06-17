@@ -1,12 +1,10 @@
 #include "print_util.h"
-#include <assert.h>
-#include <math.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #define CLEAR ("clear")
 
@@ -45,7 +43,7 @@ void printMenu(void) {
   printf("\n");
   printf("                          Welcome to the ICL Text Adventure!\n\n");
   printf("                          What would you like to do?\n\n");
-  usleep(500000);
+  usleep(100000);
   fflush(stdout);
   printf("                              [1] NEW GAME\n");
   printf("                              [2] LOAD GAME\n");
@@ -55,6 +53,11 @@ void printMenu(void) {
   printf("\n");
   printf("                          >> ");
   return;
+}
+
+void printInvalid(void) {
+  printf("\n                            Invalid choice entered!\n");
+  usleep(800000);
 }
 
 // funcion to print Room position
