@@ -106,7 +106,7 @@ bool moveRoom(state *currentState, char *dirName) {
 
 bool consume(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
-  if (!currentState->player->inventory[item->name]) {
+  if (!item || !currentState->player->inventory[item->name]) {
     printf("You don't have '%s' to eat\n", itemName);
     return false;
   }
