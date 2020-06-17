@@ -19,5 +19,5 @@ extern bool moveRoom(state *currentState, char *dirName);
 extern bool pickUpItem(state *currentState, char *itemName);
 extern bool dropItem(state *currentState, char *itemName);
 extern bool buyItem(state *currentState, char *itemName);
-
+extern bool consume(state *currentState, char *itemName);
 #endif
