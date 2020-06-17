@@ -40,5 +40,7 @@ extern uint parseImmediate(char *op2);
 extern void scanFile(FILE *armFile, symbol_table *symbolTable,
                      file_lines *output);
 extern void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out);
+extern word parseLine(symbol_table *symbolTable, const char *line,
+                      word address);
 
 #endif
