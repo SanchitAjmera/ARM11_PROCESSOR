@@ -131,7 +131,7 @@ int main(void) {
   // state *playerState = malloc(sizeof(state));
   saveGameState("sanchizzle", playerState, worldMap);
   // loadGameState("sanchizzle", playerState, worldMap);
-  int choice = NONE;
+  int choice = INVALID;
   char menuChoice[100];
 
   while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
