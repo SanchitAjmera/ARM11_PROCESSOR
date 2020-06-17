@@ -3,11 +3,13 @@
 
 typedef struct item_t item_t;
 typedef struct state state;
+#include "characters/boss/boss.h"
 #include "characters/player/player.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #define MAX_ROOM_HISTORY (5)
@@ -39,7 +41,12 @@ typedef enum {
   BUYAPPLE_INDEX = 6,
   TESCO_INDEX = 7,
   COFFEE_INDEX = 8,
-  RUM_INDEX = 9
+  RUM_INDEX = 9,
+  GUZZI_INDEX = 10,
+  SUPREME_INDEX = 11,
+  DRIP_INDEX = 12,
+  BLM_INDEX = 13
+
 } ItemIndex;
 
 typedef enum {
@@ -83,7 +90,7 @@ LECTURE HALL -> {"Huxley 308 is quiet... a bit too quiet.",
                  Huxley!",
                  "The stairway to the back of the lecture hall."}
 
-FUSION -> {"Pot noodles... a life support for any student. Replesnigh your
+FUSION -> {"Pot noodles... a life support for any student. Replenish your
            health here!".
            "You see the sofas in the JCR. It reminds you to rest (save)".
            "There's a broken vending machine - wait for part II to use.",
@@ -153,6 +160,7 @@ typedef struct room_t {
   item_t **items;
   int itemCount;
   int id;
+  boss_t *boss;
 } room_t;
 
 // structure for building consisting of room_history
@@ -204,7 +212,15 @@ static const item_t gameItems[] = {
     {"coffee", FOOD, 8, (BUYABLE | EDIBLE),
      "Pay 10 HuxCoins to get through those lectures! (Health += 10)", 10},
     {"rum & coke", FOOD, 9, (BUYABLE | EDIBLE),
-     "Pay 50 HuxCoins and get drunk ;) ! (Health += 50)", 50}};
+     "Pay 50 HuxCoins and get drunk ;) ! (Health += 50)", 50},
+    {"Guzzi Belt", FOOD, 10, (BUYABLE),
+     "Bank transfer us our uni fees for 2021 and cop the 'Guzzi Belt'"},
+    {"Supreme Hoodie", FOOD, 11, BUYABLE,
+     " Flex like an international student everytime you go to lectures!"},
+    {"Drip", FOOD, 12, BUYABLE,
+     "Drip too hard don't stand to close for only 30 Huxcoins"},
+    {"BLM Badge", FOOD, 13, BUYABLE,
+     "Support da movement with a free BLM badge!"}};
 
 extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);

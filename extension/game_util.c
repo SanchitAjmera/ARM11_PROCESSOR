@@ -1,4 +1,5 @@
 #include "game_util.h"
+#include "characters/boss/boss.h"
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
@@ -31,6 +32,9 @@
 #define FUSION_WEST_INDEX (16)
 #define FUSION_SOUTH_INDEX (17)
 #define FUSION_EAST_INDEX (18)
+#define HARRODS_START_INDEX (21)
+#define BOSSKGK ("Konstantinos")
+#define BOSSTONY ("Tony")
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -224,6 +228,7 @@ void introduction() {}
 
 // generates array of random numbers of length n
 void randomiseArray(int randArray[], int length, int randMax) {
+  srand(time(NULL));
   for (int i = 0; i < length; i++) {
     randArray[i] = rand() % randMax;
   }
@@ -281,6 +286,10 @@ void placeBuyableItems(item_t *items[], room_t *rooms[]) {
     rooms[FUSION_NORTH_INDEX]->items[rooms[FUSION_NORTH_INDEX]->itemCount] =
         items[15 + i];
     rooms[FUSION_NORTH_INDEX]->itemCount++;
+  }
+  for (int i = 0; i < 4; i++) {
+    rooms[HARRODS_START_INDEX + i]
+        ->items[rooms[HARRODS_START_INDEX + i]->itemCount] = items[20 + i];
   }
 }
 
@@ -352,6 +361,11 @@ void initialiseBuyableItem(item_t *items[]) {
   item_t *rum4 = initialiseItem(RUM_INDEX);
   item_t *rum5 = initialiseItem(RUM_INDEX);
 
+  item_t *guzziBelt = initialiseItem(GUZZI_INDEX);
+  item_t *supreme = initialiseItem(SUPREME_INDEX);
+  item_t *drip = initialiseItem(DRIP_INDEX);
+  item_t *blm = initialiseItem(BLM_INDEX);
+
   items[0] = buyApple1;
   items[1] = buyApple2;
   items[2] = buyApple3;
@@ -372,6 +386,10 @@ void initialiseBuyableItem(item_t *items[]) {
   items[17] = rum3;
   items[18] = rum4;
   items[19] = rum5;
+  items[20] = guzziBelt;
+  items[21] = supreme;
+  items[22] = drip;
+  items[23] = blm;
 
   for (int i = 0; i < BUYABLE_ITEMS_IN_ROOM; i++) {
     items[i]->cost = 5;
@@ -379,6 +397,9 @@ void initialiseBuyableItem(item_t *items[]) {
     items[i + 10]->cost = 20;
     items[i + 15]->cost = 50;
   }
+  items[20]->cost = 100;
+  items[21]->cost = 30;
+  items[22]->cost = 75;
 }
 
 // initialises room
@@ -396,6 +417,7 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   room->itemCount = 0;
   room->items = malloc(sizeof(item_t) * 20);
   checkPtr(room->items);
+  room->boss = NULL;
   return room;
 }
 
@@ -483,6 +505,13 @@ building_t *initialiseBuilding(room_t **out) {
   connectRoom(lobbyEast, fusionWest);
   connectRoom(fusionNorth, harrodsSouth);
 
+  // initialising Bosses
+  boss_t *kgk = createBoss(BOSSKGK);
+  boss_t *tony = createBoss(BOSSTONY);
+
+  // adding bosses to Rooms
+  labCentre->boss = kgk;
+  lectureHallCentre->boss = tony;
   // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
       lobbySouth,       lobbyEast,       lobbyNorth,        lobbyWest,

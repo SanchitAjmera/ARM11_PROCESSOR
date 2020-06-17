@@ -1,6 +1,8 @@
 #ifndef BOSS_H
 #define BOSS_H
+typedef struct boss_t boss_t;
 
+#include "../../game_util.h"
 #include "../player/player.h"
 #include "boss_constants.h"
 #include <stdbool.h>
@@ -26,12 +28,12 @@ typedef union {
   aggressive_t *fighting;
 } state_t;
 
-typedef struct {
+struct boss_t {
   const char *name;
   // default: true
   bool isPassive;
   state_t *state;
-} boss_t;
+};
 
 typedef struct {
   const char *key;
