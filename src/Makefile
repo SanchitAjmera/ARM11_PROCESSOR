@@ -1,6 +1,6 @@
 CC      	= gcc
 CFLAGS 		= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
-EMULATE 	= emulator/fetch/emulate_fetch.o emulator/decode/emulate_decode.o emulator/execute/emulate_execute.o
+EMULATE 	= emulator/fetch/emulate_fetch.o emulator/decode/emulate_decode.o emulator/execute/emulate_execute.o emulator/execute/emulate_execute_dpi.o
 ASSEMBLE 	= assembler/assemble_util.o assembler/file_lines.o assembler/symbol_table.o
 
 .SUFFIXES: .c .o
