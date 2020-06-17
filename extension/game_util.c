@@ -12,12 +12,12 @@
 #define ROOM_POSITION_NUMBER (5)
 #define TOTAL_ITEM_COUNT (34)
 #define TOTAL_BUYABLE_ITEM_COUNT (20)
-#define TOTAL_APPLE_COUNT (5)
+#define TOTAL_PEAR_COUNT (5)
 #define TOTAL_BUYABLE_APPLE_COUNT (5)
 #define TOTAL_SHOP_COUNT (10)
 #define TOTAL_CASH_COUNT (5)
 #define CASH_ITEM_INDEX (4)
-#define APPLE_ITEM_INDEX (0) // I beg you dont change the _ITEM_INDEX's
+#define PEAR_ITEM_INDEX (0) // I beg you dont change the _ITEM_INDEX's
 #define KEYBOARD_ITEM_INDEX (1)
 #define MOUSE_ITEM_INDEX (2)
 #define MONITOR_ITEM_INDEX (3)
@@ -232,11 +232,11 @@ void randomiseArray(int randArray[], int length, int randMax) {
 // randomly places Items in room
 void randomlyPlaceItems(item_t *items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
-  int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
+  int *randomPearLocations = malloc(sizeof(int) * TOTAL_PEAR_COUNT);
   checkPtr(randomCashLocations);
-  checkPtr(randomAppleLocations);
+  checkPtr(randomPearLocations);
   // array for random locations of apples and cash
-  randomiseArray(randomAppleLocations, TOTAL_APPLE_COUNT,
+  randomiseArray(randomPearLocations, TOTAL_PEAR_COUNT,
                  TOTAL_ROOM_COUNT - TOTAL_SHOP_COUNT);
   randomiseArray(randomCashLocations, TOTAL_CASH_COUNT,
                  TOTAL_ROOM_COUNT - TOTAL_SHOP_COUNT);
@@ -245,9 +245,9 @@ void randomlyPlaceItems(item_t *items[], room_t *rooms[]) {
     rooms[randomCashLocations[i]]
         ->items[rooms[randomCashLocations[i]]->itemCount] = items[i];
     rooms[randomCashLocations[i]]->itemCount++;
-    rooms[randomAppleLocations[i]]
-        ->items[rooms[randomAppleLocations[i]]->itemCount] = items[i + 5];
-    rooms[randomAppleLocations[i]]->itemCount++;
+    rooms[randomPearLocations[i]]
+        ->items[rooms[randomPearLocations[i]]->itemCount] = items[i + 5];
+    rooms[randomPearLocations[i]]->itemCount++;
   }
   // 4 IS THE NUMBER OF OTHER ItemS APART FROM CASH & APPLES
   // added other Items randomly around lobby
@@ -260,7 +260,7 @@ void randomlyPlaceItems(item_t *items[], room_t *rooms[]) {
     rooms[randomOtherItemLocations[i - 10]]->itemCount++;
   }
   free(randomCashLocations);
-  free(randomAppleLocations);
+  free(randomPearLocations);
   free(randomOtherItemLocations);
 }
 
@@ -312,16 +312,16 @@ void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
 
 // initialese Items
 item_t *initialiseItem(ItemIndex gameItemID) {
-  item_t *Item = malloc(sizeof(*Item));
-  checkPtr(Item);
+  item_t *item = malloc(sizeof(*item));
+  checkPtr(item);
   item_t gameItem = gameItems[gameItemID];
-  Item->key = strptr(gameItem.key);
-  Item->name = gameItem.name;
-  Item->gameItemID = gameItemID;
-  Item->properties = gameItem.properties;
-  Item->description = strptr(gameItem.description);
-  Item->cost = 0;
-  return Item;
+  item->key = strptr(gameItem.key);
+  item->name = gameItem.name;
+  item->gameItemID = gameItemID;
+  item->properties = gameItem.properties;
+  item->description = strptr(gameItem.description);
+  item->cost = gameItem.cost;
+  return item;
 }
 
 void initialiseBuyableItem(item_t *items[]) {
@@ -409,11 +409,11 @@ building_t *initialiseBuilding(room_t **out) {
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
-  item_t *apple1 = initialiseItem(APPLE_INDEX);
-  item_t *apple2 = initialiseItem(APPLE_INDEX);
-  item_t *apple3 = initialiseItem(APPLE_INDEX);
-  item_t *apple4 = initialiseItem(APPLE_INDEX);
-  item_t *apple5 = initialiseItem(APPLE_INDEX);
+  item_t *pear1 = initialiseItem(PEAR_INDEX);
+  item_t *pear2 = initialiseItem(PEAR_INDEX);
+  item_t *pear3 = initialiseItem(PEAR_INDEX);
+  item_t *pear4 = initialiseItem(PEAR_INDEX);
+  item_t *pear5 = initialiseItem(PEAR_INDEX);
   // initialising Buyable items
   item_t *buyableItemArray[TOTAL_BUYABLE_ITEM_COUNT];
   initialiseBuyableItem(buyableItemArray);
@@ -494,8 +494,8 @@ building_t *initialiseBuilding(room_t **out) {
   }
 
   item_t *itemArray[TOTAL_ITEM_COUNT - TOTAL_BUYABLE_ITEM_COUNT] = {
-      cash1,  cash2,  cash3,  cash4,    cash5, apple1,  apple2,
-      apple3, apple4, apple5, keyboard, mouse, monitor, pass};
+      cash1,  cash2,  cash3,  cash4,    cash5, pear1,  pear2,
+      pear3, pear4, pear5, keyboard, mouse, monitor, pass};
 
   randomlyPlaceItems(itemArray, roomArray);
 
