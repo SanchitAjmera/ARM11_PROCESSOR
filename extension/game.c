@@ -8,10 +8,10 @@
 #include <string.h>
 
 #define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
-#define EMPTY(string) (!strcmp(string, ""))
+#define IS_EMPTY(string) (!strcmp(string, ""))
 
 char *reduceCommand(char *argument) {
-  if (!strcmp(argument, "")) {
+  if (IS_EMPTY(argument)) {
     return argument;
   }
   char *reduced = malloc(sizeof(argument));
@@ -65,7 +65,7 @@ void playGame(state *currentState) {
     getCommand(command, argument);
     char *reduced = reduceCommand(argument);
     Command type = lookup(commandsTable, COMMAND_NUM, command);
-    if (type != FIND_FAIL && !SINGLE(type) && EMPTY(argument)) {
+    if (type != FIND_FAIL && !SINGLE(type) && IS_EMPTY(argument)) {
       printf("I think you need to type more for this command...\n");
       continue;
     }
@@ -134,8 +134,6 @@ int main(void) {
     fgets(menuChoice, sizeof(menuChoice), stdin);
     choice = atoi(menuChoice);
 
-    // printMenu();
-
     switch (choice) {
     case QUIT:
       quit();
@@ -174,8 +172,8 @@ int main(void) {
       break;
 
     default:
-      printf("Invalid choice entered!\n");
-      break;
+      printInvalid();
+      continue;
     }
     printf("Done\n");
 
