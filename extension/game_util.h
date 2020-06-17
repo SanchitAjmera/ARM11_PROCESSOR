@@ -4,8 +4,6 @@
 typedef struct item_t item_t;
 typedef struct state state;
 #include "characters/player/player.h"
-#include <math.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
