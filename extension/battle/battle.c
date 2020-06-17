@@ -1,8 +1,8 @@
 #include "battle.h"
+#include "../../src/common/util.h"
 #include "../characters/boss/boss.h"
 #include "../characters/player/player.h"
 #include "../emulateARM/emulateARM.h"
-#include "../game_util.h"
 #include "battle_constants.h"
 #include <stdbool.h>
 #include <stdio.h>
