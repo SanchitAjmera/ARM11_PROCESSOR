@@ -87,7 +87,10 @@ bool buyItem(state *currentState, char *itemName) {
 
 bool moveRoom(state *currentState, char *dirName) {
   int direction = lookup(directionTable, DIR_NUM, dirName);
-
+  if (direction == -1) {
+    printf("'%s' is not a valid direction!\n", dirName);
+    return false;
+  }
   if (currentState->currentRoom->adjacent_rooms[direction]) {
     currentState->currentRoom =
         currentState->currentRoom->adjacent_rooms[direction];
@@ -110,10 +113,11 @@ bool consume(state *currentState, char *itemName) {
   // TODO: calculate health increase
   int increase = 5;
   printf("mmm... Tasty.\n");
-  printf("Your health has increased by %d!\n");
-  item *remove = currentState->player->inventory[item->name];
+  printf("Your health has increased by %d!\n", increase);
+  // item_t *remove = currentState->player->inventory[item->name];
   currentState->player->inventory[item->name] = REMOVED;
-  free(remove);
+  // freeItem(remove);
+  return true;
 }
 
 bool hasItem(state *currentState, Item index) {
