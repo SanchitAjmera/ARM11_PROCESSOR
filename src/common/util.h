@@ -8,7 +8,6 @@ typedef uint8_t byte;
 typedef unsigned int uint;
 // Enums for checked errors within program
 typedef enum {
-  ERROR_SUCC,
   ERR_FAIL,
   MEM_ASSIGN,
   MEM_OVERFLOW,
@@ -45,7 +44,7 @@ typedef enum { EQ, NE, GE = 10, LT, GT, LE, AL } Cond;
 typedef enum { LSL, LSR, ASR, ROR } Shift;
 
 extern char *strptr(const char *in);
-extern Error validatePtr(const void *ptr);
+extern Error validatePtr(const void *ptr, Error error);
 extern void errorExit(Error error);
 
 #endif

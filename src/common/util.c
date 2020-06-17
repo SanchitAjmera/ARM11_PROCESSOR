@@ -11,16 +11,12 @@ char *strptr(const char *in) {
 }
 
 /* Checks for failed memory allocation */
-void validatePtr(const void *ptr) {
+void validatePtr(const void *ptr, Error error) {
   if (ptr == NULL) {
     printf("Error: NULL pointer.");
-    errorExit(MEM_ASSIGN);
+    errorExit(error);
   }
 }
 
 /* Exits program if an error occurred */
-void errorExit(Error error) {
-  if (error != ERR_SUCC) {
-    exit(EXIT_FAILURE);
-  }
-}
+void errorExit(Error error) { exit(error); }
