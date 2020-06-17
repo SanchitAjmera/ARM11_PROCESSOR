@@ -182,6 +182,15 @@ void printBuildingDetails(building_t *huxley) {
 
 //--------------------------Start of Player-----------------------------------
 
+void printCommmands(state *currentState) {
+  system(CLEAR);
+  printf("                    view map      ");
+  for (int i = 0; i < ITEM_NUM; i++) {
+    if (currentState->currentRoom->items[i]) {
+    }
+  }
+}
+
 void printHealth(state *currentState) {
   for (int i = 0; i < currentState->player->health / 5; i++) {
     printf("#");

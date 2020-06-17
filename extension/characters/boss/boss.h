@@ -56,8 +56,8 @@ static const char *tonyAnswers[MAX_QUESTIONS] = {"", "", "", "", ""};
 //                                         TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
 // lookup table for bosses
 static const lookupBoss_t bossTable[] = {
-    {"Konstantinos", kgkQuestions, kgkAnswers},
-    {"Tony", tonyQuestions, tonyAnswers}};
+    {"konstantinos", kgkQuestions, kgkAnswers},
+    {"tony", tonyQuestions, tonyAnswers}};
 
 extern boss_t *createBoss(const char *name);
 // for testing
@@ -70,5 +70,6 @@ extern void freeBoss(boss_t *boss);
 extern void initBattle(boss_t *boss, player_t *player);
 extern void processResult(boss_t *boss, player_t *player, int correct);
 extern void quiz(boss_t *boss, player_t *player);
+extern void fight(state *currentState, char *boss);
 
 #endif

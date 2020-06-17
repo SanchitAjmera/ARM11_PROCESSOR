@@ -93,6 +93,7 @@ void playGame(state *currentState) {
     case MOVE:
       moveRoom(currentState, reduced);
       printStateDetails(currentState);
+
       break;
     case VIEW:
       view(currentState, reduced);
@@ -113,6 +114,7 @@ void playGame(state *currentState) {
       printStateDetails(currentState);
       break;
     case FIGHT:
+      fight(currentState, reduced);
       break;
     case FRESH:
       system(CLEAR);
@@ -120,7 +122,6 @@ void playGame(state *currentState) {
       break;
     default:
       printf("I'm not sure how to '%s'?\n", command);
-      break;
     }
   }
 

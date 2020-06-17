@@ -33,8 +33,8 @@
 #define FUSION_SOUTH_INDEX (17)
 #define FUSION_EAST_INDEX (18)
 #define HARRODS_START_INDEX (21)
-#define BOSSKGK ("Konstantinos")
-#define BOSSTONY ("Tony")
+#define BOSSKGK ("konstantinos")
+#define BOSSTONY ("tony")
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));

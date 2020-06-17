@@ -137,3 +137,16 @@ void quiz(boss_t *boss, player_t *player) {
   }
   processResult(boss, player, correct);
 }
+
+void fight(state *currentState, char *boss) {
+
+  if (!currentState->currentRoom->boss) {
+    printf("          No Boss in da house, go to Central Lab...\n");
+    return;
+  }
+  if (strcmp(boss, currentState->currentRoom->boss->name)) {
+    printf("there is no boss by that name ");
+    return;
+  }
+  quiz(currentState->currentRoom->boss, currentState->player);
+}
