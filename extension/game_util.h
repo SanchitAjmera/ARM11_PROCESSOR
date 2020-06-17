@@ -143,12 +143,12 @@ static const item_t gameItems[] = {
     {"pass", PASS, 5, THROWABLE, "You shall not pass"},
     {"apple", FOOD, 6, (BUYABLE | EDIBLE),
      "Pay 5 HuxCoins to get an apple! (Health += 5)"},
-    {"Tesco Meal Deal", FOOD, 7, (BUYABLE | EDIBLE),
+    {"tesco meal deal", FOOD, 7, (BUYABLE | EDIBLE),
      "Pay 20 HuxCoins for a Tesco meal deal! (Health += 20)"},
-    {"Coffee", FOOD, 8, (BUYABLE | EDIBLE),
+    {"coffee", FOOD, 8, (BUYABLE | EDIBLE),
      "Pay 10 HuxCoins for some coffee to get through those lectures! (Health "
      "+= 10)"},
-    {"Rum & Coke", FOOD, 9, (BUYABLE | EDIBLE),
+    {"rum & coke", FOOD, 9, (BUYABLE | EDIBLE),
      "Pay 50 HuxCoins and get drunk ;) ! (Health += 50)"}};
 
 extern building_t *initialiseBuilding(room_t **out);
