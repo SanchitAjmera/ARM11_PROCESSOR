@@ -65,10 +65,12 @@ void playGame(state *currentState) {
     getCommand(command, argument);
     char *reduced = reduceCommand(argument);
     Command type = lookup(commandsTable, COMMAND_NUM, command);
+
     if (type != FIND_FAIL && !SINGLE(type) && IS_EMPTY(argument)) {
       printf("I think you need to type more for this command...\n");
       continue;
     }
+
     switch (type) {
     case SKIP:
       printf("It might be useful to type a command...\n");
@@ -105,7 +107,10 @@ void playGame(state *currentState) {
     case HELP:
       printf("Help is on its way -- need function\n");
       break;
-
+    case THROW:
+      break;
+    case CONSUME:
+      break;
     default:
       printf("I'm not sure how to '%s'?\n", command);
       break;
