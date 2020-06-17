@@ -111,6 +111,10 @@ void playGame(state *currentState) {
       break;
     case FIGHT:
       break;
+    case FRESH:
+      system(CLEAR);
+      printf("The screen was cleared!\n");
+      break;
     default:
       printf("I'm not sure how to '%s'?\n", command);
       break;

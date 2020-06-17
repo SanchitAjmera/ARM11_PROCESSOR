@@ -77,7 +77,8 @@ typedef enum {
   HELP,
   SKIP,
   CONSUME,
-  FIGHT
+  FIGHT,
+  FRESH
 } Command;
 
 // generic (string, enum) struct for lookups
@@ -137,9 +138,9 @@ static const pair_t directionTable[] = {
 
 //
 static const pair_t commandsTable[] = {
-    {"exit", EXIT}, {"pickup", PICKUP},   {"drop", DROP},  {"buy", BUY},
-    {"move", MOVE}, {"view", VIEW},       {"save", SAVE},  {"help", HELP},
-    {"skip", SKIP}, {"consume", CONSUME}, {"fight", FIGHT}};
+    {"exit", EXIT}, {"pickup", PICKUP},   {"drop", DROP},   {"buy", BUY},
+    {"move", MOVE}, {"view", VIEW},       {"save", SAVE},   {"help", HELP},
+    {"skip", SKIP}, {"consume", CONSUME}, {"fight", FIGHT}, {"clear", FRESH}};
 
 // Supported Items
 static const item_t gameItems[] = {
