@@ -13,7 +13,7 @@ void testSaveFiles() {
   room_t **saveMap = malloc(sizeof(room_t *) * 25);
   building_t *saveHuxley = initialiseBuilding(saveMap);
 
-  state *saveState = initialiseState(saveHuxley->start_room);
+  state *saveState = initialiseState(saveHuxley->startRoom);
   int result = saveGameState("test_save_file.dat", saveState, saveMap);
   testBool(result == 0, "File saves without error");
 
@@ -28,8 +28,8 @@ void testSaveFiles() {
       strcmp(saveState->profile.username, loadState->profile.username);
   testBool(usernameCmp == 0, "Usernames match");
 
-  room_t *loadCurrRoom = loadState->curr_room_node;
-  room_t *saveCurrRoom = saveState->curr_room_node;
+  room_t *loadCurrRoom = loadState->currentRoom;
+  room_t *saveCurrRoom = saveState->currentRoom;
   testBool((loadCurrRoom->current_room == saveCurrRoom->current_room) &&
                (loadCurrRoom->position == saveCurrRoom->position),
            "Player location matches");
@@ -51,12 +51,12 @@ void testSaveFiles() {
     room_t *loadRoom = loadMap[i];
     room_t *saveRoom = saveMap[i];
     printf("Testing room %i\n", i + 1);
-    testBool(loadRoom->ItemCount == saveRoom->ItemCount,
+    testBool(loadRoom->itemCount == saveRoom->itemCount,
              "Room's item count matches");
-    for (int j = 0; j < loadRoom->ItemCount; j++) {
+    for (int j = 0; j < loadRoom->itemCount; j++) {
       printf("  Testing room %i item %i\n", i + 1, j + 1);
-      item_t *loadItem = loadRoom->Items[j];
-      item_t *saveItem = saveRoom->Items[j];
+      item_t *loadItem = loadRoom->items[j];
+      item_t *saveItem = saveRoom->items[j];
       testBool(loadItem->hash == saveItem->hash, "Room item hash matches");
     }
   }
@@ -68,6 +68,9 @@ void testSaveFiles() {
   freeState(loadState);
   freeBuilding(loadHuxley);
 }
+
+// TODO:
+void testLookup() { printf("%s", gameItems[0].key); }
 
 int main(void) {
   printf("-------Testing-Save-Files-------\n");

@@ -6,7 +6,7 @@
 void printRoomName(room_t *room1);
 void printAdjacentRooms(room_t *room1);
 void printRoomDetails(room_t *room1);
-void printItemDetails(item_t **items, int itemCount);
+void printItemDetails(item_t **items);
 void printBuildingDetails(building_t *huxley);
 void printKonstantinos(void);
 void printKonstantinosMouthOpen(void);
@@ -14,5 +14,9 @@ void printKonstantinosIndent(void);
 void printKonstantinosMouthOpenIndent(void);
 void printRemaining(void);
 void printStateDetails(state *state1);
-void printMenu(void);
+void printMenu(bool isValid);
+void printInventory(state *currentState);
+void view(state *currentState, char *argument);
+void printPreparingGame(void);
+void printInvalid(void);
 #endif

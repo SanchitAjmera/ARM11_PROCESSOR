@@ -7,7 +7,7 @@ all: libs game testme
 
 game: print_util.o game_util.o characters/player/player.o
 testme: testme.o game_util.o print_util.o characters/player/player.o
-print_util.o: print_util.h constants.h
+print_util.o: print_util.h constants.h game_util.h
 game_util.o: game_util.h constants.h
 testme.o: game_util.h print_util.h
 libs:

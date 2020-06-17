@@ -8,4 +8,4 @@ libs:
 
 clean:
 		rm -f $(wildcard *.o)
-		cd player; make
+		cd player; make clean

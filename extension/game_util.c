@@ -75,7 +75,7 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
     return -1;
   } else {
     FILE *file = fopen(fname, "rb");
-    if (validatePtr(file, "could not open this save file.") == -1) {
+    if (!file) {
       return -1;
     } else {
       // TODO: add error checking to each fread to ensure that the end of the
@@ -109,21 +109,20 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
       fread(&currentRoom, sizeof(RoomName), 1, file);
       RoomPosition currentPosition;
       fread(&currentPosition, sizeof(RoomPosition), 1, file);
-      playerState->curr_room_node =
-          worldMap[(currentRoom * 5) + currentPosition];
+      playerState->currentRoom = worldMap[(currentRoom * 5) + currentPosition];
 
       /* Load items in each room */
       for (int i = 0; i < TOTAL_ROOM_COUNT; i++) { // For each room in the map
         int itemCount;
         fread(&itemCount, sizeof(int), 1, file);
-        worldMap[i]->ItemCount = itemCount;
+        worldMap[i]->itemCount = itemCount;
         for (int j = 0; j < itemCount; j++) {
           ItemIndex gameItemID;
           fread(&gameItemID, sizeof(ItemIndex), 1, file);
           int hash;
           fread(&hash, sizeof(int), 1, file);
-          worldMap[i]->Items[j] = initialiseItem(gameItemID);
-          worldMap[i]->Items[j]->hash = hash;
+          worldMap[i]->items[j] = initialiseItem(gameItemID);
+          worldMap[i]->items[j]->hash = hash;
         }
       }
     }
@@ -138,7 +137,8 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
    the player's state to the file. */
 int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
   FILE *fileOut = fopen(fname, "wb");
-  if (validatePtr(fileOut, "something went wrong mate idk wagwaan") == -1) {
+  if (!fileOut) {
+    printf("Something went wrong with the save g, idk wagwaan.");
     return -1;
   } else {
     // Save state
@@ -155,15 +155,15 @@ int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
       fwrite(&item->hash, sizeof(int), 1, fileOut);
     }
     // Save player's location
-    room_t *currentRoom = playerState->curr_room_node;
+    room_t *currentRoom = playerState->currentRoom;
     fwrite(&currentRoom->current_room, sizeof(RoomName), 1, fileOut);
     fwrite(&currentRoom->position, sizeof(RoomPosition), 1, fileOut);
     // Save items in each room
     for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
       room_t *room = worldMap[i];
-      fwrite(&room->ItemCount, sizeof(int), 1, fileOut);
-      for (int j = 0; j < room->ItemCount; j++) {
-        item_t *item = room->Items[j];
+      fwrite(&room->itemCount, sizeof(int), 1, fileOut);
+      for (int j = 0; j < room->itemCount; j++) {
+        item_t *item = room->items[j];
         fwrite(&item->gameItemID, sizeof(ItemIndex), 1, fileOut);
         fwrite(&item->hash, sizeof(int), 1, fileOut);
       }
@@ -172,13 +172,14 @@ int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
   }
   return 0;
 }
-
+//--------------Possible const error---------------------
 // shows player their inventory of Items
 /* Returns respective int value; -1 for failure */
-item_t *itemLookup(item_t table[], const int size, const char *key) {
+const item_t *itemLookup(const item_t table[], const int size,
+                         const char *key) {
   for (int i = 0; i < size; i++) {
     if (!strcmp(table[i].key, key)) {
-      return &table[i];
+      return table + i;
     }
   }
   return LOOKUP_FAILURE;
@@ -195,7 +196,7 @@ int lookup(const pair_t table[], const int size, const char *key) {
 }
 
 // Checks if an item has a certain property
-bool hasProperty(Property property, item_t *item) {
+bool hasProperty(Property property, const item_t *item) {
   return (property & item->properties);
 }
 
@@ -229,7 +230,7 @@ void randomiseArray(int randArray[], int length, int randMax) {
 }
 
 // randomly places Items in room
-void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
+void randomlyPlaceItems(item_t *items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
   int *randomAppleLocations = malloc(sizeof(int) * TOTAL_APPLE_COUNT);
   checkPtr(randomCashLocations);
@@ -242,11 +243,11 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   // dynamically addes apple and cash Items into random rooms
   for (int i = 0; i < 5; i++) {
     rooms[randomCashLocations[i]]
-        ->Items[rooms[randomCashLocations[i]]->ItemCount] = Items[i];
-    rooms[randomCashLocations[i]]->ItemCount++;
+        ->items[rooms[randomCashLocations[i]]->itemCount] = items[i];
+    rooms[randomCashLocations[i]]->itemCount++;
     rooms[randomAppleLocations[i]]
-        ->Items[rooms[randomAppleLocations[i]]->ItemCount] = Items[i + 5];
-    rooms[randomAppleLocations[i]]->ItemCount++;
+        ->items[rooms[randomAppleLocations[i]]->itemCount] = items[i + 5];
+    rooms[randomAppleLocations[i]]->itemCount++;
   }
   // 4 IS THE NUMBER OF OTHER ItemS APART FROM CASH & APPLES
   // added other Items randomly around lobby
@@ -255,8 +256,8 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
   randomiseArray(randomOtherItemLocations, 4, ROOM_POSITION_NUMBER);
   for (int i = 10; i < TOTAL_ITEM_COUNT - TOTAL_BUYABLE_ITEM_COUNT; i++) {
     rooms[randomOtherItemLocations[i - 10]]
-        ->Items[rooms[randomOtherItemLocations[i - 10]]->ItemCount] = Items[i];
-    rooms[randomOtherItemLocations[i - 10]]->ItemCount++;
+        ->items[rooms[randomOtherItemLocations[i - 10]]->itemCount] = items[i];
+    rooms[randomOtherItemLocations[i - 10]]->itemCount++;
   }
   free(randomCashLocations);
   free(randomAppleLocations);
@@ -265,31 +266,37 @@ void randomlyPlaceItems(item_t *Items[], room_t *rooms[]) {
 
 void placeBuyableItems(item_t *items[], room_t *rooms[]) {
   for (int i = 0; i < BUYABLE_ITEMS_IN_ROOM; i++) {
-    rooms[FUSION_WEST_INDEX]->Items[rooms[FUSION_WEST_INDEX]->ItemCount] =
+    rooms[FUSION_WEST_INDEX]->items[rooms[FUSION_WEST_INDEX]->itemCount] =
         items[i];
-    rooms[FUSION_WEST_INDEX]->ItemCount++;
+    rooms[FUSION_WEST_INDEX]->itemCount++;
 
-    rooms[FUSION_EAST_INDEX]->Items[rooms[FUSION_EAST_INDEX]->ItemCount] =
+    rooms[FUSION_EAST_INDEX]->items[rooms[FUSION_EAST_INDEX]->itemCount] =
         items[5 + i];
-    rooms[FUSION_EAST_INDEX]->ItemCount++;
+    rooms[FUSION_EAST_INDEX]->itemCount++;
 
-    rooms[FUSION_SOUTH_INDEX]->Items[rooms[FUSION_SOUTH_INDEX]->ItemCount] =
+    rooms[FUSION_SOUTH_INDEX]->items[rooms[FUSION_SOUTH_INDEX]->itemCount] =
         items[10 + i];
-    rooms[FUSION_SOUTH_INDEX]->ItemCount++;
+    rooms[FUSION_SOUTH_INDEX]->itemCount++;
 
-    rooms[FUSION_NORTH_INDEX]->Items[rooms[FUSION_NORTH_INDEX]->ItemCount] =
+    rooms[FUSION_NORTH_INDEX]->items[rooms[FUSION_NORTH_INDEX]->itemCount] =
         items[15 + i];
-    rooms[FUSION_NORTH_INDEX]->ItemCount++;
+    rooms[FUSION_NORTH_INDEX]->itemCount++;
   }
 }
 
 // connects first room to second room
 void connectRoom(room_t *first, room_t *second) {
-  // assigns room to each other's adjacent rooms array
-  first->adjacent_rooms[first->adjacent_room_count] = second;
-  second->adjacent_rooms[second->adjacent_room_count] = first;
-
-  // increments count of adjacent rooms
+  switch (first->position) {
+  case CENTRE:
+    first->adjacent_rooms[second->position] = second;
+    second->adjacent_rooms[((second->position) + 2) % 4] = first;
+    break;
+  // first: north lobby second south fusion
+  default:
+    first->adjacent_rooms[first->position] = second;
+    second->adjacent_rooms[second->position] = first;
+    break;
+  }
   second->adjacent_room_count++;
   first->adjacent_room_count++;
 }
@@ -299,7 +306,7 @@ void connectRoomPositions(room_t *r1, room_t *r2, room_t *r3, room_t *r4,
                           room_t *r5) {
   room_t *roomArray[ROOM_POSITION_NUMBER - 1] = {r1, r2, r3, r4};
   for (int i = 0; i < ROOM_POSITION_NUMBER - 1; i++) {
-    connectRoom(roomArray[i], r5);
+    connectRoom(r5, roomArray[i]);
   }
 }
 
@@ -383,9 +390,9 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
   checkPtr(room->adjacent_rooms);
-  room->ItemCount = 0;
-  room->Items = malloc(sizeof(item_t) * 20);
-  checkPtr(room->Items);
+  room->itemCount = 0;
+  room->items = malloc(sizeof(item_t) * 20);
+  checkPtr(room->items);
   return room;
 }
 
@@ -397,8 +404,8 @@ building_t *initialiseBuilding(room_t **out) {
   building_t *huxley = malloc(sizeof(*huxley));
   checkPtr(huxley);
 
-  huxley->start_room = malloc(sizeof(room_t));
-  checkPtr(huxley->start_room);
+  huxley->startRoom = malloc(sizeof(room_t));
+  checkPtr(huxley->startRoom);
 
   // initialise Items to put in rooms
   // initilaising 5 game apples
@@ -470,18 +477,18 @@ building_t *initialiseBuilding(room_t **out) {
   // connecting rooms which link to each other
   connectRoom(lobbyWest, labEast);
   connectRoom(lobbyNorth, lectureHallSouth);
-  connectRoom(lobbyNorth, fusionSouth);
+  connectRoom(lobbyEast, fusionWest);
   connectRoom(fusionNorth, harrodsSouth);
 
   // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
-      lobbyEast,        lobbyWest,        lobbyNorth,        lobbySouth,
-      lobbyCentre,      labEast,          labWest,           labNorth,
-      labSouth,         labCentre,        lectureHallEast,   lectureHallWest,
-      lectureHallNorth, lectureHallSouth, lectureHallCentre, fusionEast,
-      fusionWest,       fusionNorth,      fusionSouth,       fusionCentre,
-      harrodsEast,      harrodsWest,      harrodsNorth,      harrodsSouth,
-      harrodsCentre};
+      lobbyCentre,      lobbyEast,       lobbyNorth,        lobbyWest,
+      lobbySouth,       labCentre,       labEast,           labNorth,
+      labWest,          labSouth,        lectureHallCentre, lectureHallEast,
+      lectureHallNorth, lectureHallWest, lectureHallSouth,  fusionCentre,
+      fusionEast,       fusionNorth,     fusionWest,        fusionSouth,
+      harrodsCentre,    harrodsEast,     harrodsNorth,      harrodsWest,
+      harrodsSouth};
   for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
     out[i] = roomArray[i];
   }
@@ -494,7 +501,7 @@ building_t *initialiseBuilding(room_t **out) {
 
   placeBuyableItems(buyableItemArray, roomArray);
 
-  huxley->start_room = lobbySouth;
+  huxley->startRoom = lobbySouth;
 
   return huxley;
 }
@@ -515,11 +522,11 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     free(room1->adjacent_rooms);
   }
 
-  if (room1->Items != NULL) {
-    for (int i = 0; i < room1->ItemCount; i++) {
-      free(room1->Items[i]);
+  if (room1->items != NULL) {
+    for (int i = 0; i < room1->itemCount; i++) {
+      free(room1->items[i]);
     }
-    free(room1->Items);
+    free(room1->items);
   }
 
   free(room1);
@@ -532,45 +539,15 @@ void freeBuilding(building_t *huxley) {
     return;
   }
   // calling recursive function to traverse through and free all the rooms
-  freeRoom(NULL, huxley->start_room);
+  freeRoom(NULL, huxley->startRoom);
   free(huxley);
-}
-// changes room of person and pushes current room into room histroy of player
-void changeRoom(state *person, room_t dest_room) {}
-
-//
-//
-//
-//
-//
-//
-//
-// --------------------------------------------------------------------------
-// ----------- LUQMANS IMPLEMENTATION OF PLAYER FUNCTIONS--------------------
-//
-//
-//
-//
-//
-//
-//
-// need ptr checks
-player_t *initialisePlayer() {
-  player_t *newPlayer = malloc(sizeof(*newPlayer));
-  checkPtr(newPlayer);
-  newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t));
-  checkPtr(newPlayer->inventory);
-  newPlayer->health = MAX_HEALTH;
-  newPlayer->cash = INITIAL_CASH;
-  newPlayer->itemCount = 0;
-  return newPlayer;
 }
 
 state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
   checkPtr(initialState);
   initialState->player = initialisePlayer();
-  initialState->curr_room_node = initialRoom;
+  initialState->currentRoom = initialRoom;
   char *username = malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
   strcpy(username, "sanchit");
   // scanf("%s\n", username);
