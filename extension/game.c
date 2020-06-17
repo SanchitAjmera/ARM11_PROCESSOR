@@ -83,11 +83,11 @@ void playGame(state *currentState) {
       free(argument);
       quit();
     case PICKUP:
-      pickUpItem(currentState, reduced);
+      pickUpItem(currentState, argument);
       printStateDetails(currentState);
       break;
     case DROP:
-      dropItem(currentState, reduced);
+      dropItem(currentState, argument);
       printStateDetails(currentState);
       break;
     case MOVE:
@@ -109,6 +109,8 @@ void playGame(state *currentState) {
       printf("Help is on its way -- need function\n");
       break;
     case CONSUME:
+      consume(currentState, argument);
+      printStateDetails(currentState);
       break;
     case FIGHT:
       break;
