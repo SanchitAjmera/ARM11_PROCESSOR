@@ -32,6 +32,11 @@ void getCommand(char *command, char *argument) {
   lowercase(args);
 
   // Copy results into given pointers
+  if (!comm) {
+    strcpy(command, "skip");
+    return;
+  }
+
   strcpy(command, comm);
   if (args) {
     strcpy(argument, args);
@@ -51,6 +56,9 @@ void playGame(state *currentState) {
     char *reduced = reduceCommand(argument);
     Command type = lookup(commandsTable, COMMAND_NUM, command);
     switch (type) {
+    case SKIP:
+      printf("It might be useful to type a command...\n");
+      break;
     case EXIT:
       // TODO: free all possible resources taken up by the game
       free(command);
