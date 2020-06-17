@@ -43,10 +43,10 @@ typedef enum {
 } ItemIndex;
 
 typedef enum {
-  EAST = 1,
-  WEST = 3,
-  NORTH = 2,
   SOUTH = 0,
+  EAST = 1,
+  NORTH = 2,
+  WEST = 3,
   CENTRE = 4
 } RoomPosition;
 
@@ -195,7 +195,7 @@ static const item_t gameItems[] = {
     {"monitor", MONITOR, 3, VALUABLE,
      "A monitor. Can't see your seg faults without it!"},
     {"cash", CASH, 4, VALUABLE,
-     "Cash. I wonder what I could buy around here...", 10},
+     "Cash. I wonder what I could buy around here..."},
     {"pass", PASS, 5, VALUABLE, "You shall not pass"},
     {"apple", FOOD, 6, (BUYABLE | EDIBLE),
      "Pay 5 HuxCoins to get an apple! (Health += 5)", 5},
