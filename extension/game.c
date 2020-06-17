@@ -22,7 +22,7 @@ char *reduceCommand(char *argument) {
 
 void getCommand(char *command, char *argument) {
   char input[30];
-  printf("                           >> ");
+  printf("                        >> ");
   fgets(input, sizeof(input), stdin);
 
   // obtain user input
@@ -144,11 +144,6 @@ int main(void) {
     printMenu((choices > 0));
     fgets(menuChoice, sizeof(menuChoice), stdin);
     choice = atoi(menuChoice);
-<<<<<<< HEAD
-=======
-    choices++;
-    // printMenu();
->>>>>>> origin/extension-print2
 
     switch (choice) {
     case QUIT:
