@@ -7,13 +7,12 @@
 
 // determines if the game is finished
 static bool battleOver(boss_t *boss, player_t *player) {
-  return FIGHT(boss)->health <= 0;
-  || player->health <= 0;
+  return FIGHT(boss)->health <= 0 || player->health <= 0;
 }
 
 // determines if the player won
 static bool playerWon(boss_t *boss, player_t *player) {
-  // PRE: gamover() returns true
+  // PRE: gameover() returns true
   return FIGHT(boss)->health < player->health;
 }
 
