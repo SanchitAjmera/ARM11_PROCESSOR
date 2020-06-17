@@ -200,11 +200,19 @@ void printCash(state *currentState) {
 }
 
 void printInventory(state *currentState) {
-  printf("The items in your inventory are:");
+  printf("                        ");
+  int printed = 0;
   for (int i = 0; i < 6; i++) {
     if (currentState->player->inventory[i]) {
-      printf(" %s|", currentState->player->inventory[i]->key);
+      if (printed != 0) {
+        printf("|");
+      }
+      printf(" %s ", currentState->player->inventory[i]->key);
+      printed++;
     }
+  }
+  if (printed == 0) {
+    printf("EMPTY INVENTORY");
   }
   printf("\n");
 }
@@ -308,8 +316,9 @@ void printStateDetails(state *state1) {
   printAdjacentRooms(state1->currentRoom);
   printf("\n");
   printItemDetails(state1->currentRoom->items);
-  printf("\n\n\n\n\n\n\n");
+  printf("\n\n\n\n\n");
   printInventory(state1);
+  printf("\n\n");
 }
 // TO BE MOVED:
 //-------------------------Konstantinos-----------------------------------------
