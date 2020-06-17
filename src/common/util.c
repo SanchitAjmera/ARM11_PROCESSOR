@@ -6,6 +6,7 @@
 /* Takes in a string and returns a pointer to that string on heap */
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
+  validatePtr(out, MEM_ASSIGN);
   strcpy(out, in);
   return out;
 }
