@@ -70,6 +70,5 @@ extern void freeBoss(boss_t *boss);
 extern void initBattle(boss_t *boss, player_t *player);
 extern void processResult(boss_t *boss, player_t *player, int correct);
 extern void quiz(boss_t *boss, player_t *player);
-extern char *getAnswer(void);
 
 #endif

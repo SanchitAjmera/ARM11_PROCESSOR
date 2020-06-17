@@ -105,7 +105,7 @@ void initBattle(boss_t *boss, player_t *player) {
 }
 
 // takes in the user's input for the answer
-char *getAnswer(void) {
+static char *getAnswer(void) {
   // TODO: get answer from user as input
   bool takeInput = true;
   resizable_string *code = newString();
