@@ -46,7 +46,7 @@ bool pickUpItem(state *currentState, char *itemName) {
     return false;
   }
   if (currentState->currentRoom->items[index]->name == CASH) {
-    currentState->player->cash += item->cost;
+    currentState->player->cash += currentState->currentRoom->items[index]->cost;
     printf("%d HuxCoins Added\n", item->cost);
     currentState->currentRoom->items[index] = REMOVED;
     return true;
