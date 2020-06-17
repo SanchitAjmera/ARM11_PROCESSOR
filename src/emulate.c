@@ -1,21 +1,25 @@
 #include "common/constants.h"
+#include "emulator/decode/emulate_decode.h"
+#include "emulator/emulate_constants.h"
 #include "emulator/emulate_util.h"
+#include "emulator/execute/emulate_execute.h"
+#include "emulator/fetch/emulate_fetch.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 void printArmState(arm_t *state) {
   printf("Registers:\n");
-  char registerName[5];
+  char registerName[MAX_REGISTER_NAME_LENGTH];
   for (int i = 0; i < NUM_REGISTERS; i++) {
     if (i == 13 || i == 14) {
       // Not used in this exercise
       continue;
     }
 
-    if (i == 15) {
+    if (i == PC) {
       strcpy(registerName, "PC");
-    } else if (i == 16) {
+    } else if (i == CPSR) {
       strcpy(registerName, "CPSR");
     } else {
       sprintf(registerName, "$%i", i);
