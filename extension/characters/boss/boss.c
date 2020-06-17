@@ -128,14 +128,13 @@ static char *getAnswer(void) {
     appendToString(code, input);
   }
   // printf("%s\n", code->value);
-  char **output = runCode(code->value);
-  printOutput(output);
+  char *output = runCode(code->value);
+  printf("%s", output);
 
-  freeOutput(output);
   freeString(code);
   free(input);
   printf(">");
-  return "";
+  return output;
 }
 
 void processResult(boss_t *boss, player_t *player, int correct) {
