@@ -3,7 +3,6 @@
 #include "../common/util.h"
 #include "assemble_constants.h"
 #include "file_lines.h"
-#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,13 +23,13 @@ int lookup(const pair_t table[], const int size, const char *key) {
     represent each line, stripped of the newline \n,
     and stores expressions in their string form at the end of the array. */
 void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
-  assert(armFile != NULL && symbolTable != NULL && output != NULL);
-
+  // PRE: armFile, symbolTable, output are not NULL
   // Will be used to store expressions found during the scan
   file_lines *expressions = newFileLines();
 
   /* Scan file for labels and expressions */
-  char *line = malloc(LINE_CHAR_LIM);
+  char *line = malloc(LINE_CHAR_LIM * sizeof(*line));
+  validatePtr(line, MEM_ASSIGN);
   while (fgets(line, LINE_CHAR_LIM, armFile) != NULL) {
     // Iterate through chars in line
     bool isLabel = false;
@@ -75,17 +74,15 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
 
   // Add expressions to the end of the file
   addLines(output, expressions->lines, expressions->lineCount);
-
   freeFileLines(expressions);
 }
 
 /* Performs the second pass on fileLines */
 void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
-  assert(out);
+  // PRE: in, symbolTable, out are not NULL
   for (int i = 0; i < in->lineCount; i++) {
     char *line = in->lines[i];
     char *rest = NULL;
-
     char *fields[5];
     int fieldCount = 0;
     char *token = strtok_r(line, " ,", &rest);
@@ -95,19 +92,19 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
         continue;
       }
       fields[fieldCount++] = token;
-      if (rest[0] == '[') { // If the next token starts with a [
+      if (rest[0] == '[') {
+        // If the next token starts with a [
         token = strtok_r(rest, "]", &rest);
       } else {
         token = strtok_r(NULL, " ,", &rest);
       }
     }
-
     // Stores the current instruction's information in struct
     instruction instr = {
         fields[0], lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]),
         fields + 1, fieldCount - 1, i * WORD_SIZE_BYTES};
     symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
-    assert(instrSymbol != NULL);
+    validatePtr(instrSymbol, MEM_ASSIGN);
     word binLine;
     if (instrSymbol->type == INSTR) {
       binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
@@ -115,7 +112,6 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
       // Parse expression
       binLine = parseImmediate(in->lines[i] + 1);
     }
-
     fwrite(&binLine, sizeof(word), 1, out);
   }
 }
@@ -148,9 +144,8 @@ static word rotateLeft(word value, uint rotateNum) {
 /* Exits program if num exceeds the highest representable value */
 void exitOverflow(uint num, const uint max) {
   if (num > max) {
-    fprintf(stderr, "Number cannot be represented.\n");
-    // TODO: change to errorExit();
-    exit(EXIT_FAILURE);
+    // fprintf(stderr, "Number cannot be represented.\n");
+    errorExit(MEM_OVERFLOW);
   }
 }
 
@@ -179,10 +174,10 @@ static word calcRotatedImm(word imm) {
 /* Calculates immediate value, including any rotation required to
 fit number into 8 bits */
 static word parseOperand2Imm(char **op2) {
-  uint imm = parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
+  word imm = (word)parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
   exitOverflow(imm, MAX_NUM);
   if (imm > MAX_BYTE) {
-    return calcRotatedImm(imm);
+    imm = calcRotatedImm(imm);
   }
   return imm;
 }
@@ -192,17 +187,19 @@ including registers with shifts attached */
 static word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
   if (args < SHIFT_NO_ARGS) {
-    // No shift type/ shift of 0
+    // No shift type (shift of 0)
     return rm;
   }
   Shift shiftType = parseShiftType(op2[1]);
   if (IS_IMMEDIATE(op2[2])) {
-    uint shiftNum = parseImmediate(REMOVE_FIRST_CHAR(op2[2]));
-    return (shiftNum << 7) | (shiftType << 5) | rm;
+    return (parseImmediate(REMOVE_FIRST_CHAR(op2[2])) << SHIFT_NUM_SHIFT) |
+           (shiftType << SHIFT_TYPE_SHIFT) | rm;
   }
   uint rs = REM_INT(op2[2]);
   // Rs can be any general purpose register except the PC
-  assert(rs != PC);
+  if (rs == PC) {
+    errorExit(UNEXPECTED_CASE);
+  }
   return (rs << RS_SHIFT) | (shiftType << SHIFT_TYPE_SHIFT) |
          SHIFT_BY_REG_HARDCODE | rm;
 }
@@ -336,14 +333,16 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
 converts remaining strings into unsigned int values
 returns array containing register address and expression address */
 word *remBracket(const char *string) {
-  word *addresses = malloc(sizeof(word) * 4);
+  word *addresses = malloc(sizeof(*addresses) * 4);
+  validatePtr(addresses, MEM_ASSIGN);
   char *unbracketed = strptr(string + 1);
   // separator
   char *delim = ", ";
   // Gets Rn
   char *token = strtok(unbracketed, delim);
   // gets address of register rn
-  if (token[0] == 'r') { // rn could either be a register or immediate const
+  if (token[0] == 'r') {
+    // Rn could either be a register or immediate const
     REMOVE_FIRST_CHAR(token);
   }
   addresses[0] = parseImmediate(token);
@@ -366,20 +365,19 @@ static SDTIOperation SDTIparser(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
   if (field_count == POST_COUNT) {
     return POST_RN_EXP;
-  } else if (strstr(fields[1], ",")) {
-    return PRE_RN_EXP;
-  } else if (strstr(fields[1], "r")) {
-    return PRE_RN;
-  } else {
-    return NUMERIC_CONST;
   }
+  if (strstr(fields[1], ",")) {
+    return PRE_RN_EXP;
+  }
+  if (strstr(fields[1], "r")) {
+    return PRE_RN;
+  }
+  return NUMERIC_CONST;
 }
 
 /* Assembly function for all store and load instructions */
 word assembleSDTI(symbol_table *symbolTable, instruction input) {
-  // TODO: (WIP) I refactored your `remBracket` & added var `addresses` - Alex
   word *addresses = remBracket(input.fields[1]);
-
   // Decoding address type
   SDTIOperation operation = SDTIparser(input.fields, input.field_count);
   // Load bit
@@ -387,9 +385,9 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
   // PRE/POST-INDEXING bits
   word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
   // Base register Rn
-  word Rn = addresses[0] << SDTI_RN_SHIFT;
+  word rn = addresses[0] << SDTI_RN_SHIFT;
   // Source/ dest register Rd
-  word Rd = REM_INT(input.fields[0]) << SDTI_RD_SHIFT;
+  word rd = REM_INT(input.fields[0]) << SDTI_RD_SHIFT;
   // Offsets
   word offset;
   // Up bit
@@ -409,7 +407,6 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     break;
   case PRE_RN_EXP:
     // Offset
-    // TODO: check if this is null? - Alex
     offset = addresses[1];
     u = addresses[2] << SDTI_U_SHIFT;
     i = addresses[3] << SDTI_I_SHIFT;
@@ -427,16 +424,15 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
                PIPELINE_OFFSET;
       offset -= input.currentAddress;
       // Base register Rn
-      Rn = PC << SDTI_RN_SHIFT;
+      rn = PC << SDTI_RN_SHIFT;
     }
     break;
   default:
-    // This should never happen, fields were most likely parsed wrong
-    assert(false);
-    break;
+    // No other case - if so fields were most likely parsed incorrectly
+    errorExit(UNEXPECTED_CASE);
   }
   // Freeing memory for the register address and expression address
   free(addresses);
   // Returning constructed instruction
-  return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
+  return ALWAYS | SDTI_HARDCODE | i | p | u | l | rn | rd | offset;
 }
