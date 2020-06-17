@@ -7,7 +7,7 @@
 
 static dp_t *decodeDPI(arm_t *state, word instruction) {
   dp_t *decoded = malloc(sizeof(*decoded));
-  validatePtr(decoded);
+  validatePtr(decoded, MEM_ASSIGN);
   // decoded of code
   decoded->i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
   // instruction to execute
@@ -27,7 +27,7 @@ static dp_t *decodeDPI(arm_t *state, word instruction) {
 
 static multiply_t *decodeMultiply(arm_t *state, word instruction) {
   multiply_t *decoded = malloc(sizeof(*decoded));
-  validatePtr(decoded);
+  validatePtr(decoded, MEM_ASSIGN);
   decoded->a = instruction & ACCUMULATE_FLAG;
   decoded->s = UPDATE_CPSR(instruction);
   decoded->destination = (instruction & MULT_RDEST_MASK) >> MULT_RDEST_SHIFT;
@@ -39,7 +39,7 @@ static multiply_t *decodeMultiply(arm_t *state, word instruction) {
 
 static sdt_t *decodeSDTI(arm_t *state, word instruction) {
   sdt_t *decoded = malloc(sizeof(*decoded));
-  validatePtr(decoded);
+  validatePtr(decoded, MEM_ASSIGN);
   decoded->i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
   decoded->p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
   decoded->u = (instruction & SDTI_U_MASK) >> SDTI_U_SHIFT;
@@ -52,7 +52,7 @@ static sdt_t *decodeSDTI(arm_t *state, word instruction) {
 
 static branch_t *decodeBranch(arm_t *state, word instruction) {
   branch_t *decoded = malloc(sizeof(*decoded));
-  validatePtr(decoded);
+  validatePtr(decoded, MEM_ASSIGN);
   decoded->offset = instruction & BRANCH_OFFSET_MASK;
   return decoded;
 }

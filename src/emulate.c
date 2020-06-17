@@ -46,8 +46,10 @@ int main(int argc, char **argv) {
   }
 
   arm_t *state = malloc(sizeof(*state));
+  validatePtr(state, MEM_ASSIGN);
   initArm(state, argv[1]);
   decoded_t *decoded = malloc(sizeof(*decoded));
+  validatePtr(decoded, MEM_ASSIGN);
 
   // PIPELINE
   while ((state->decoded.isSet && state->decoded.instruction) ||

@@ -4,7 +4,6 @@
 #include "../emulate_constants.h"
 #include "../emulate_util.h"
 #include "emulate_execute.h"
-#include <assert.h>
 
 /* Constant shift if operand 2 is a register (bit 4 = 0) */
 static uint shiftByConstant(uint shiftPart) {
@@ -64,8 +63,8 @@ static operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   // bits that specify the shift operation
   Shift shiftType = (shiftPart & SHIFT_TYPE_MASK) >> GET_SHIFT_TYPE;
   // tuple for the result and the carry out bit
-  operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(operation_t));
-  errorExit(validatePtr(shiftedOp2, "Not enough memory!"));
+  operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(*shiftedOp2));
+  validatePtr(shiftedOp2, MEM_ASSIGN);
   word result;
   // carry out from a right shift operation
   uint carryOut = rightCarryOut(value, shiftNum);
@@ -87,7 +86,7 @@ static operation_t *barrelShifter(arm_t *state, word value, uint shiftPart) {
   default:
     // no other shift instruction
     // should never happen
-    assert(false);
+    errorExit(UNEXPECTED_CASE);
   }
   shiftedOp2->result = result;
   shiftedOp2->carryOut = carryOut;
@@ -112,8 +111,8 @@ operation_t *opImmediate(arm_t *state, uint op2) {
   // number to rotate by
   uint rotateNum = (op2 >> GET_ROTATION_NUM) * ROTATION_FACTOR;
   // struct for the result and the carry out bit
-  operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(operation_t));
-  errorExit(validatePtr(shiftedOp2, "Not enough memory!"));
+  operation_t *shiftedOp2 = (operation_t *)malloc(sizeof(*shiftedOp2));
+  validatePtr(shiftedOp2, MEM_ASSIGN);
   // result of the rotation operation
   shiftedOp2->result = rotateRight(imm, rotateNum);
   // carry out for CSPR flag
@@ -126,7 +125,7 @@ static word getCarryOut(word op1, word op2, bool isAddition) {
   if (isAddition) {
     return (op1 <= UINT32_MAX - op2) ? 0 : 1;
   }
-  // pre: op1 - op2
+  // PRE: op1 - op2
   return op1 < op2 ? 0 : 1;
 }
 
@@ -199,7 +198,7 @@ void executeDPI(arm_t *state, dp_t *decoded) {
   default:
     // no other instructions
     // should never happen
-    assert(false);
+    errorExit(UNEXPECTED_CASE);
   }
   // if s (bit 20) is set then the CPSR flags should be updated
   if (decoded->s) {

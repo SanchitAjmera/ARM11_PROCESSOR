@@ -12,11 +12,11 @@
  * pointers on heap, where memory is of size MEMORY_CAPACITY bytes */
 void initArm(arm_t *state, const char *fname) {
   // load binary file into memory
-  byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(byte));
-  errorExit(validatePtr(memory, "Not enough memory.\n"));
+  byte *memory = (byte *)calloc(MEMORY_CAPACITY, sizeof(*memory));
+  validatePtr(memory, MEM_ASSIGN);
   // file handling
   FILE *binFile = fopen(fname, "rb");
-  errorExit(validatePtr(binFile, "File could not be opened\n"));
+  validatePtr(binFile, FILE_ERR);
   fseek(binFile, SEEK_SET, SEEK_END);
   long fileSize = ftell(binFile);
   rewind(binFile);

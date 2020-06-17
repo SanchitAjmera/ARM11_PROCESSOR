@@ -5,25 +5,20 @@
 #include "../emulate_util.h"
 #include "../fetch/emulate_fetch.h"
 #include "emulate_execute_dpi.h"
-#include <assert.h>
 #include <stdio.h>
 
 /* function for checking if word is within MEMORY_CAPACITY
    prints error if memory is out of bounds */
-static bool checkValidAddress(word address) {
+static void checkValidAddress(word address) {
   if (address > MEMORY_CAPACITY) {
-    printf("Error: Out of bounds memory access at address 0x%08x\n", address);
-    return false;
+    errorExit(MEM_OVERFLOW);
   }
-  return true;
 }
 
 /* Stores address, found in source register Rd, into the the memory */
 static void store(arm_t *state, word sourceReg, word baseReg) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
-  if (!checkValidAddress(baseReg)) {
-    return;
-  }
+  checkValidAddress(baseReg);
   // value inside source register Rd
   word value = state->registers[sourceReg];
   // storing value within memory located by address inside base register
@@ -35,12 +30,11 @@ static void store(arm_t *state, word sourceReg, word baseReg) {
 /* Function which loads address inside base register Rn into the memory */
 static void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
-  if (checkValidAddress(sourceAddr)) {
-    // value inside base register
-    word value = getWord(state->memory + sourceAddr, NOT_BIG_ENDIAN);
-    // laoding value into destination register Rd
-    state->registers[destReg] = value;
-  }
+  checkValidAddress(sourceAddr);
+  // value inside base register
+  word value = getWord(state->memory + sourceAddr, NOT_BIG_ENDIAN);
+  // laoding value into destination register Rd
+  state->registers[destReg] = value;
 }
 
 /* Executes all supported Single Data Transfer instructions */
@@ -134,7 +128,7 @@ static bool checkCond(arm_t *state, word instruction) {
   default:
     // no other instruction
     // should never happen
-    assert(false);
+    errorExit(UNEXPECTED_CASE);
   }
 }
 
@@ -144,7 +138,6 @@ void execute(arm_t *state, decoded_t *decoded) {
     return;
   }
   switch (state->decoded.instructionType) {
-  // TODO: consider removing instruction from the paramter of each execution
   case BR:
     executeBranch(state, decoded->branch);
     break;
@@ -163,6 +156,6 @@ void execute(arm_t *state, decoded_t *decoded) {
   default:
     // no other instructions
     // should never happen
-    assert(false);
+    errorExit(UNEXPECTED_CASE);
   }
 }
