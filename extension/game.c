@@ -1,12 +1,11 @@
 #include "game_util.h"
 #include "print_util.h"
-#include <math.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
 #define EMPTY(string) (!strcmp(string, ""))
@@ -47,6 +46,9 @@ void getCommand(char *command, char *argument) {
   if (!args) {
     strcpy(argument, "");
     return;
+  }
+  while (isspace(*args)) {
+    args++;
   }
   strcpy(argument, args);
 }
