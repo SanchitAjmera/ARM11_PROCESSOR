@@ -1,6 +1,7 @@
 #ifndef BOSS_H
 #define BOSS_H
 
+#include "../../game_util.h"
 #include "../player/player.h"
 #include "boss_constants.h"
 #include <stdbool.h>

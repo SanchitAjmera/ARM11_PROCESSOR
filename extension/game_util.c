@@ -32,6 +32,8 @@
 #define FUSION_SOUTH_INDEX (17)
 #define FUSION_EAST_INDEX (18)
 #define HARRODS_START_INDEX (21)
+#define BOSSKGK "Konstantinos"
+#define BOSSTONY "Tony"
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -498,6 +500,13 @@ building_t *initialiseBuilding(room_t **out) {
   connectRoom(lobbyEast, fusionWest);
   connectRoom(fusionNorth, harrodsSouth);
 
+  // initialising Bosses
+  boss_t *kgk = createBoss(BOSSKGK);
+  boss_t *tony = createBoss(BOSSTONY);
+
+  // adding bosses to Rooms
+  labCentre->boss = kgk;
+  lectureHallCentre->boss = tony;
   // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
       lobbyCentre,      lobbyEast,       lobbyNorth,        lobbyWest,

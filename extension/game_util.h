@@ -3,6 +3,7 @@
 
 typedef struct item_t item_t;
 typedef struct state state;
+#include "characters/boss/boss.h"
 #include "characters/player/player.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -159,6 +160,7 @@ typedef struct room_t {
   item_t **items;
   int itemCount;
   int id;
+  boss_t *boss;
 } room_t;
 
 // structure for building consisting of room_history
