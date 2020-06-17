@@ -10,9 +10,11 @@ typedef unsigned int uint;
 typedef enum {
   ERROR_SUCC,
   ERR_FAIL,
+  MEM_ASSIGN,
   MEM_OVERFLOW,
   FILE_ERR,
-  UNEXPECTED_CASE
+  UNEXPECTED_CASE,
+  UNEXPECTED_ARGS
 } Error;
 // Enum registers for special named registers
 typedef enum { SP = 13, LR, PC, CPSR } Register;
@@ -43,7 +45,7 @@ typedef enum { EQ, NE, GE = 10, LT, GT, LE, AL } Cond;
 typedef enum { LSL, LSR, ASR, ROR } Shift;
 
 extern char *strptr(const char *in);
-extern Error validatePtr(const void *ptr, const char *errorMsg);
+extern Error validatePtr(const void *ptr);
 extern void errorExit(Error error);
 
 #endif
