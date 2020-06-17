@@ -321,6 +321,9 @@ item_t *initialiseItem(ItemIndex gameItemID) {
   item->properties = gameItem.properties;
   item->description = strptr(gameItem.description);
   item->cost = gameItem.cost;
+  if (gameItemID == CASH_INDEX) {
+    item->cost = rand() % 100;
+  }
   return item;
 }
 
@@ -482,19 +485,19 @@ building_t *initialiseBuilding(room_t **out) {
 
   // Keep it in this order I beg
   room_t *roomArray[TOTAL_ROOM_COUNT] = {
-      lobbyCentre,      lobbyEast,       lobbyNorth,        lobbyWest,
-      lobbySouth,       labCentre,       labEast,           labNorth,
-      labWest,          labSouth,        lectureHallCentre, lectureHallEast,
-      lectureHallNorth, lectureHallWest, lectureHallSouth,  fusionCentre,
-      fusionEast,       fusionNorth,     fusionWest,        fusionSouth,
-      harrodsCentre,    harrodsEast,     harrodsNorth,      harrodsWest,
-      harrodsSouth};
+      lobbySouth,       lobbyEast,       lobbyNorth,        lobbyWest,
+      lobbyCentre,      labSouth,        labEast,           labNorth,
+      labWest,          labCentre,       lectureHallSouth,  lectureHallEast,
+      lectureHallNorth, lectureHallWest, lectureHallCentre, fusionSouth,
+      fusionEast,       fusionNorth,     fusionWest,        fusionCentre,
+      harrodsSouth,     harrodsEast,     harrodsNorth,      harrodsWest,
+      harrodsCentre};
   for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
     out[i] = roomArray[i];
   }
 
   item_t *itemArray[TOTAL_ITEM_COUNT - TOTAL_BUYABLE_ITEM_COUNT] = {
-      cash1,  cash2,  cash3,  cash4,    cash5, pear1,  pear2,
+      cash1, cash2, cash3, cash4,    cash5, pear1,   pear2,
       pear3, pear4, pear5, keyboard, mouse, monitor, pass};
 
   randomlyPlaceItems(itemArray, roomArray);
