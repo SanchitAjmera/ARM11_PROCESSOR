@@ -219,7 +219,7 @@ static const item_t gameItems[] = {
     {"Supreme Hoodie", FOOD, 11, BUYABLE,
      " Flex like an international student everytime you go to lectures!"},
     {"Drip", FOOD, 12, BUYABLE,
-     "Drip to hard don't stand to close for only 30 Huxcoins"},
+     "Drip too hard don't stand to close for only 30 Huxcoins"},
     {"BLM Badge", FOOD, 13, BUYABLE,
      "Support da movement with a free BLM badge!"}};
 

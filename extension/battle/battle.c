@@ -34,14 +34,14 @@ static void attackBoss(boss_t *boss, player_t *player, int damage,
   if (IS_CRIT(rand())) {
     damage *= CRIT_FACTOR;
   }
-  boss->health -= damage;
+  FIGHT(boss) -= damage;
   printAttack("You", damage, attackName);
 }
 
 // player's turn in battle
 static void playerTurn(boss_t *boss, player_t *player) {
   // TODO: @Luqman to code...
-  printHealth();
+  attackBoss(boss, player, 1, "sanchizzle");
 }
 
 // boss's turn in battle

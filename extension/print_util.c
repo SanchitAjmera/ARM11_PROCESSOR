@@ -88,14 +88,14 @@ void printRoomPosition(room_t *room) {
 }
 
 void printItemDetails(item_t **items) {
-  printf("                                                           ROOM "
+  printf("                                                             ROOM "
          "ITEMS\n");
-  printf("                                                            ");
+  printf("                                                             ");
   for (int i = 0; i < ITEM_NUM; i++) {
     if (items[i]) {
       printf("%s ", items[i]->key);
       printf("\n");
-      printf("                                                            ");
+      printf("                                                             ");
     }
   }
 }
@@ -105,10 +105,10 @@ void printRoomName(room_t *room1) {
 
   switch (room1->current_room) {
   case LOBBY:
-    printf(" Lobby");
+    printf("Lobby");
     break;
   case LAB:
-    printf("  Lab");
+    printf("Lab");
     break;
   case HARRODS:
     printf("Harrods");
@@ -129,7 +129,7 @@ void printAdjacentRooms(room_t *room1) {
       printRoomPosition(room1->adjacent_rooms[i]);
       printRoomName(room1->adjacent_rooms[i]);
       printf("\n");
-      printf("                                                        ");
+      printf("                                                             ");
     }
   }
 }
@@ -246,71 +246,28 @@ void printPlayer(state *currentState) {
 
 //--------------------------End of Player--------------------------------
 
-void printStateDetails2(state *state1) {
-  system(CLEAR);
-  printf("\n");
-  //  printf("%s\n", state1->profile.username);
-  printHealth(state1);
-  printf("                               ");
-  if (state1->currentRoom->adjacent_rooms[NORTH]) {
-    printRoomPosition(state1->currentRoom->adjacent_rooms[NORTH]);
-    printRoomName(state1->currentRoom->adjacent_rooms[NORTH]);
-  }
-  printf("\n");
-  printf("Score:     %d", state1->profile.score);
-  printf("                                       ");
-  printf("        |\n");
-  printCash(state1);
-  printf("                                 ");
-  if (state1->currentRoom->adjacent_rooms[WEST]) {
-    printRoomPosition(state1->currentRoom->adjacent_rooms[WEST]);
-    printRoomName(state1->currentRoom->adjacent_rooms[WEST]);
-  } else {
-    printf("       ");
-  }
-  printf(" -- ");
-  printRoomPosition(state1->currentRoom);
-  printRoomName(state1->currentRoom);
-  printf(" -- ");
-  if (state1->currentRoom->adjacent_rooms[EAST]) {
-    printRoomPosition(state1->currentRoom->adjacent_rooms[EAST]);
-    printRoomName(state1->currentRoom->adjacent_rooms[EAST]);
-    printf("\n");
-  } else {
-    printf("      \n");
-  }
-  printf("                                                   ");
-  printf("        |\n");
-  printf("                                                        ");
-  if (state1->currentRoom->adjacent_rooms[SOUTH]) {
-    printRoomPosition(state1->currentRoom->adjacent_rooms[SOUTH]);
-    printRoomName(state1->currentRoom->adjacent_rooms[SOUTH]);
-  } else {
-    printf("      \n");
-  }
-  printf("\n\n\n\n\n\n\n");
-  printInventory(state1);
-  printf("currently in room: ");
-  printRoomDetails(state1->currentRoom);
-}
-
 void printStateDetails(state *state1) {
   system(CLEAR);
   printf("\n");
   // printing health
   printHealth(state1);
-  printf("                               ");
+  printf("                                    CURRENT ROOM:\n");
+  // printing score
+  printf("Score:     %d", state1->profile.score);
+  printf("                                                 ");
   // printing current room details
   printRoomPosition(state1->currentRoom);
   printRoomName(state1->currentRoom);
   printf("\n");
-  // printing score
-  printf("Score:     %d", state1->profile.score);
-  printf("                                                   |\n");
   // printing cash
   printCash(state1);
-  printf("                                            ");
+  printf("\n");
+
+  printf(
+      "                                                             ADJACENT "
+      "ROOMS:\n");
   // printing adjacent rooms
+  printf("                                                             ");
   printAdjacentRooms(state1->currentRoom);
   printf("\n");
   printItemDetails(state1->currentRoom->items);

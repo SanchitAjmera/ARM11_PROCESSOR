@@ -8,11 +8,9 @@
 #include <string.h>
 
 // dummy pre-processor function
-#define NULL_POINTER(pointer) (validatePtr(pointer, "NULL pointer."))
+#define NULL_POINTER(pointer) (checkPtr(pointer))
 // dummy function
-void validatePtr(const void *pointer, const char *msg) {}
-
-lookupBoss_t lookup(const char *name) {
+lookupBoss_t lookupBoss(const char *name) {
   for (int i = 0; i < BOSSES; i++) {
     if (strcmp(bossTable[i].key, name) == 0) {
       return bossTable[i];
@@ -48,7 +46,7 @@ boss_t *initBoss(const char *name) {
 
 boss_t *createBoss(const char *name) {
   // PRE: name is one of the pre-defined bosses
-  lookupBoss_t table = lookup(name);
+  lookupBoss_t table = lookupBoss(name);
   boss_t *boss = initBoss(table.key);
   boss->state->teaching =
       createPassive(table.questions, table.answers, MAX_QUESTIONS);
@@ -95,11 +93,11 @@ void initBattle(boss_t *boss, player_t *player) {
     aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
                                TONY_ATTACK_NAME, TONY_SPECIAL_NAME,
                                TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
-    *(boss->state->fighting) = tonyBattle;
+    (boss->state->fighting) = &tonyBattle;
   } else {
     aggressive_t kgkBattle = {KGK_ATTACK,       KGK_SPECIAL,    KGK_ATTACK_NAME,
                               KGK_SPECIAL_NAME, KGK_MAX_HEALTH, KGK_MAX_HEALTH};
-    *(boss->state->fighting) = kgkBattle;
+    (boss->state->fighting) = &kgkBattle;
   }
   battle(boss, player);
 }

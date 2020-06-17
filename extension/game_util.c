@@ -1,4 +1,5 @@
 #include "game_util.h"
+#include "characters/boss/boss.h"
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
@@ -32,8 +33,8 @@
 #define FUSION_SOUTH_INDEX (17)
 #define FUSION_EAST_INDEX (18)
 #define HARRODS_START_INDEX (21)
-#define BOSSKGK "Konstantinos"
-#define BOSSTONY "Tony"
+#define BOSSKGK ("Konstantinos")
+#define BOSSTONY ("Tony")
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -413,6 +414,7 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   room->itemCount = 0;
   room->items = malloc(sizeof(item_t) * 20);
   checkPtr(room->items);
+  room->boss = NULL;
   return room;
 }
 
