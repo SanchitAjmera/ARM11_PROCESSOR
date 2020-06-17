@@ -22,7 +22,7 @@ char *reduceCommand(char *argument) {
 
 void getCommand(char *command, char *argument) {
   char input[30];
-  printf(" >> ");
+  printf("                           >> ");
   fgets(input, sizeof(input), stdin);
 
   // obtain user input
@@ -54,6 +54,7 @@ void getCommand(char *command, char *argument) {
 }
 
 void playGame(state *currentState) {
+  printStateDetails(currentState);
   bool play = true;
   // TODO: validate ptr on these and look at size/magic numbers
   char *command = malloc(sizeof(char) * 30);
@@ -130,7 +131,6 @@ int main(void) {
   // pointer to a location on heap storing an array of room pointers
   room_t **worldMap = malloc(sizeof(room_t *) * 25);
   building_t *huxley = initialiseBuilding(worldMap);
-
   state *playerState = initialiseState(huxley->startRoom);
   // state *playerState = malloc(sizeof(state));
   saveGameState("sanchizzle", playerState, worldMap);
@@ -138,10 +138,17 @@ int main(void) {
   int choice = INVALID;
   char menuChoice[100];
 
+  int choices = 0;
   while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
-    printMenu();
+
+    printMenu((choices > 0));
     fgets(menuChoice, sizeof(menuChoice), stdin);
     choice = atoi(menuChoice);
+<<<<<<< HEAD
+=======
+    choices++;
+    // printMenu();
+>>>>>>> origin/extension-print2
 
     switch (choice) {
     case QUIT:
@@ -151,17 +158,9 @@ int main(void) {
       printPreparingGame();
 
       // TODO: validate huxley ptr
-      room_t **rooms = malloc(sizeof(*rooms) * ROOM_COUNT);
-      building_t *huxley = initialiseBuilding(rooms);
-      state *playerState = initialiseState(huxley->startRoom);
-      // printBuildingDetails(huxley);
-      // printf("\n");
-      printStateDetails(playerState);
+
       playGame(playerState);
 
-      freeState(playerState);
-      freeBuilding(huxley);
-      free(rooms);
       break;
 
     case LOAD_GAME:
@@ -185,9 +184,8 @@ int main(void) {
       continue;
     }
     printf("Done\n");
-
-    freeBuilding(huxley);
-    free(worldMap);
-    exit(EXIT_SUCCESS);
   }
+  freeState(playerState);
+  freeBuilding(huxley);
+  free(worldMap);
 }
