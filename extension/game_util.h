@@ -63,7 +63,7 @@ typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 typedef enum { BATMAN, UTA } Character;
 
 // enum for menu choices
-typedef enum { NONE, NEW_GAME, LOAD_GAME, QUIT } Menu;
+typedef enum { INVALID, NEW_GAME, LOAD_GAME, QUIT } Menu;
 
 // enum for supported commands
 typedef enum {
@@ -144,13 +144,14 @@ static const pair_t commandsTable[] = {
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", FOOD, 0, EDIBLE, "An apple. Increases health by 5 when eaten!"},
-    {"keyboard", 1, KEYBOARD, NONE, "A keyboard. A programmer's best friend."},
+    {"keyboard", 1, KEYBOARD, VALUABLE,
+     "A keyboard. A programmer's best friend."},
     {"mouse", MOUSE, 2, NONE, "A mouse. Click and scroll for days."},
-    {"monitor", MONITOR, 3, NONE,
+    {"monitor", MONITOR, 3, VALUABLE,
      "A monitor. Can't see your seg faults without it!"},
     {"cash", CASH, 4, VALUABLE,
      "Cash. I wonder what I could buy around here..."},
-    {"pass", PASS, 5, NONE, "You shall not pass"},
+    {"pass", PASS, 5, VALUABLE, "You shall not pass"},
     {"apple", FOOD, 6, (BUYABLE | EDIBLE),
      "Pay 5 HuxCoins to get an apple! (Health += 5)"},
     {"tesco meal deal", FOOD, 7, (BUYABLE | EDIBLE),
