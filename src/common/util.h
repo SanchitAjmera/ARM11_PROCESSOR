@@ -7,7 +7,13 @@ typedef uint32_t word;
 typedef uint8_t byte;
 typedef unsigned int uint;
 // Enums for checked errors within program
-typedef enum { ERROR_SUCC, ERR_FAIL } Error;
+typedef enum {
+  ERROR_SUCC,
+  ERR_FAIL,
+  MEM_OVERFLOW,
+  FILE_ERR,
+  UNEXPECTED_CASE
+} Error;
 // Enum registers for special named registers
 typedef enum { SP = 13, LR, PC, CPSR } Register;
 // Opcode mnemonics for DPI
