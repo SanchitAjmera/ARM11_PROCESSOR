@@ -1,7 +1,9 @@
 #include "battle.h"
+#include "../../src/common/util.h"
 #include "../characters/boss/boss.h"
 #include "../characters/player/player.h"
 #include "battle_constants.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,8 +41,7 @@ static void attackBoss(boss_t *boss, player_t *player, int damage,
 }
 
 // player's turn in battle
-static void playerTurn(boss_t *boss, player_t *player) {
-  // TODO: @Luqman to code...
+void playerTurn(boss_t *boss, player_t *player) {
   attackBoss(boss, player, 1, "sanchizzle");
 }
 

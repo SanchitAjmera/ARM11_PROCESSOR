@@ -25,3 +25,37 @@ void errorExit(Error error) {
     exit(EXIT_FAILURE);
   }
 }
+
+void extendString(resizable_string *string) {
+  if (string->length < string->maxLength - 1) {
+    return;
+  }
+  while (string->length >= string->maxLength - 1) {
+    string->maxLength *= 2;
+  }
+  string->value = realloc(string->value, sizeof(char) * string->maxLength);
+}
+
+resizable_string *newString(void) {
+  resizable_string *string = malloc(sizeof(resizable_string));
+  string->value = malloc(sizeof(char));
+  string->length = 0;
+  string->maxLength = 16;
+  extendString(string);
+  return string;
+}
+
+void appendToString(resizable_string *string, const char *append) {
+  int oldLength = string->length;
+  int appendLength = strlen(append);
+  string->length += appendLength;
+  extendString(string);
+  char *startPos = string->value + oldLength;
+  strcpy(startPos, append);
+  strcpy(string->value + string->length, "\0");
+}
+
+void freeString(resizable_string *string) {
+  free(string->value);
+  free(string);
+}
