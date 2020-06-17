@@ -90,12 +90,12 @@ void printRoomPosition(room_t *room) {
 void printItemDetails(item_t **items) {
   printf("                                                           ROOM "
          "ITEMS\n");
-  printf("                                                             ");
+  printf("                                                            ");
   for (int i = 0; i < ITEM_NUM; i++) {
     if (items[i]) {
       printf("%s ", items[i]->key);
       printf("\n");
-      printf("                                                             ");
+      printf("                                                            ");
     }
   }
 }

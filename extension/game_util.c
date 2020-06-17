@@ -10,8 +10,8 @@
 #include <unistd.h>
 
 #define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ITEM_COUNT (34)
-#define TOTAL_BUYABLE_ITEM_COUNT (20)
+#define TOTAL_ITEM_COUNT (38)
+#define TOTAL_BUYABLE_ITEM_COUNT (24)
 #define TOTAL_APPLE_COUNT (5)
 #define TOTAL_BUYABLE_APPLE_COUNT (5)
 #define TOTAL_SHOP_COUNT (10)
@@ -31,6 +31,7 @@
 #define FUSION_WEST_INDEX (16)
 #define FUSION_SOUTH_INDEX (17)
 #define FUSION_EAST_INDEX (18)
+#define HARRODS_START_INDEX (21)
 
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
@@ -283,6 +284,10 @@ void placeBuyableItems(item_t *items[], room_t *rooms[]) {
         items[15 + i];
     rooms[FUSION_NORTH_INDEX]->itemCount++;
   }
+  for (int i = 0; i < 4; i++) {
+    rooms[HARRODS_START_INDEX + i]
+        ->items[rooms[HARRODS_START_INDEX + i]->itemCount] = items[20 + i];
+  }
 }
 
 // connects first room to second room
@@ -350,6 +355,11 @@ void initialiseBuyableItem(item_t *items[]) {
   item_t *rum4 = initialiseItem(RUM_INDEX);
   item_t *rum5 = initialiseItem(RUM_INDEX);
 
+  item_t *guzziBelt = initialiseItem(GUZZI_INDEX);
+  item_t *supreme = initialiseItem(SUPREME_INDEX);
+  item_t *drip = initialiseItem(DRIP_INDEX);
+  item_t *blm = initialiseItem(BLM_INDEX);
+
   items[0] = buyApple1;
   items[1] = buyApple2;
   items[2] = buyApple3;
@@ -370,6 +380,10 @@ void initialiseBuyableItem(item_t *items[]) {
   items[17] = rum3;
   items[18] = rum4;
   items[19] = rum5;
+  items[20] = guzziBelt;
+  items[21] = supreme;
+  items[22] = drip;
+  items[23] = blm;
 
   for (int i = 0; i < BUYABLE_ITEMS_IN_ROOM; i++) {
     items[i]->cost = 5;
@@ -377,6 +391,9 @@ void initialiseBuyableItem(item_t *items[]) {
     items[i + 10]->cost = 20;
     items[i + 15]->cost = 50;
   }
+  items[20]->cost = 100;
+  items[21]->cost = 30;
+  items[22]->cost = 75;
 }
 
 // initialises room
