@@ -25,6 +25,7 @@ clean:
 		rm -f $(wildcard *.o)
 		rm -f game
 		rm -f testme
+		rm test_save_file.dat
 		cd characters; make clean
 		cd battle; make clean
 		cd emulateARM; make
