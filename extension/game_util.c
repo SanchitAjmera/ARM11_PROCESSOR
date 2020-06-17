@@ -542,25 +542,6 @@ void freeBuilding(building_t *huxley) {
   freeRoom(NULL, huxley->startRoom);
   free(huxley);
 }
-// changes room of person and pushes current room into room histroy of player
-void changeRoom(state *person, room_t dest_room) {}
-
-//
-//
-//
-//
-//
-//
-//
-// --------------------------------------------------------------------------
-// ----------- LUQMANS IMPLEMENTATION OF PLAYER FUNCTIONS--------------------
-//
-//
-//
-//
-//
-//
-//
 
 state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));

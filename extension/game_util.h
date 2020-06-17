@@ -4,8 +4,6 @@
 typedef struct item_t item_t;
 typedef struct state state;
 #include "characters/player/player.h"
-#include <math.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,7 +13,7 @@ typedef struct state state;
 #define MAX_ROOM_HISTORY (5)
 #define ROOM_COUNT (5)
 #define CLEAR ("clear")
-#define ITEM_NUM (5)
+#define ITEM_NUM (10)
 #define LOOKUP_FAILURE (NULL)
 #define INITIAL_CASH (0)
 #define MAX_HEALTH (100)
@@ -25,7 +23,7 @@ typedef struct state state;
 #define PROPERTY_NUM (4)
 #define USERNAME_CHAR_LIMIT (20)
 #define TOTAL_ROOM_COUNT (25)
-#define COMMAND_NUM (6)
+#define COMMAND_NUM (11)
 #define DIR_NUM (4)
 
 // enum for position in rooms
@@ -48,15 +46,15 @@ typedef enum {
   EAST = 1,
   WEST = 3,
   NORTH = 2,
-  SOUTH = 4,
-  CENTRE = 0
+  SOUTH = 0,
+  CENTRE = 4
 } RoomPosition;
 
 // enum for Items stored by person in inventory with respective cost
-typedef enum { FOOD = 0, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
+typedef enum { FOOD, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
-typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
+typedef enum { NONE, EDIBLE, VALUABLE = 2, BUYABLE = 4 } Property;
 
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
@@ -109,10 +107,23 @@ HARRODS -> {"Cosmetic DLC coming soon!",
 typedef enum { BATMAN, UTA } Character;
 
 // enum for menu choices
-typedef enum { NONE, QUIT, NEW_GAME, LOAD_GAME } Menu;
+typedef enum { INVALID, NEW_GAME, LOAD_GAME, QUIT } Menu;
 
 // enum for supported commands
-typedef enum { EXIT, PICKUP, DROP, BUY, MOVE, VIEW } Command;
+typedef enum {
+  EXIT,
+  PICKUP,
+  DROP,
+  BUY,
+  MOVE,
+  VIEW,
+  SAVE,
+  HELP,
+  SKIP,
+  CONSUME,
+  FIGHT,
+  FRESH
+} Command;
 
 // generic (string, enum) struct for lookups
 typedef struct {
@@ -162,7 +173,7 @@ struct state {
 // Room_name room_history[MAX_ROOM_HISTORY];
 
 static const pair_t propertyTable[] = {{"edible", EDIBLE},
-                                       {"throwable", THROWABLE},
+                                       {"none", NONE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
 
@@ -170,29 +181,30 @@ static const pair_t directionTable[] = {
     {"north", NORTH}, {"south", SOUTH}, {"east", EAST}, {"west", WEST}};
 
 //
-static const pair_t commandsTable[] = {{"exit", EXIT}, {"pickup", PICKUP},
-                                       {"drop", DROP}, {"buy", BUY},
-                                       {"move", MOVE}, {"view", VIEW}};
+static const pair_t commandsTable[] = {
+    {"exit", EXIT}, {"pickup", PICKUP},   {"drop", DROP},   {"buy", BUY},
+    {"move", MOVE}, {"view", VIEW},       {"save", SAVE},   {"help", HELP},
+    {"skip", SKIP}, {"consume", CONSUME}, {"fight", FIGHT}, {"clear", FRESH}};
 
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", FOOD, 0, EDIBLE, "An apple. Increases health by 5 when eaten!"},
-    {"keyboard", 1, KEYBOARD, THROWABLE,
+    {"keyboard", 1, KEYBOARD, VALUABLE,
      "A keyboard. A programmer's best friend."},
-    {"mouse", MOUSE, 2, THROWABLE, "A mouse. Click and scroll for days."},
-    {"monitor", MONITOR, 3, THROWABLE,
+    {"mouse", MOUSE, 2, NONE, "A mouse. Click and scroll for days."},
+    {"monitor", MONITOR, 3, VALUABLE,
      "A monitor. Can't see your seg faults without it!"},
     {"cash", CASH, 4, VALUABLE,
      "Cash. I wonder what I could buy around here..."},
-    {"pass", PASS, 5, THROWABLE, "You shall not pass"},
+    {"pass", PASS, 5, VALUABLE, "You shall not pass"},
     {"apple", FOOD, 6, (BUYABLE | EDIBLE),
      "Pay 5 HuxCoins to get an apple! (Health += 5)"},
-    {"Tesco Meal Deal", FOOD, 7, (BUYABLE | EDIBLE),
+    {"tesco meal deal", FOOD, 7, (BUYABLE | EDIBLE),
      "Pay 20 HuxCoins for a Tesco meal deal! (Health += 20)"},
-    {"Coffee", FOOD, 8, (BUYABLE | EDIBLE),
+    {"coffee", FOOD, 8, (BUYABLE | EDIBLE),
      "Pay 10 HuxCoins for some coffee to get through those lectures! (Health "
      "+= 10)"},
-    {"Rum & Coke", FOOD, 9, (BUYABLE | EDIBLE),
+    {"rum & coke", FOOD, 9, (BUYABLE | EDIBLE),
      "Pay 50 HuxCoins and get drunk ;) ! (Health += 50)"}};
 
 extern building_t *initialiseBuilding(room_t **out);

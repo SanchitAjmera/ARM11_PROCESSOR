@@ -1,38 +1,60 @@
 #include "game_util.h"
 #include "print_util.h"
-#include <math.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
+#define IS_EMPTY(string) (!strcmp(string, ""))
+
+char *reduceCommand(char *argument) {
+  if (IS_EMPTY(argument)) {
+    return argument;
+  }
+  char *reduced = malloc(sizeof(argument));
+  strcpy(reduced, argument);
+  reduced = strtok(reduced, " ");
+  return reduced;
+}
 
 void getCommand(char *command, char *argument) {
   char input[30];
-  printf(" >> ");
+  printf("                        >> ");
   fgets(input, sizeof(input), stdin);
 
   // obtain user input
   char *comm = strtok(input, " ");
-  char *arg = strtok(NULL, " ");
+  char *args = strtok(NULL, "\n");
 
   // remove trailing new line characters
   comm = strtok(comm, "\n");
-  arg = strtok(arg, "\n");
 
   // Make both into lowercase
   lowercase(comm);
-  lowercase(arg);
+  lowercase(args);
 
   // Copy results into given pointers
-  strcpy(command, comm);
-  if (arg) {
-    strcpy(argument, arg);
+  if (!comm) {
+    strcpy(command, "skip");
+    return;
   }
+  strcpy(command, comm);
+
+  if (!args) {
+    strcpy(argument, "");
+    return;
+  }
+  while (isspace(*args)) {
+    args++;
+  }
+  strcpy(argument, args);
 }
 
 void playGame(state *currentState) {
+  printStateDetails(currentState);
   bool play = true;
   // TODO: validate ptr on these and look at size/magic numbers
   char *command = malloc(sizeof(char) * 30);
@@ -42,29 +64,58 @@ void playGame(state *currentState) {
 
   while (play) {
     getCommand(command, argument);
+    char *reduced = reduceCommand(argument);
     Command type = lookup(commandsTable, COMMAND_NUM, command);
+
+    if (type != FIND_FAIL && !SINGLE(type) && IS_EMPTY(argument)) {
+      printf("I think you need to type more for this command...\n");
+      continue;
+    }
+
     switch (type) {
+    case SKIP:
+      printf("It might be useful to type a command...\n");
+      break;
     case EXIT:
+      // TODO: free all possible resources taken up by the game
       free(command);
+      free(reduced);
       free(argument);
       quit();
     case PICKUP:
-      pickUpItem(currentState, argument);
+      pickUpItem(currentState, reduced);
       printStateDetails(currentState);
       break;
     case DROP:
+      dropItem(currentState, reduced);
+      printStateDetails(currentState);
       break;
     case MOVE:
-      moveRoom(currentState, argument);
+      moveRoom(currentState, reduced);
       printStateDetails(currentState);
       break;
     case VIEW:
-      view(currentState, argument);
+      view(currentState, reduced);
       // printInventory(currentState);
       break;
     case BUY:
+      buyItem(currentState, argument);
+      printStateDetails(currentState);
       break;
-
+    case SAVE:
+      //  saveGameState(argument, currentState, );
+      break;
+    case HELP:
+      printf("Help is on its way -- need function\n");
+      break;
+    case CONSUME:
+      break;
+    case FIGHT:
+      break;
+    case FRESH:
+      system(CLEAR);
+      printf("The screen was cleared!\n");
+      break;
     default:
       printf("I'm not sure how to '%s'?\n", command);
       break;
@@ -80,20 +131,17 @@ int main(void) {
   // pointer to a location on heap storing an array of room pointers
   room_t **worldMap = malloc(sizeof(room_t *) * 25);
   building_t *huxley = initialiseBuilding(worldMap);
-
   state *playerState = initialiseState(huxley->startRoom);
   // state *playerState = malloc(sizeof(state));
   saveGameState("sanchizzle", playerState, worldMap);
   // loadGameState("sanchizzle", playerState, worldMap);
-  int choice = NONE;
+  int choice = INVALID;
   char menuChoice[100];
-  printMenu();
 
+  int choices = 0;
   while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
 
-    printf("Please enter a 1 (quit), 2 (new game) or 3 (load game)!\n");
-    printf(" >> ");
-
+    printMenu((choices > 0));
     fgets(menuChoice, sizeof(menuChoice), stdin);
     choice = atoi(menuChoice);
 
@@ -102,20 +150,12 @@ int main(void) {
       quit();
 
     case NEW_GAME:
-      printf("Prepare for a new adventure...\n");
-      printf("dummy: %s\n", gameItems[0].key);
+      printPreparingGame();
+
       // TODO: validate huxley ptr
-      room_t **rooms = malloc(sizeof(*rooms) * ROOM_COUNT);
-      building_t *huxley = initialiseBuilding(rooms);
-      state *playerState = initialiseState(huxley->startRoom);
-      // printBuildingDetails(huxley);
-      // printf("\n");
-      printStateDetails(playerState);
+
       playGame(playerState);
 
-      freeState(playerState);
-      freeBuilding(huxley);
-      free(rooms);
       break;
 
     case LOAD_GAME:
@@ -135,13 +175,12 @@ int main(void) {
       break;
 
     default:
-      printf("Invalid choice entered!\n");
-      break;
+      printInvalid();
+      continue;
     }
+    printf("Done\n");
   }
-  printf("Done\n");
-
+  freeState(playerState);
   freeBuilding(huxley);
   free(worldMap);
-  exit(EXIT_SUCCESS);
 }
