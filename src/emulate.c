@@ -1,4 +1,5 @@
 #include "common/constants.h"
+#include "common/util.h"
 #include "emulator/decode/emulate_decode.h"
 #include "emulator/emulate_constants.h"
 #include "emulator/emulate_util.h"
@@ -43,9 +44,9 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
-  arm_t *state = malloc(sizeof(arm_t));
+  arm_t *state = malloc(sizeof(*state));
   initArm(state, argv[1]);
-  decoded_t *decoded = malloc(sizeof(decoded_t));
+  decoded_t *decoded = malloc(sizeof(*decoded));
 
   // PIPELINE
   while ((state->decoded.isSet && state->decoded.instruction) ||

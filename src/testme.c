@@ -5,6 +5,7 @@
 
 #include "common/constants.h"
 #include "emulator/emulate_util.h"
+#include "emulator/fetch/emulate_fetch.h"
 
 void testBool(bool cond, char *test_name) {
   printf("T: %s : %s\n", test_name, cond ? "OK" : "FAIL");
