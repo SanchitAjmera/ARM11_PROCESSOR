@@ -18,6 +18,20 @@ int lookup(const pair_t table[], const int size, const char *key) {
   return LOOKUP_FAILURE;
 }
 
+/* Converts string to integer for both denary and hex constants */
+uint parseImmediate(char *op2) {
+  // PRE: # has been removed from <#expression> (op2)
+  if (op2[0] == '-') {
+    REMOVE_FIRST_CHAR(op2);
+  }
+  if (strlen(op2) > 2) {
+    if (op2[0] == '0' && op2[1] == 'x') {
+      return (uint)strtol(op2, NULL, HEX_BASE);
+    }
+  }
+  return (uint)atoi(op2);
+}
+
 /* Performs the first scan on a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
@@ -26,7 +40,6 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   // PRE: armFile, symbolTable, output are not NULL
   // Will be used to store expressions found during the scan
   file_lines *expressions = newFileLines();
-
   /* Scan file for labels and expressions */
   char *line = malloc(LINE_CHAR_LIM * sizeof(*line));
   validatePtr(line, MEM_ASSIGN);
@@ -62,7 +75,6 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
     free(lineCopy);
   }
   free(line);
-
   /* Now that we have added all lines to output, we can add all expressions
      to the symbol table and calculate their address using lineCount */
   for (int i = 0; i < expressions->lineCount; i++) {
@@ -116,171 +128,6 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   }
 }
 
-/* Converts string to integer for both denary and hex constants */
-uint parseImmediate(char *op2) {
-  // PRE: # has been removed from <#expression> (op2)
-  if (op2[0] == '-') {
-    REMOVE_FIRST_CHAR(op2);
-  }
-  if (strlen(op2) > 2) {
-    if (op2[0] == '0' && op2[1] == 'x') {
-      return (uint)strtol(op2, NULL, HEX_BASE);
-    }
-  }
-  return (uint)atoi(op2);
-}
-
-/* Calculates shift type enum from string */
-static Shift parseShiftType(const char *shift) {
-  return lookup(shiftTable, SHIFT_TABLE_SIZE, shift);
-}
-
-/* Returns circular bitwise left rotation of input num by rotateNum */
-static word rotateLeft(word value, uint rotateNum) {
-  uint msbs = value & ~((1 << (WORD_SIZE - rotateNum)) - 1);
-  return (value << rotateNum) | (msbs >> (WORD_SIZE - rotateNum));
-}
-
-/* Exits program if num exceeds the highest representable value */
-void exitOverflow(uint num, const uint max) {
-  if (num > max) {
-    // fprintf(stderr, "Number cannot be represented.\n");
-    errorExit(MEM_OVERFLOW);
-  }
-}
-
-/* Calculates the rotation amount to fit an immediate constant in 8 bits */
-static word calcRotatedImm(word imm) {
-  // PRE: imm can be represented by WORD_SIZE bits
-  uint mask = 1;
-  uint rotation = 0;
-  for (int i = 0; i < WORD_SIZE; i++) {
-    if (mask & imm) {
-      rotation = WORD_SIZE - i;
-      break;
-    }
-    mask = mask << 1;
-  }
-  // Rotation must be even
-  if (rotation % ROTATION_FACTOR != 0) {
-    rotation++;
-  }
-  imm = rotateLeft(imm, rotation);
-  exitOverflow(imm, MAX_BYTE);
-  rotation = rotation / ROTATION_FACTOR;
-  return (rotation << GET_ROTATION_NUM) | imm;
-}
-
-/* Calculates immediate value, including any rotation required to
-fit number into 8 bits */
-static word parseOperand2Imm(char **op2) {
-  word imm = (word)parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
-  exitOverflow(imm, MAX_NUM);
-  if (imm > MAX_BYTE) {
-    imm = calcRotatedImm(imm);
-  }
-  return imm;
-}
-
-/* Calculates binary representation of a register operand2
-including registers with shifts attached */
-static word parseOperand2Reg(char **op2, uint args) {
-  uint rm = REM_INT(op2[0]);
-  if (args < SHIFT_NO_ARGS) {
-    // No shift type (shift of 0)
-    return rm;
-  }
-  Shift shiftType = parseShiftType(op2[1]);
-  if (IS_IMMEDIATE(op2[2])) {
-    return (parseImmediate(REMOVE_FIRST_CHAR(op2[2])) << SHIFT_NUM_SHIFT) |
-           (shiftType << SHIFT_TYPE_SHIFT) | rm;
-  }
-  uint rs = REM_INT(op2[2]);
-  // Rs can be any general purpose register except the PC
-  if (rs == PC) {
-    errorExit(UNEXPECTED_CASE);
-  }
-  return (rs << RS_SHIFT) | (shiftType << SHIFT_TYPE_SHIFT) |
-         SHIFT_BY_REG_HARDCODE | rm;
-}
-
-/* Checks type of operand 2 (imm/reg) and calls corresponding parser */
-static word parseOperand2(char **op2, uint args) {
-  // 8 bit immediate value - <#expression>
-  // Decimal or hexadecimal ("#n" or “#0x...”)
-  if (IS_IMMEDIATE(op2[0])) {
-    return parseOperand2Imm(op2);
-  }
-  // Shifted register - Rm <shiftname> {<register> or <#expression>}
-  return parseOperand2Reg(op2, args);
-}
-
-/* Provides assembly conversion for supported data processing instructions */
-word assembleDPI(symbol_table *symbolTable, instruction input) {
-  word opcode = input.mnemonic;
-  word s = 0;
-  word rn = 0;
-  word rd = 0;
-  char **operand2;
-  uint args;
-  char *imm;
-
-  // andeq r0, r0, r0
-  if (opcode == ANDEQ) {
-    return 0x00000000;
-  }
-
-  // instruction: mov
-  // syntax: mov Rd, <Operand2>
-  else if (opcode == MOV) {
-    imm = input.fields[1];
-    rd = REM_INT(input.fields[0]);
-    operand2 = input.fields + 1;
-    args = input.field_count - 1;
-  }
-
-  // lsl Rn, <#expression>
-  else if (opcode == LSL_SPECIAL) {
-    opcode = MOV;
-    imm = input.fields[0];
-    char *rdCopy = input.fields[0];
-    rd = REM_INT(input.fields[0]);
-    char *ops[SHIFT_NO_ARGS] = {rdCopy, "lsl", input.fields[1]};
-    args = SHIFT_NO_ARGS;
-    operand2 = ops;
-  }
-
-  // instructions: tst, teq, cmp
-  // syntax: <opcode> Rn, <Operand2>
-
-  else if (opcode == TST || opcode == TEQ || opcode == CMP) {
-    imm = input.fields[1];
-    // COND flags should be updated (s bit is set)
-    s = 1;
-    rn = REM_INT(input.fields[0]);
-    operand2 = input.fields + 1;
-    args = input.field_count - 1;
-  }
-
-  // instructions: and, eor, sub, rsb, add, orr
-  // syntax: <opcode> Rd, Rn, <Operand2>
-  else {
-    imm = input.fields[2];
-    rn = REM_INT(input.fields[1]);
-    rd = REM_INT(input.fields[0]);
-    operand2 = input.fields + 2;
-    args = input.field_count - 2;
-  }
-
-  opcode = opcode << DPI_OPCODE_SHIFT;
-  s = s << DPI_S_SHIFT;
-  rn = rn << DPI_RN_SHIFT;
-  rd = rd << DPI_RD_SHIFT;
-  word i = IS_IMMEDIATE(imm) ? (1 << DPI_I_SHIFT) : 0;
-  word op2 = parseOperand2(operand2, args);
-  return ALWAYS | i | opcode | s | rn | rd | op2;
-}
-
 /* Provides assembly function for 'mla' and 'mul' instructions and
 returns the corresponding ARM-binary based on the instruction arguments */
 word assembleMultiply(symbol_table *symbolTable, instruction input) {
@@ -332,7 +179,7 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
 /* Removes bracketing around string
 converts remaining strings into unsigned int values
 returns array containing register address and expression address */
-word *remBracket(const char *string) {
+static word *remBracket(const char *string) {
   word *addresses = malloc(sizeof(*addresses) * 4);
   validatePtr(addresses, MEM_ASSIGN);
   char *unbracketed = strptr(string + 1);
