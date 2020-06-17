@@ -54,7 +54,7 @@ typedef enum {
 typedef enum { FOOD, KEYBOARD, MOUSE, MONITOR, CASH, PASS } Item;
 
 // enum for properties of products
-typedef enum { EDIBLE = 1, THROWABLE = 2, VALUABLE = 4, BUYABLE = 8 } Property;
+typedef enum { NONE, EDIBLE, VALUABLE = 2, BUYABLE = 4 } Property;
 
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
@@ -77,7 +77,7 @@ typedef enum {
   HELP,
   SKIP,
   CONSUME,
-  THROW
+  FIGHT
 } Command;
 
 // generic (string, enum) struct for lookups
@@ -128,7 +128,7 @@ struct state {
 // Room_name room_history[MAX_ROOM_HISTORY];
 
 static const pair_t propertyTable[] = {{"edible", EDIBLE},
-                                       {"throwable", THROWABLE},
+                                       {"none", NONE},
                                        {"valuable", VALUABLE},
                                        {"buyable", BUYABLE}};
 
@@ -139,19 +139,18 @@ static const pair_t directionTable[] = {
 static const pair_t commandsTable[] = {
     {"exit", EXIT}, {"pickup", PICKUP},   {"drop", DROP},  {"buy", BUY},
     {"move", MOVE}, {"view", VIEW},       {"save", SAVE},  {"help", HELP},
-    {"skip", SKIP}, {"consume", CONSUME}, {"throw", THROW}};
+    {"skip", SKIP}, {"consume", CONSUME}, {"fight", FIGHT}};
 
 // Supported Items
 static const item_t gameItems[] = {
     {"apple", FOOD, 0, EDIBLE, "An apple. Increases health by 5 when eaten!"},
-    {"keyboard", 1, KEYBOARD, THROWABLE,
-     "A keyboard. A programmer's best friend."},
-    {"mouse", MOUSE, 2, THROWABLE, "A mouse. Click and scroll for days."},
-    {"monitor", MONITOR, 3, THROWABLE,
+    {"keyboard", 1, KEYBOARD, NONE, "A keyboard. A programmer's best friend."},
+    {"mouse", MOUSE, 2, NONE, "A mouse. Click and scroll for days."},
+    {"monitor", MONITOR, 3, NONE,
      "A monitor. Can't see your seg faults without it!"},
     {"cash", CASH, 4, VALUABLE,
      "Cash. I wonder what I could buy around here..."},
-    {"pass", PASS, 5, THROWABLE, "You shall not pass"},
+    {"pass", PASS, 5, NONE, "You shall not pass"},
     {"apple", FOOD, 6, (BUYABLE | EDIBLE),
      "Pay 5 HuxCoins to get an apple! (Health += 5)"},
     {"tesco meal deal", FOOD, 7, (BUYABLE | EDIBLE),
