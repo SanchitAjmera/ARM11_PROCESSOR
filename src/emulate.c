@@ -13,7 +13,7 @@ void printArmState(arm_t *state) {
   printf("Registers:\n");
   char registerName[MAX_REGISTER_NAME_LENGTH];
   for (int i = 0; i < NUM_REGISTERS; i++) {
-    if (i == 13 || i == 14) {
+    if (i == SP || i == LR) {
       // Not used in this exercise
       continue;
     }

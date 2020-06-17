@@ -9,7 +9,7 @@ typedef unsigned int uint;
 // Enums for checked errors within program
 typedef enum { ERROR_SUCC, ERR_FAIL, ERR_PASS } Error;
 // Enum registers for special named registers
-typedef enum { PC = 15, CPSR = 16 } Register;
+typedef enum { SP = 13, LR, PC, CPSR } Register;
 // Opcode mnemonics for DPI
 typedef enum {
   AND,
