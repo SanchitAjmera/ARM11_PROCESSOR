@@ -1,6 +1,9 @@
 #include "../../game_util.h"
 
 int roomItemTraversal(room_t *room, const item_t *item) {
+  if (!item) {
+    return -1;
+  }
   for (int i = 0; i < ITEM_NUM; i++) {
     if (room->items[i]) {
       if (room->items[i]->name == item->name) {
@@ -25,7 +28,7 @@ player_t *initialisePlayer() {
   checkPtr(newPlayer);
   newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t));
   checkPtr(newPlayer->inventory);
-  newPlayer->health = MAX_HEALTH;
+  newPlayer->health = 50; // MAX_HEALTH;
   newPlayer->cash = INITIAL_CASH;
   newPlayer->itemCount = 0;
   return newPlayer;
@@ -34,12 +37,22 @@ player_t *initialisePlayer() {
 bool pickUpItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   int index = roomItemTraversal(currentState->currentRoom, item);
-  if (!item || !currentState->currentRoom->items[index]) {
-    printf("This item could not be found here!\n");
+  if (index == -1 || !item || !currentState->currentRoom->items[index]) {
+    printf("'%s' could not be found here!\n", itemName);
     return false;
   }
+  if (hasProperty(BUYABLE, item)) {
+    printf("No stealing in this game...!\n");
+    return false;
+  }
+  if (currentState->currentRoom->items[index]->name == CASH) {
+    currentState->player->cash += item->cost;
+    printf("%d HuxCoins Added\n", item->cost);
+    currentState->currentRoom->items[index] = REMOVED;
+    return true;
+  }
   if (currentState->player->inventory[item->name]) {
-    printf("%s is already in your inventory!", itemName);
+    printf("%s is already in your inventory!\n", itemName);
   } else {
     currentState->player->inventory[item->name] =
         currentState->currentRoom->items[index];
@@ -80,6 +93,7 @@ bool buyItem(state *currentState, char *itemName) {
       printf("your a broke boy\n");
       return false;
     }
+    currentState->player->cash -= item->cost;
     currentState->player->inventory[item->name] =
         currentState->currentRoom->items[index];
     currentState->currentRoom->items[index] = REMOVED;
@@ -114,13 +128,16 @@ bool consume(state *currentState, char *itemName) {
     printf("You can't eat that!\n");
     return false;
   }
-  // TODO: calculate health increase
-  int increase = 5;
   printf("mmm... Tasty.\n");
-  printf("Your health has increased by %d!\n", increase);
-  // item_t *remove = currentState->player->inventory[item->name];
+  int increase = item->cost;
+  if (currentState->player->health + increase >= 100) {
+    printf("Max health reached!\n");
+    currentState->player->health = MAX_HEALTH;
+  } else {
+    printf("Your health has increased by %d!\n", increase);
+    currentState->player->health += increase;
+  }
   currentState->player->inventory[item->name] = REMOVED;
-  // freeItem(remove);
   return true;
 }
 
