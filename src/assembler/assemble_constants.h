@@ -3,6 +3,7 @@
 
 // Universal constants & pre-processor functions
 #define MAX_NUM (4294967295)
+#define MAX_FIELD_COUNT (5)
 #define MAX_BYTE (0xFF)
 #define LINE_CHAR_LIM (512)
 #define PREDEFINED_SYMBOLS_COUNT (23)
