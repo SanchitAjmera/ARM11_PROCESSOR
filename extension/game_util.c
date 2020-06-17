@@ -11,8 +11,8 @@
 #include <unistd.h>
 
 #define ROOM_POSITION_NUMBER (5)
-#define TOTAL_ITEM_COUNT (34)
-#define TOTAL_BUYABLE_ITEM_COUNT (20)
+#define TOTAL_ITEM_COUNT (38)
+#define TOTAL_BUYABLE_ITEM_COUNT (24)
 #define TOTAL_PEAR_COUNT (5)
 #define TOTAL_BUYABLE_APPLE_COUNT (5)
 #define TOTAL_SHOP_COUNT (10)
@@ -287,9 +287,9 @@ void placeBuyableItems(item_t *items[], room_t *rooms[]) {
         items[15 + i];
     rooms[FUSION_NORTH_INDEX]->itemCount++;
   }
-  for (int i = 0; i < 4; i++) {
-    rooms[HARRODS_START_INDEX + i]
-        ->items[rooms[HARRODS_START_INDEX + i]->itemCount] = items[20 + i];
+  for (int i = 20; i < TOTAL_ROOM_COUNT - 1; i++) {
+    rooms[i]->items[0] = items[i];
+    rooms[i]->itemCount++;
   }
 }
 
@@ -331,7 +331,7 @@ item_t *initialiseItem(ItemIndex gameItemID) {
   item->description = strptr(gameItem.description);
   item->cost = gameItem.cost;
   if (gameItemID == CASH_INDEX) {
-    item->cost = rand() % 100;
+    item->cost = rand() % 1000;
   }
   return item;
 }
@@ -366,6 +366,11 @@ void initialiseBuyableItem(item_t *items[]) {
   item_t *drip = initialiseItem(DRIP_INDEX);
   item_t *blm = initialiseItem(BLM_INDEX);
 
+  guzziBelt->hash = 100;
+  supreme->hash = 101;
+  drip->hash = 102;
+  blm->hash = 103;
+
   items[0] = buyApple1;
   items[1] = buyApple2;
   items[2] = buyApple3;
@@ -390,16 +395,6 @@ void initialiseBuyableItem(item_t *items[]) {
   items[21] = supreme;
   items[22] = drip;
   items[23] = blm;
-
-  for (int i = 0; i < BUYABLE_ITEMS_IN_ROOM; i++) {
-    items[i]->cost = 5;
-    items[i + 5]->cost = 10;
-    items[i + 10]->cost = 20;
-    items[i + 15]->cost = 50;
-  }
-  items[20]->cost = 100;
-  items[21]->cost = 30;
-  items[22]->cost = 75;
 }
 
 // initialises room

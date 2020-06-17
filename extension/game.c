@@ -22,7 +22,7 @@ char *reduceCommand(char *argument) {
 
 void getCommand(char *command, char *argument) {
   char input[30];
-  printf("                     >> ");
+  printf("         >> ");
   fgets(input, sizeof(input), stdin);
 
   // obtain user input

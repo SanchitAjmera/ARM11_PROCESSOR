@@ -214,13 +214,13 @@ static const item_t gameItems[] = {
     {"rum & coke", FOOD, 9, (BUYABLE | EDIBLE),
      "Pay 50 HuxCoins and get drunk ;) ! (Health += 50)", 50},
     {"Guzzi Belt", FOOD, 10, (BUYABLE),
-     "Bank transfer us our uni fees for 2021 and cop the 'Guzzi Belt'"},
+     "Bank transfer us our uni fees for 2021 and cop the 'Guzzi Belt'", 100},
     {"Supreme Hoodie", FOOD, 11, BUYABLE,
-     " Flex like an international student everytime you go to lectures!"},
+     " Flex like an international student everytime you go to lectures!", 40},
     {"Drip", FOOD, 12, BUYABLE,
-     "Drip too hard don't stand to close for only 30 Huxcoins"},
+     "Drip too hard don't stand to close for only 30 Huxcoins", 30},
     {"BLM Badge", FOOD, 13, BUYABLE,
-     "Support da movement with a free BLM badge!"}};
+     "Support da movement with a free BLM badge!", 0}};
 
 extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);
