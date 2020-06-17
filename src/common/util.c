@@ -11,17 +11,17 @@ char *strptr(const char *in) {
 }
 
 /* Checks for failed memory allocation */
-Error validatePtr(const void *ptr, const char *errorMsg) {
+void validatePtr(const void *ptr, const char *errorMsg) {
   if (ptr == NULL) {
     printf("Error: %s\n", errorMsg);
-    return ERR_FAIL;
+    errorExit(ERR_FAIL);
   }
-  return ERR_PASS;
+  return ERR_SUCC;
 }
 
 /* Exits program if an error occurred */
 void errorExit(Error error) {
-  if (error == ERR_FAIL) {
+  if (error != ERR_SUCC) {
     exit(EXIT_FAILURE);
   }
 }
