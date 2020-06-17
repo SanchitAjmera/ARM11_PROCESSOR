@@ -40,8 +40,9 @@ void printArmState(arm_t *state) {
 
 int main(int argc, char **argv) {
   if (argc == 1) {
-    fprintf(stderr, "Please specify an ARM binary object code file.\n");
-    exit(EXIT_FAILURE);
+    errorExit(UNEXPECTED_ARG);
+    // fprintf(stderr, "Please specify an ARM binary object code file.\n");
+    // exit(EXIT_FAILURE);
   }
 
   arm_t *state = malloc(sizeof(*state));
