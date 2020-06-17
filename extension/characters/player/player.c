@@ -66,6 +66,10 @@ bool dropItem(state *currentState, char *itemName) {
 
 bool buyItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
+  if (!item) {
+    printf("%s cannot be bought!\n", itemName);
+    return false;
+  }
   int index = roomItemTraversal(currentState->currentRoom, item);
   if (index != FIND_FAIL) {
     if (currentState->player->inventory[item->name]) {
