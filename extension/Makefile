@@ -12,9 +12,11 @@ testme: testme.o game_util.o print_util.o characters/player/player.o battle/batt
 print_util.o: print_util.h constants.h game_util.h
 game_util.o: game_util.h constants.h
 testme.o: game_util.h print_util.h
+emulateARM.o:
 libs:
 	cd characters; make
 	cd battle; make
+	cd emulateARM; make
 
 test:
 	./testme | grep ^T:
@@ -25,3 +27,4 @@ clean:
 		rm -f testme
 		cd characters; make clean
 		cd battle; make clean
+		cd emulateARM; make
