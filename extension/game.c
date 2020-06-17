@@ -8,6 +8,13 @@
 #include <string.h>
 #include <unistd.h>
 
+char *reduceCommand(char *argument) {
+  char *reduced = malloc(sizeof(argument));
+  strcpy(reduced, argument);
+  reduced = strtok(reduced, " ");
+  return reduced;
+}
+
 void getCommand(char *command, char *argument) {
   char input[30];
   printf(" >> ");
@@ -15,20 +22,19 @@ void getCommand(char *command, char *argument) {
 
   // obtain user input
   char *comm = strtok(input, " ");
-  char *arg = strtok(NULL, " ");
+  char *args = strtok(NULL, "\n");
 
   // remove trailing new line characters
   comm = strtok(comm, "\n");
-  arg = strtok(arg, "\n");
 
   // Make both into lowercase
   lowercase(comm);
-  lowercase(arg);
+  lowercase(args);
 
   // Copy results into given pointers
   strcpy(command, comm);
-  if (arg) {
-    strcpy(argument, arg);
+  if (args) {
+    strcpy(argument, args);
   }
 }
 
@@ -42,27 +48,29 @@ void playGame(state *currentState) {
 
   while (play) {
     getCommand(command, argument);
+    char *reduced = reduceCommand(argument);
     Command type = lookup(commandsTable, COMMAND_NUM, command);
     switch (type) {
     case EXIT:
       // TODO: free all possible resources taken up by the game
       free(command);
+      free(reduced);
       free(argument);
       quit();
     case PICKUP:
-      pickUpItem(currentState, argument);
+      pickUpItem(currentState, reduced);
       printStateDetails(currentState);
       break;
     case DROP:
-      dropItem(currentState, argument);
+      dropItem(currentState, reduced);
       printStateDetails(currentState);
       break;
     case MOVE:
-      moveRoom(currentState, argument);
+      moveRoom(currentState, reduced);
       printStateDetails(currentState);
       break;
     case VIEW:
-      view(currentState, argument);
+      view(currentState, reduced);
       // printInventory(currentState);
       break;
     case BUY:
