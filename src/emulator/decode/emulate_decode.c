@@ -5,7 +5,7 @@
 #include "../emulate_util.h"
 #include <stdlib.h>
 
-dp_t *decodeDPI(arm_t *state, word instruction) {
+static dp_t *decodeDPI(arm_t *state, word instruction) {
   dp_t *decoded = malloc(sizeof(dp_t));
   // decoded of code
   decoded->i = (instruction & DPI_I_MASK) >> DPI_I_SHIFT;
@@ -24,7 +24,7 @@ dp_t *decodeDPI(arm_t *state, word instruction) {
   return decoded;
 }
 
-multiply_t *decodeMultiply(arm_t *state, word instruction) {
+static multiply_t *decodeMultiply(arm_t *state, word instruction) {
   multiply_t *decoded = malloc(sizeof(multiply_t));
   decoded->a = instruction & ACCUMULATE_FLAG;
   decoded->s = UPDATE_CPSR(instruction);
@@ -35,7 +35,7 @@ multiply_t *decodeMultiply(arm_t *state, word instruction) {
   return decoded;
 }
 
-sdt_t *decodeSDTI(arm_t *state, word instruction) {
+static sdt_t *decodeSDTI(arm_t *state, word instruction) {
   sdt_t *decoded = malloc(sizeof(sdt_t));
   decoded->i = (instruction & SDTI_I_MASK) >> SDTI_I_SHIFT;
   decoded->p = (instruction & SDTI_P_MASK) >> SDTI_P_SHIFT;
@@ -47,7 +47,7 @@ sdt_t *decodeSDTI(arm_t *state, word instruction) {
   return decoded;
 }
 
-branch_t *decodeBranch(arm_t *state, word instruction) {
+static branch_t *decodeBranch(arm_t *state, word instruction) {
   branch_t *decoded = malloc(sizeof(branch_t));
   decoded->offset = instruction & BRANCH_OFFSET_MASK;
   return decoded;

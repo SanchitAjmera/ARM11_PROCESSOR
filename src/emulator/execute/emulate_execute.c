@@ -44,7 +44,7 @@ static void load(arm_t *state, word destReg, word sourceAddr) {
 }
 
 /* Executes all supported Single Data Transfer instructions */
-void executeSDTI(arm_t *state, sdt_t *decoded) {
+static void executeSDTI(arm_t *state, sdt_t *decoded) {
   uint l = decoded->l;
   uint rd = decoded->rd;
   word offset = decoded->offset;
@@ -69,7 +69,7 @@ void executeSDTI(arm_t *state, sdt_t *decoded) {
 }
 
 /* Executes all supported Multiply instructions */
-void executeMultiply(arm_t *state, multiply_t *decoded) {
+static void executeMultiply(arm_t *state, multiply_t *decoded) {
   int regS = decoded->regS;
   int regM = decoded->regM;
   // initial execution of instruction
@@ -95,7 +95,7 @@ void flushPipeline(arm_t *state) {
 }
 
 /* Execution of a branch instruction */
-void executeBranch(arm_t *state, branch_t *decoded) {
+static void executeBranch(arm_t *state, branch_t *decoded) {
   flushPipeline(state);
   int offset = decoded->offset;
   // extracting information from instruction
@@ -108,7 +108,7 @@ void executeBranch(arm_t *state, branch_t *decoded) {
 }
 
 // checks the instruction condition with the CPSR flags
-bool checkCond(arm_t *state, word instruction) {
+static bool checkCond(arm_t *state, word instruction) {
   // CPSR flag bits
   word cpsr = state->registers[CPSR];
   uint n = GET_CPSR_N(cpsr);
