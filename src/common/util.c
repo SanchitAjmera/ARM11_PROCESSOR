@@ -11,9 +11,9 @@ char *strptr(const char *in) {
 }
 
 /* Checks for failed memory allocation */
-void validatePtr(const void *ptr, const char *errorMsg) {
+void validatePtr(const void *ptr) {
   if (ptr == NULL) {
-    printf("Error: %s\n", errorMsg);
+    printf("Error: NULL pointer.");
     errorExit(ERR_FAIL);
   }
   return ERR_SUCC;
