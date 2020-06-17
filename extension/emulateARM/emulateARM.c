@@ -1,11 +1,12 @@
-#include "../src/assembler/assemble_constants.h"
-#include "../src/assembler/assemble_util.h"
-#include "../src/assembler/symbol_table.h"
-#include "../src/common/constants.h"
-#include "../src/emulator/decode/emulate_decode.h"
-#include "../src/emulator/emulate_util.h"
-#include "../src/emulator/execute/emulate_execute.h"
-#include "../src/emulator/fetch/emulate_fetch.h"
+#include "emulateARM.h"
+#include "../../src/assembler/assemble_constants.h"
+#include "../../src/assembler/assemble_util.h"
+#include "../../src/assembler/symbol_table.h"
+#include "../../src/common/constants.h"
+#include "../../src/emulator/decode/emulate_decode.h"
+#include "../../src/emulator/emulate_util.h"
+#include "../../src/emulator/execute/emulate_execute.h"
+#include "../../src/emulator/fetch/emulate_fetch.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -19,7 +20,7 @@ static void initialiseArm(arm_t *arm) {
 
 // Initialises the symbol table with predefined symbols
 // TODO: expand this function to take in a set of allowed instructions?
-void initialiseSymbolTable(symbol_table *s) {
+static void initialiseSymbolTable(symbol_table *s) {
   symbol predefinedSymbols[23] = {
       {strptr("add"), INSTR, .body.assembleFunc = assembleDPI},
       {strptr("sub"), INSTR, .body.assembleFunc = assembleDPI},
@@ -47,8 +48,8 @@ void initialiseSymbolTable(symbol_table *s) {
   addSymbols(s, predefinedSymbols, 23);
 }
 
-void firstPass(const char *code, symbol_table *symbolTable,
-               file_lines *output) {
+static void firstPass(const char *code, symbol_table *symbolTable,
+                      file_lines *output) {
   file_lines *expressions = newFileLines();
 
   /* Scan file for labels and expressions */
@@ -173,14 +174,4 @@ void printOutput(char **output) {
   for (int i = 0; i < NUM_REGISTERS; i++) {
     printf("%s", output[i]);
   }
-}
-
-int main() {
-  char *test = "mov r1, #1\nb foo\nmov r2,#2\nfoo:\nmov r3,#3\n";
-  char **output = runCode(test);
-
-  printOutput(output);
-
-  freeOutput(output);
-  return EXIT_SUCCESS;
 }
