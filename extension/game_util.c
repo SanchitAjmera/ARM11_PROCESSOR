@@ -224,6 +224,7 @@ void introduction() {}
 
 // generates array of random numbers of length n
 void randomiseArray(int randArray[], int length, int randMax) {
+  srand(time(NULL));
   for (int i = 0; i < length; i++) {
     randArray[i] = rand() % randMax;
   }
