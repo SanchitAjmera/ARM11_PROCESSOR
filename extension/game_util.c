@@ -36,6 +36,8 @@
 #define HARRODS_START_INDEX (21)
 #define BOSSKGK ("konstantinos")
 #define BOSSTONY ("tony")
+#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
+#define IS_EMPTY(string) (!strcmp(string, ""))
 
 /*
 char *strptr(const char *in) {
@@ -179,6 +181,50 @@ int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
   }
   return 0;
 }
+
+char *reduceCommand(char *argument) {
+  if (IS_EMPTY(argument)) {
+    return argument;
+  }
+  char *reduced = malloc(sizeof(argument));
+  strcpy(reduced, argument);
+  reduced = strtok(reduced, " ");
+  return reduced;
+}
+
+void getCommand(char *command, char *argument) {
+  char input[30];
+  printf("         >> ");
+  fgets(input, sizeof(input), stdin);
+
+  // obtain user input
+  char *comm = strtok(input, " ");
+  char *args = strtok(NULL, "\n");
+
+  // remove trailing new line characters
+  comm = strtok(comm, "\n");
+
+  // Make both into lowercase
+  lowercase(comm);
+  lowercase(args);
+
+  // Copy results into given pointers
+  if (!comm) {
+    strcpy(command, "skip");
+    return;
+  }
+  strcpy(command, comm);
+
+  if (!args) {
+    strcpy(argument, "");
+    return;
+  }
+  while (isspace(*args)) {
+    args++;
+  }
+  strcpy(argument, args);
+}
+
 //--------------Possible const error---------------------
 // shows player their inventory of Items
 /* Returns respective int value; -1 for failure */

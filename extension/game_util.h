@@ -27,7 +27,8 @@ typedef struct state state;
 #define TOTAL_ROOM_COUNT (25)
 #define COMMAND_NUM (12)
 #define DIR_NUM (4)
-
+#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
+#define IS_EMPTY(string) (!strcmp(string, ""))
 // enum for position in rooms
 
 // enum for
@@ -238,5 +239,7 @@ extern int loadGameState(const char *fname, state *playerState,
                          room_t **worldMap);
 extern int saveGameState(const char *fname, state *playerState,
                          room_t **worldMap);
+extern char *reduceCommand(char *arg);
+extern void getCommand(char *com, char *arg);
 
 #endif
