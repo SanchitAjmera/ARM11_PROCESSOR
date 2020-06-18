@@ -131,11 +131,10 @@ static char *getAnswer(void) {
   }
   // printf("%s\n", code->value);
   char *output = runCode(code->value);
-  printf("%s", output);
+  printf("%s\n", output);
 
   freeString(code);
   free(input);
-  printf(">");
   return output;
 }
 
@@ -170,14 +169,17 @@ void quiz(boss_t *boss, player_t *player) {
   printf("Wild %s appeared!\n%s starts asking you assembly questions!\n",
          boss->name, boss->name);
   srand(time(NULL));
-  int randomQuestion = rand() % 5;
+  int randomQuestion = rand() % MAX_QUESTIONS;
 
   printf("                        Question %d: %s\n", randomQuestion + 1,
          boss->state->teaching->questions[randomQuestion]);
   printf("                        enter 'END' on a separate line to submit "
          "your answer\n");
   const char *input = getAnswer();
-  if (strcmp(input, boss->state->teaching->answers[randomQuestion]) == 0) {
+  const char *correctInput =
+      runCode(boss->state->teaching->answers[randomQuestion]);
+  printf("%s", correctInput);
+  if (strcmp(input, correctInput) == 0) {
     correct = true;
   }
 
