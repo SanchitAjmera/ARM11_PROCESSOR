@@ -69,12 +69,12 @@ void freeBossTeaching(passive_t *passive) {
   if (passive == NULL) {
     return;
   }
-  for (int i = 0; i < passive->num; i++) {
-    free((void *)passive->questions[i]);
-    free((void *)passive->answers[i]);
-  }
-  free(passive->questions);
-  free(passive->answers);
+  // for (int i = 0; i < passive->num; i++) {
+  // free((char *)passive->questions[i]);
+  // free((char *)passive->answers[i]);
+  // }
+  // free((char **)passive->questions);
+  // free((char **)passive->answers);
   free(passive);
 }
 
