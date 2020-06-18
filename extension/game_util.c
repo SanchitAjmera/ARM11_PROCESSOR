@@ -36,8 +36,6 @@
 #define HARRODS_START_INDEX (21)
 #define BOSSKGK ("konstantinos")
 #define BOSSTONY ("tony")
-#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
-#define IS_EMPTY(string) (!strcmp(string, ""))
 
 /*
 char *strptr(const char *in) {
