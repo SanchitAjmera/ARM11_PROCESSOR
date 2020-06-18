@@ -12,25 +12,6 @@ typedef struct state state;
 #include <time.h>
 #include <unistd.h>
 
-#define MAX_ROOM_HISTORY (5)
-#define ROOM_COUNT (5)
-#define CLEAR ("clear")
-#define ITEM_NUM (10)
-#define LOOKUP_FAILURE (NULL)
-#define INITIAL_CASH (0)
-#define MAX_HEALTH (100)
-#define FIND_FAIL (-1)
-#define REMOVED (NULL)
-#define MAX_PROPERTY (8)
-#define PROPERTY_NUM (4)
-#define USERNAME_CHAR_LIMIT (20)
-#define TOTAL_ROOM_COUNT (25)
-#define COMMAND_NUM (12)
-#define DIR_NUM (4)
-#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
-#define IS_EMPTY(string) (!strcmp(string, ""))
-// enum for position in rooms
-
 // enum for
 typedef enum {
   PEAR_INDEX = 0,

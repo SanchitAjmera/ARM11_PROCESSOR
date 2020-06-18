@@ -12,8 +12,8 @@ void playGame(state *currentState) {
   bool play = true;
   // TODO: validate ptr on these and look at size/magic numbers
   char *command = malloc(sizeof(char) * 30);
-  char *argument = malloc(sizeof(char) * 30);
   checkPtr(command);
+  char *argument = malloc(sizeof(char) * 30);
   checkPtr(argument);
 
   while (play) {
@@ -32,6 +32,7 @@ void playGame(state *currentState) {
       break;
     case EXIT:
       // TODO: free all possible resources taken up by the game
+      // TODO: make a freeAll() function
       free(command);
       free(reduced);
       free(argument);
@@ -47,7 +48,6 @@ void playGame(state *currentState) {
     case MOVE:
       moveRoom(currentState, reduced);
       printStateDetails(currentState);
-
       break;
     case VIEW:
       view(currentState, reduced);
@@ -78,13 +78,11 @@ void playGame(state *currentState) {
       printf("I'm not sure how to '%s'?\n", command);
     }
   }
-
   free(command);
   free(argument);
 }
 
 int main(void) {
-
   // pointer to a location on heap storing an array of room pointers
   room_t **worldMap = malloc(sizeof(room_t *) * 25);
   building_t *huxley = initialiseBuilding(worldMap);
@@ -97,7 +95,6 @@ int main(void) {
 
   int choices = 0;
   while (choice != NEW_GAME && choice != LOAD_GAME && choice != QUIT) {
-
     printMenu((choices > 0));
     fgets(menuChoice, sizeof(menuChoice), stdin);
     choice = atoi(menuChoice);
@@ -105,24 +102,16 @@ int main(void) {
     switch (choice) {
     case QUIT:
       quit();
-
     case NEW_GAME:
       printPreparingGame();
-
       // TODO: validate huxley ptr
-
       playGame(playerState);
-
       break;
-
     case LOAD_GAME:
       printf("Enter the load file name: ");
-
       char fileName[100];
       fgets(fileName, sizeof(fileName), stdin);
-
       printf("File loaded: %s\n", fileName);
-
       int result = -1; // loadGame(fileName); // to be checked
       if (result == -1) {
         printf("File loading failed!\n");

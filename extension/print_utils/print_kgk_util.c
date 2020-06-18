@@ -1,316 +1,22 @@
 #include "print_util.h"
-
-#define CLEAR ("clear")
-
-void printPreparingGame(void) {
-
-  for (int i = 0; i < 32; i++) {
-    system(CLEAR);
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("                       Prepare for a new adventure...");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("                       ");
-    for (int j = 0; j < i; j++) {
-      printf("#");
-    }
-    for (int j = 30; j >= i; j--) {
-      printf("-");
-    }
-    printf("\n");
-    fflush(stdout);
-    usleep(70000);
-  }
-  printf("\n");
-  printf("\n");
-}
-
-void printMenu(bool isInvalid) {
-  system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("                          Welcome to the ICL Text Adventure!\n\n");
-  printf("                          What would you like to do?\n\n");
-  if (!isInvalid) {
-    usleep(500000);
-  }
-  fflush(stdout);
-  printf("                              [1] NEW GAME\n");
-  printf("                              [2] LOAD GAME\n");
-  printf("                              [3] QUIT\n");
-  printf("\n");
-  if (isInvalid) {
-    printf("                          You have entered an invalid choice\n");
-  } else {
-    printf("\n");
-  }
-  printf("\n");
-  printf("                          >> ");
-  return;
-}
-
-void printInvalid(void) {
-  printf("\n                            Invalid choice entered!\n");
-  usleep(800000);
-}
-
-// funcion to print Room position
-void printRoomPosition(room_t *room) {
-  switch (room->position) {
-  case NORTH:
-    printf("North ");
-    break;
-  case SOUTH:
-    printf("South ");
-    break;
-  case WEST:
-    printf("West ");
-    break;
-  case EAST:
-    printf("East ");
-    break;
-  case CENTRE:
-    printf("Central ");
-    break;
-  }
-}
-
-void printItemDetails(item_t **items) {
-  printf("                                                             ROOM "
-         "ITEMS\n");
-  printf("                                                             ");
-  for (int i = 0; i < ITEM_NUM; i++) {
-    if (items[i]) {
-      printf("%s ", items[i]->key);
-      printf("\n");
-      printf("                                                             ");
-    }
-  }
-}
-
-// function for printing out name of room
-void printRoomName(room_t *room1) {
-
-  switch (room1->current_room) {
-  case LOBBY:
-    printf("Lobby");
-    break;
-  case LAB:
-    printf("Lab");
-    break;
-  case HARRODS:
-    printf("Harrods");
-    break;
-  case FUSION:
-    printf("Fusion");
-    break;
-  case LECTURE_HALL:
-    printf("Room 340");
-    break;
-  }
-}
-
-// function for printing out names of adjacent rooms
-void printAdjacentRooms(room_t *room1) {
-  for (int i = 0; i < 5; i++) {
-    if (room1->adjacent_rooms[i]) {
-      printRoomPosition(room1->adjacent_rooms[i]);
-      printRoomName(room1->adjacent_rooms[i]);
-      printf("\n");
-      printf("                                                             ");
-    }
-  }
-}
-
-// function purely for testing ouptut of connect RoomName
-void printRoomDetails(room_t *room1) {
-  printRoomPosition(room1);
-  printRoomName(room1);
-  printf("Items in the room: ");
-  printItemDetails(room1->items);
-  printf("number of adjacent rooms: %d\n", room1->adjacent_room_count);
-  printf("adjacent rooms:\n");
-  printAdjacentRooms(room1);
-}
-
-// prints map of current and adjancent room on top right of terminal
-
-bool containsRoom(room_t *printedRooms[4], int size, room_t *room) {
-  for (int i = 0; i < size; i++) {
-    if (room->current_room == printedRooms[i]->current_room) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// traverses through all rooms and applies function pointer to each room
-void roomTraverser(room_t *entranceRoom, room_t *room1,
-                   void (*funcRooms)(room_t *)) {
-  if (room1 == NULL) {
-    return;
-  }
-  if (room1->adjacent_rooms != NULL) {
-    for (int i = 0; i < 5; i++) {
-      if (room1->adjacent_rooms[i]) {
-        if (room1->adjacent_rooms[i] != entranceRoom) {
-          roomTraverser(room1, room1->adjacent_rooms[i], funcRooms);
-        }
-      }
-    }
-  }
-  (*funcRooms)(room1);
-  printf("\n");
-}
-
-// prints details of all rooms in the building
-void printBuildingDetails(building_t *huxley) {
-  roomTraverser(NULL, huxley->startRoom, printRoomDetails);
-}
-
-//--------------------------Start of Player-----------------------------------
-
-void printCommmands(state *currentState) {
-  system(CLEAR);
-  printf("                    view map      ");
-  for (int i = 0; i < ITEM_NUM; i++) {
-    if (currentState->currentRoom->items[i]) {
-    }
-  }
-}
-
-void printHealth(state *currentState) {
-  for (int i = 0; i < currentState->player->health / 5; i++) {
-    printf("#");
-  }
-  for (int i = 20; i > currentState->player->health / 5; i--) {
-    printf("-");
-  }
-
-  printf("  %d", currentState->player->health);
-}
-
-void printCash(state *currentState) {
-  printf("HuxCoins: $%d", currentState->player->cash);
-}
-
-void printInventory(state *currentState) {
-  printf("                        ");
-  int printed = 0;
-  for (int i = 0; i < 6; i++) {
-    if (currentState->player->inventory[i]) {
-      if (printed != 0) {
-        printf("|");
-      }
-      printf(" %s ", currentState->player->inventory[i]->key);
-      printed++;
-    }
-  }
-  if (printed == 0) {
-    printf("EMPTY INVENTORY");
-  }
-  printf("\n");
-}
-
-char *getPropertyStr(Property property) {
-  for (int i = 1; i < PROPERTY_NUM; i++) {
-    if (propertyTable[i].value == property) {
-      return propertyTable[i].key;
-    }
-  }
-  return LOOKUP_FAILURE;
-}
-
-void printProperties(state *currentState, char *itemName) {
-  const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
-  if (!item || !currentState->player->inventory[item->name]) {
-    printf("%s is not in your inventory!\n", itemName);
-    return;
-  }
-  for (int i = 1; i <= MAX_PROPERTY; i <<= 1) {
-    if (hasProperty(i, item)) {
-      printf(" %s |", getPropertyStr(i));
-    }
-  }
-  printf("\n");
-}
-
-void printPlayer(state *currentState) {
-  printHealth(currentState);
-  printCash(currentState);
-  printInventory(currentState);
-}
-
-//--------------------------End of Player--------------------------------
-
-void printStateDetails(state *state1) {
-  system(CLEAR);
-  printf("\n");
-  // printing health
-  printHealth(state1);
-  printf("                                    CURRENT ROOM:\n");
-  // printing score
-  printf("Score:     %d", state1->profile.score);
-  printf("                                                 ");
-  // printing current room details
-  printRoomPosition(state1->currentRoom);
-  printRoomName(state1->currentRoom);
-  printf("\n");
-  // printing cash
-  printCash(state1);
-  printf("\n");
-
-  printf(
-      "                                                             ADJACENT "
-      "ROOMS:\n");
-  // printing adjacent rooms
-  printf("                                                             ");
-  printAdjacentRooms(state1->currentRoom);
-  printf("\n");
-  printItemDetails(state1->currentRoom->items);
-  int totalLines =
-      state1->currentRoom->adjacent_room_count + state1->currentRoom->itemCount;
-  for (int i = 0; i < (8 - totalLines); i++) {
-    printf("\n");
-  }
-  printInventory(state1);
-  printf("\n\n");
-}
-// TO BE MOVED:
-//-------------------------Konstantinos-----------------------------------------
+#include <stdio.h>
 
 void printRemaining(void) {
   printf("                                          YOU");
-  fflush(stdout);
+  FLUSH;
   printf("       HAVE");
-  fflush(stdout);
+  FLUSH;
   printf("       10");
-  fflush(stdout);
+  FLUSH;
   printf("       MINUTES");
-  fflush(stdout);
+  FLUSH;
   printf("      REMAINING");
-  fflush(stdout);
+  FLUSH;
 }
 
 void printKonstantinos(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -383,26 +89,15 @@ void printKonstantinos(void) {
   printf("                              _/_/_/                                 "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n\n\n");
 
-  // fflush(stdout);
+  // FLUSH;
   // sleep(3);
 }
 
 void printKonstantinosMouthOpen(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -481,21 +176,12 @@ void printKonstantinosMouthOpen(void) {
   printf("                              _/_/_/                                 "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n");
 }
 
 void printKonstantinosIndent(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -591,26 +277,15 @@ void printKonstantinosIndent(void) {
          "                                "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n\n\n");
 
-  // fflush(stdout);
+  // FLUSH;
   // sleep(3);
 }
 
 void printKonstantinosMouthOpenIndent(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -714,114 +389,29 @@ void printKonstantinosMouthOpenIndent(void) {
          "                                "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n");
 }
 
-// function for testing sleep() functions
 void printKonstantinosTalking(void) {
   for (int i = 0; i < 18; i++) {
     if (i % 6 == 0 || i % 6 == 1 || i % 6 == 2) {
       printKonstantinos();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
       printKonstantinosMouthOpen();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
     } else {
       printKonstantinosIndent();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
       printKonstantinosMouthOpenIndent();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
     }
   }
-}
-
-void view(state *currentState, char *argument) {
-  if (strcmp(argument, "room") == 0) {
-    printRoomDetails(currentState->currentRoom);
-  } else if (strcmp(argument, "inventory") == 0) {
-    printInventory(currentState);
-  } else if (strcmp(argument, "map") == 0) {
-    printMap(currentState);
-  }
-}
-
-void checkRoom(state *currentState, RoomName roomName, RoomPosition pos) {
-  if (currentState->currentRoom->current_room == roomName &&
-      currentState->currentRoom->position == pos) {
-    printf("X");
-  } else {
-    printf(" ");
-  }
-}
-
-void printMap(state *currentState) {
-  system(CLEAR);
-  printf("\n\n\n\n");
-  printf("                                 @@@@@@@@@                         "
-         "     \n");
-  printf("                                 @       @                         "
-         "     \n");
-  printf("                                 @   ");
-  checkRoom(currentState, LECTURE_HALL, NORTH);
-  printf("   @            \n");
-  printf("                                 @       @                         "
-         "   \n");
-  printf("                         @@@@@@@@@@@@@@@@@@@@@@@@@      \n");
-  printf("                         @       @       @       @              \n");
-  printf("                         @   ");
-  checkRoom(currentState, LECTURE_HALL, WEST);
-  printf("   @   ");
-  checkRoom(currentState, LECTURE_HALL, CENTRE);
-  printf("   @   ");
-  checkRoom(currentState, LECTURE_HALL, EAST);
-  printf("   @        \n");
-  printf("                         @       @       @       @                 "
-         "     \n");
-  printf("                         @@@@@@@@@@@@@@@@@@@@@@@@@                 "
-         "   \n");
-  printf("                                 @       @                         "
-         "     \n");
-  printf("                                 @   ");
-  checkRoom(currentState, LECTURE_HALL, SOUTH);
-  printf("   @                        \n");
-  printf("                                 @       @                         "
-         "     \n");
-  printf("               @@@@@@@@@         @@@@@@@@@       @@@@@@@@@       \n");
-  printf("               @       @         @       @       @       @    \n");
-  printf("               @   ");
-  checkRoom(currentState, LAB, NORTH);
-  printf("   @         @   ");
-  checkRoom(currentState, LOBBY, NORTH);
-  printf("   @       @   ");
-  checkRoom(currentState, FUSION, NORTH);
-  printf("   @       \n");
-  printf("               @       @         @       @       @       @   \n");
-  printf(" "
-         "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-         "@@@@\n");
-  printf(" @       @       @       @       @       @       @       @       @ "
-         "      @ \n");
-  printf(" @       @       @       @       @   X   @       @       @       @ "
-         "      @ \n");
-  printf(" @       @       @       @       @       @       @       @       @ "
-         "      @ \n");
-  printf(" "
-         "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-         "@@@@\n");
-  printf("                                 @       @                 \n");
-  printf("                                 @   X   @                 \n");
-  printf("                                 @       @                   \n");
-  printf("                                 @@@@@@@@@               \n");
 }

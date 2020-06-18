@@ -1,20 +1,18 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include <stdbool.h>
-
-typedef struct player_t player_t;
 
 #include "../../game_util.h"
+#include <stdbool.h>
 
 // Struct to store details about player;
-struct player_t {
+typedef struct {
   item_t **inventory;
   int itemCount;
   int health;
   int cash;
-};
+} player_t;
 
-extern player_t *initialisePlayer();
+extern player_t *initialisePlayer(void);
 extern bool moveRoom(state *currentState, char *dirName);
 extern bool pickUpItem(state *currentState, char *itemName);
 extern bool dropItem(state *currentState, char *itemName);

@@ -1,14 +1,12 @@
 #include "../../game_util.h"
 
 int roomItemTraversal(room_t *room, const item_t *item) {
-  if (!item) {
+  if (IS_NULL(item)) {
     return -1;
   }
   for (int i = 0; i < ITEM_NUM; i++) {
-    if (room->items[i]) {
-      if (room->items[i]->name == item->name) {
-        return i;
-      }
+    if (!IS_NULL(room->items[i]) && (room->items[i]->name == item->name)) {
+      return i;
     }
   }
   return -1;
@@ -16,14 +14,14 @@ int roomItemTraversal(room_t *room, const item_t *item) {
 
 int findSpace(room_t *room, const item_t *item) {
   for (int i = 0; i < ITEM_NUM; i++) {
-    if (!room->items[i]) {
+    if (IS_NULL(room->items[i])) {
       return i;
     }
   }
   return -1;
 }
 
-player_t *initialisePlayer() {
+player_t *initialisePlayer(void) {
   player_t *newPlayer = malloc(sizeof(*newPlayer));
   checkPtr(newPlayer);
   newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t));
@@ -34,10 +32,23 @@ player_t *initialisePlayer() {
   return newPlayer;
 }
 
+void freePlayer(player_t *player) {
+  // TODO: add a freeItem function
+  if (IS_NULL(player->inventory)) {
+    return;
+  }
+  for (int i = 0; i < player->itemCount; i++) {
+    free(player->inventory[i]);
+  }
+  free(player->inventory);
+  free(player);
+}
+
 bool pickUpItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   int index = roomItemTraversal(currentState->currentRoom, item);
-  if (index == -1 || !item || !currentState->currentRoom->items[index]) {
+  if (index == -1 || IS_NULL(item) ||
+      IS_NULL(currentState->currentRoom->items[index])) {
     printf("'%s' could not be found here!\n", itemName);
     return false;
   }
@@ -65,7 +76,7 @@ bool pickUpItem(state *currentState, char *itemName) {
 bool dropItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
   int index = findSpace(currentState->currentRoom, item);
-  if (!item || !currentState->player->inventory[item->name]) {
+  if (IS_NULL(item) || IS_NULL(currentState->player->inventory[item->name])) {
     printf("You do not have this item to drop: %s\n", itemName);
     return false;
   }
@@ -79,37 +90,37 @@ bool dropItem(state *currentState, char *itemName) {
 
 bool buyItem(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
-  if (!item) {
+  if (IS_NULL(item)) {
     printf("%s cannot be bought!\n", itemName);
     return false;
   }
   int index = roomItemTraversal(currentState->currentRoom, item);
-  if (index != FIND_FAIL) {
-    if (currentState->player->inventory[item->name]) {
-      printf("inventory is full\n");
-      return false;
-    }
-    if (currentState->player->cash < item->cost) {
-      printf("your a broke boy\n");
-      return false;
-    }
-    currentState->player->cash -= item->cost;
-    currentState->player->inventory[item->name] =
-        currentState->currentRoom->items[index];
-    currentState->currentRoom->items[index] = REMOVED;
-    return true;
+  if (index == FIND_FAIL) {
+    printf("sorry %s out of stock\n", itemName);
+    return false;
   }
-  printf("sorry %s out of stock\n", itemName);
-  return false;
+  if (currentState->player->inventory[item->name]) {
+    printf("inventory is full\n");
+    return false;
+  }
+  if (currentState->player->cash < item->cost) {
+    printf("you're a broke boy\n");
+    return false;
+  }
+  currentState->player->cash -= item->cost;
+  currentState->player->inventory[item->name] =
+      currentState->currentRoom->items[index];
+  currentState->currentRoom->items[index] = REMOVED;
+  return true;
 }
 
 bool hasItem(state *currentState, Item index) {
-  return currentState->player->inventory[index] != NULL;
+  return !IS_NULL(currentState->player->inventory[index]);
 }
 
 // TODO assigne macros
 bool validateAccess(state *currentState, int index) {
-  if (!currentState->currentRoom->adjacent_rooms[index]) {
+  if (IS_NULL(currentState->currentRoom->adjacent_rooms[index])) {
     return false;
   }
   if (currentState->currentRoom->current_room == LOBBY &&
@@ -138,11 +149,11 @@ bool moveRoom(state *currentState, char *dirName) {
 
 bool consume(state *currentState, char *itemName) {
   const item_t *item = itemLookup(gameItems, ITEM_NUM, itemName);
-  if (!item || !currentState->player->inventory[item->name]) {
+  if (IS_NULL(item) || IS_NULL(currentState->player->inventory[item->name])) {
     printf("You don't have '%s' to eat\n", itemName);
     return false;
   }
-  if (!hasProperty(EDIBLE, item)) {
+  if (IS_NULL(hasProperty(EDIBLE, item))) {
     printf("You can't eat that!\n");
     return false;
   }
