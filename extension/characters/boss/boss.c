@@ -4,21 +4,17 @@
 #include "../../emulateARM/emulateARM.h"
 #include "../player/player.h"
 #include "boss_constants.h"
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// dummy pre-processor function
-#define NULL_POINTER(pointer) (checkPtr(pointer))
-// dummy function
 static lookupBoss_t lookupBoss(const char *name) {
   for (int i = 0; i < BOSSES; i++) {
     if (strcmp(bossTable[i].key, name) == 0) {
       return bossTable[i];
     }
   }
-  assert(false);
+  return {NULL, NULL, NULL};
 }
 
 static passive_t *createPassive(const char **questions, const char **answers,
