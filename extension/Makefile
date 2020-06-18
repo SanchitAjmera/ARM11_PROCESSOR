@@ -14,10 +14,11 @@ game_util.o: game_util.h constants.h
 testme.o: game_util.h print_util.h
 emulateARM.o:
 libs:
+	cd ../src; make
 	cd characters; make
 	cd battle; make
 	cd emulateARM; make
-	cd ../src; make
+
 
 test:
 	./testme | grep ^T:
