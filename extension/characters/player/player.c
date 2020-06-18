@@ -5,10 +5,8 @@ int roomItemTraversal(room_t *room, const item_t *item) {
     return -1;
   }
   for (int i = 0; i < ITEM_NUM; i++) {
-    if (room->items[i]) {
-      if (room->items[i]->name == item->name) {
-        return i;
-      }
+    if (!IS_NULL(room->items[i]) && (room->items[i]->name == item->name)) {
+      return i;
     }
   }
   return -1;
@@ -16,7 +14,7 @@ int roomItemTraversal(room_t *room, const item_t *item) {
 
 int findSpace(room_t *room, const item_t *item) {
   for (int i = 0; i < ITEM_NUM; i++) {
-    if (!room->items[i]) {
+    if (IS_NULL(room->items[i])) {
       return i;
     }
   }
@@ -36,12 +34,13 @@ player_t *initialisePlayer(void) {
 
 void freePlayer(player_t *player) {
   // TODO: add a freeItem function
-  if (!IS_NULL(player->inventory)) {
-    for (int i = 0; i < player->itemCount; i++) {
-      free(player->inventory[i]);
-    }
-    free(player->inventory);
+  if (IS_NULL(player->inventory)) {
+    return;
   }
+  for (int i = 0; i < player->itemCount; i++) {
+    free(player->inventory[i]);
+  }
+  free(player->inventory);
   free(player);
 }
 
@@ -116,12 +115,12 @@ bool buyItem(state *currentState, char *itemName) {
 }
 
 bool hasItem(state *currentState, Item index) {
-  return currentState->player->inventory[index] != NULL;
+  return !IS_NULL(currentState->player->inventory[index]);
 }
 
 // TODO assigne macros
 bool validateAccess(state *currentState, int index) {
-  if (!currentState->currentRoom->adjacent_rooms[index]) {
+  if (IS_NULL(currentState->currentRoom->adjacent_rooms[index])) {
     return false;
   }
   if (currentState->currentRoom->current_room == LOBBY &&
