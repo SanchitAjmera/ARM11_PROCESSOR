@@ -3,15 +3,15 @@
 
 void printRemaining(void) {
   printf("                                          YOU");
-  fflush(stdout);
+  FLUSH;
   printf("       HAVE");
-  fflush(stdout);
+  FLUSH;
   printf("       10");
-  fflush(stdout);
+  FLUSH;
   printf("       MINUTES");
-  fflush(stdout);
+  FLUSH;
   printf("      REMAINING");
-  fflush(stdout);
+  FLUSH;
 }
 
 void printKonstantinos(void) {
@@ -91,7 +91,7 @@ void printKonstantinos(void) {
          "_/_/_/  \n");
   printf("\n\n\n\n\n\n\n\n");
 
-  // fflush(stdout);
+  // FLUSH;
   // sleep(3);
 }
 
@@ -279,7 +279,7 @@ void printKonstantinosIndent(void) {
          "_/_/_/  \n");
   printf("\n\n\n\n\n\n\n\n");
 
-  // fflush(stdout);
+  // FLUSH;
   // sleep(3);
 }
 
@@ -397,20 +397,20 @@ void printKonstantinosTalking(void) {
     if (i % 6 == 0 || i % 6 == 1 || i % 6 == 2) {
       printKonstantinos();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
       printKonstantinosMouthOpen();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
     } else {
       printKonstantinosIndent();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
       printKonstantinosMouthOpenIndent();
       printRemaining();
-      fflush(stdout);
+      FLUSH;
       usleep(300000);
     }
   }

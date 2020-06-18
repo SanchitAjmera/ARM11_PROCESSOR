@@ -15,7 +15,7 @@ void printPreparingGame(void) {
       printf("-");
     }
     printf("\n");
-    fflush(stdout);
+    FLUSH;
     usleep(70000);
   }
   printf("\n\n");
@@ -29,7 +29,7 @@ void printMenu(bool isInvalid) {
   if (!isInvalid) {
     usleep(500000);
   }
-  fflush(stdout);
+  FLUSH;
   printf("                              [1] NEW GAME\n");
   printf("                              [2] LOAD GAME\n");
   printf("                              [3] QUIT\n\n");

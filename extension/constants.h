@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#define FLUSH (fflush(stdout))
+
 // from game_util.c
 #define ROOM_POSITION_NUMBER (5)
 #define TOTAL_ITEM_COUNT (38)
