@@ -19,6 +19,8 @@ static bool playerWon(boss_t *boss, player_t *player) {
 }
 
 static void printAttack(const char *name, int damage, const char *attackName) {
+  usleep(100000);
+  fflush(stdout);
   printf("%s used '%s'...\n...and dealt %d damage!\n", name, attackName,
          damage);
 }
@@ -42,7 +44,15 @@ static void attackBoss(boss_t *boss, player_t *player, int damage,
 
 // player's turn in battle
 void playerTurn(boss_t *boss, player_t *player) {
-  attackBoss(boss, player, 1, "sanchizzle");
+  char *com = malloc(sizeof(char) * 30);
+  char *arg = malloc(sizeof(char) * 30);
+  getCommand(com, arg);
+  if (strcmp("attack", com) == 0) {
+    attackBoss(boss, player, 10, "your ICL computing powers");
+  } else {
+    printf("invalid attack");
+    return;
+  }
 }
 
 // boss's turn in battle
