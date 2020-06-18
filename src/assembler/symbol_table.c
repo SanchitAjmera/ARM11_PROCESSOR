@@ -58,9 +58,12 @@ void freeTable(symbol_table *s) {
 
 static int hash(const symbol_table *s, const char *key) {
   int index = PRIME_INIT;
-  for (int i = 0; i < strlen(key); i++) {
-    index = (index * PRIME_FACTOR) + key[i];
+  for (char *copy = key; *copy; copy++) {
+    index = (index * PRIME_FACTOR) + copy[0];
   }
+  // for (int i = 0; i < strlen(key); i++) {
+  //   index = (index * PRIME_FACTOR) + key[i];
+  // }
   return index % s->size;
 }
 
