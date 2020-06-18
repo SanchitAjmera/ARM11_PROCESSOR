@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 #define FLUSH (fflush(stdout))
+#define IS_NULL(pointer) (pointer == NULL)
 
 // from game_util.c
 #define ROOM_POSITION_NUMBER (5)

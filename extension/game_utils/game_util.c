@@ -41,7 +41,8 @@ int validatePtr(const void *ptr, char *message) {
 
 /* Checks for failed memory allocation */
 void checkPtr(const void *ptr) {
-  if (ptr == NULL) {
+  if (IS_NULL(ptr)) {
+    // TODO: save game
     printf("A memory error occurred. The game must end!");
     quit();
   }
@@ -49,11 +50,18 @@ void checkPtr(const void *ptr) {
 
 // converts a string to lowercase
 void lowercase(char *in) {
-  if (in) {
-    for (char *string = in; *string; string++) {
-      *string = tolower(*string);
-    }
+  if (IS_NULL(in)) {
+    return;
   }
+
+  for (int i = 0; i < strlen(in); i++) {
+    in[i] = tolower(in[i]);
+  }
+  // if (!IS_NULL(in)) {
+  //   for (char *string = in; *string; string++) {
+  //     *string = tolower(*string);
+  //   }
+  // }
 }
 
 // shows player their inventory of Items

@@ -5,10 +5,10 @@
 // traverses through all rooms and applies function pointer to each room
 void roomTraverser(room_t *entranceRoom, room_t *room1,
                    void (*funcRooms)(room_t *)) {
-  if (room1 == NULL) {
+  if (IS_NULL(room1)) {
     return;
   }
-  if (room1->adjacent_rooms != NULL) {
+  if (!IS_NULL(room1->adjacent_rooms)) {
     for (int i = 0; i < 5; i++) {
       if (room1->adjacent_rooms[i]) {
         if (room1->adjacent_rooms[i] != entranceRoom) {
@@ -59,7 +59,7 @@ void printRoomName(room_t *room1) {
     printf("Fusion");
     break;
   case LECTURE_HALL:
-    printf("Room 340");
+    printf("Room 308");
     break;
   }
 }

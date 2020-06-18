@@ -173,7 +173,7 @@ building_t *initialiseBuilding(room_t **out) {
 
 // frees room
 void freeRoom(room_t *entranceRoom, room_t *room1) {
-  if (room1 == NULL) {
+  if (IS_NULL(room1)) {
     return;
   }
 
@@ -199,7 +199,7 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
 
 // frees all the rooms in the building
 void freeBuilding(building_t *huxley) {
-  if (huxley == NULL) {
+  if (IS_NULL(huxley)) {
     return;
   }
   // calling recursive function to traverse through and free all the rooms

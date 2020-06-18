@@ -13,7 +13,7 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
     return -1;
   } else {
     FILE *file = fopen(fname, "rb");
-    if (file == NULL) {
+    if (IS_NULL(file)) {
       return -1;
     } else {
       // TODO: add error checking to each fread to ensure that the end of the
@@ -75,7 +75,7 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
    the player's state to the file. */
 int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
   FILE *fileOut = fopen(fname, "wb");
-  if (fileOut == NULL) {
+  if (IS_NULL(fileOut)) {
     printf("Something went wrong with the save file.");
     return -1;
   } else {
