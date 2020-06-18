@@ -37,6 +37,7 @@ static void attackPlayer(boss_t *boss, player_t *player, int damage,
 static void attackBoss(boss_t *boss, player_t *player, int damage,
                        const char *attackName) {
   if (IS_CRIT(rand())) {
+    prinf("        You start typing faster and get a damage buff!");
     damage *= CRIT_FACTOR;
   }
   FIGHT(boss) -= damage;
@@ -50,7 +51,7 @@ void playerTurn(boss_t *boss, player_t *player) {
   getCommand(com, arg);
   if (strcmp("attack", com) == 0) {
     // TODO: change magic number
-    attackBoss(boss, player, 10, "your ICL computing powers");
+    attackBoss(boss, player, player->attack, "buffer overflow attack");
   } else {
     printf("invalid attack");
     return;
@@ -84,8 +85,7 @@ void battle(boss_t *boss, player_t *player, bool correct) {
              "time!'\n",
              boss->name);
     }
-  }
-  if (correct) {
+  } else if (correct) {
     // player attacks boss
     playerTurn(boss, player);
   } else {
