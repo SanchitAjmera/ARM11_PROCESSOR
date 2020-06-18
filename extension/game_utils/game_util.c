@@ -53,9 +53,6 @@ void lowercase(char *in) {
   if (IS_NULL(in)) {
     return;
   }
-  // for (; *in; in++) {
-  //   *in = tolower(*in);
-  // }
   for (char *string = in; *string; string++) {
     *string = tolower(*string);
   }
