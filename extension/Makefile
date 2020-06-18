@@ -17,6 +17,7 @@ libs:
 	cd characters; make
 	cd battle; make
 	cd emulateARM; make
+	cd ../src; make
 
 test:
 	./testme | grep ^T:
@@ -29,3 +30,4 @@ clean:
 		cd characters; make clean
 		cd battle; make clean
 		cd emulateARM; make clean
+		cd ../src; make clean
