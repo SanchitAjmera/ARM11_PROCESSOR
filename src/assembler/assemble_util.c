@@ -38,12 +38,10 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
         char *label = strtok(line, ":");
-        symbol *labelSymbol = malloc(sizeof(*labelSymbol));
-        validatePtr(labelSymbol, "NULL pointer.");
-        symbol temp = {strptr(label), LABEL, 0,
-                       .body.address = output->lineCount * WORD_SIZE_BYTES};
-        *labelSymbol = temp;
-        addSymbol(symbolTable, labelSymbol);
+        symbol labelSymbol = {strptr(label), LABEL, 0,
+                              .body.address =
+                                  output->lineCount * WORD_SIZE_BYTES};
+        addSymbol(symbolTable, &labelSymbol);
         isLabel = true;
         break;                         // Line contains only one label
       } else if (lineCopy[i] == '=') { // Line contains an =0x expression
@@ -71,11 +69,8 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   for (int i = 0; i < expressions->lineCount; i++) {
     char *expr = expressions->lines[i];
     word address = (output->lineCount + i) * WORD_SIZE_BYTES;
-    symbol *exprSymbol = malloc(sizeof(*exprSymbol));
-    validatePtr(exprSymbol, "Null pointer.");
-    symbol temp = {strptr(expr), LABEL, 0, .body.address = address};
-    *exprSymbol = temp;
-    addSymbol(symbolTable, exprSymbol);
+    symbol exprSymbol = {strptr(expr), LABEL, 0, .body.address = address};
+    addSymbol(symbolTable, &exprSymbol);
   }
 
   // Add expressions to the end of the file
