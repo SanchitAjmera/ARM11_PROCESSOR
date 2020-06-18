@@ -1,5 +1,5 @@
-#include "../src/common/util.h"
-#include "characters/boss/boss.h"
+#include "../../src/common/util.h"
+#include "../characters/boss/boss.h"
 #include "game_util.h"
 
 /* loadGameState takes in a filename, a pointer to an uninitialised state,

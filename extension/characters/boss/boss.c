@@ -1,7 +1,8 @@
 #include "boss.h"
 #include "../../../src/common/util.h"
 #include "../../battle/battle.h"
-#include "../../emulateARM/emulateARM.h"
+#include "../../emulate_ARM/emulate_ARM.h"
+#include "../../game_utils/game_util.h"
 #include "../player/player.h"
 #include "boss_constants.h"
 #include <assert.h>

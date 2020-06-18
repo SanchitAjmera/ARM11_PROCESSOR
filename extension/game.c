@@ -1,5 +1,5 @@
-#include "game_util.h"
-#include "print_util.h"
+#include "game_utils/game_util.h"
+#include "print_utils/print_util.h"
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>

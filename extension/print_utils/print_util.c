@@ -1,5 +1,5 @@
 #include "print_util.h"
-#include "game_util.h"
+#include "../game_utils/game_util.h"
 #include <stdio.h>
 
 void printPreparingGame(void) {

@@ -1,4 +1,4 @@
-#include "../../game_util.h"
+#include "../../game_utils/game_util.h"
 
 int roomItemTraversal(room_t *room, const item_t *item) {
   if (IS_NULL(item)) {
@@ -153,7 +153,7 @@ bool consume(state *currentState, char *itemName) {
     printf("You don't have '%s' to eat\n", itemName);
     return false;
   }
-  if (IS_NULL(hasProperty(EDIBLE, item))) {
+  if (!hasProperty(EDIBLE, item)) {
     printf("You can't eat that!\n");
     return false;
   }

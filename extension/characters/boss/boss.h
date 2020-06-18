@@ -2,7 +2,7 @@
 #define BOSS_H
 typedef struct boss_t boss_t;
 
-#include "../../game_util.h"
+#include "../../game_utils/game_util.h"
 #include "../player/player.h"
 #include "boss_constants.h"
 #include <stdbool.h>

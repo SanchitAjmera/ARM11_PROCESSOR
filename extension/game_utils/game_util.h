@@ -3,8 +3,9 @@
 
 typedef struct item_t item_t;
 typedef struct state state;
-#include "characters/boss/boss.h"
-#include "characters/player/player.h"
+#include "../characters/boss/boss.h"
+#include "../characters/player/player.h"
+#include "../constants.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -209,8 +210,8 @@ static const item_t gameItems[] = {
 extern building_t *initialiseBuilding(room_t **out);
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
-extern item_t *initialiseItem(ItemIndex gameItemID);
 extern void freeState(state *state1);
+extern item_t *initialiseItem(ItemIndex gameItemID);
 extern void quit();
 extern bool hasProperty(Property property, const item_t *item);
 extern int lookup(const pair_t table[], const int size, const char *key);
@@ -222,5 +223,8 @@ extern int loadGameState(const char *fname, state *playerState,
                          room_t **worldMap);
 extern int saveGameState(const char *fname, state *playerState,
                          room_t **worldMap);
+extern void randomiseArray(int randArray[], int length, int randMax);
+extern void getCommand(char *command, char *argument);
+extern char *reduceCommand(char *argument);
 
 #endif
