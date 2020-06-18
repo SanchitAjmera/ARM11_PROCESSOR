@@ -1,7 +1,6 @@
 #ifndef BATTLE_CONSTANTS_H
 #define BATTLE_CONSTANTS_H
 
-#define FIGHT(boss) (boss->state->fighting)
 #define BOSS_LOW_HEALTH(boss) (FIGHT(boss)->maxHealth * 0.25)
 #define CRIT_FACTOR (2)
 #define CRIT_CHANCE (8)
