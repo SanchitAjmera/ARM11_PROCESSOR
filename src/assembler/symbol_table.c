@@ -59,7 +59,7 @@ static int hash(const symbol_table *s, const char *key) {
 symbol *getSymbol(const symbol_table *s, const char *name) {
   int index1 = hash(s, name);
   int size = s->symbols[index1][0].collisions;
-  if (size > 1) {
+  if (size >= 1) {
     for (int i = 0; i < size; i++) {
       if (!strcmp(s->symbols[index1][i].name, name)) {
         return s->symbols[index1] + i;
