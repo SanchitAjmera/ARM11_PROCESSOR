@@ -1,4 +1,5 @@
 #include "game_util.h"
+#include "../src/common/util.h"
 #include "characters/boss/boss.h"
 #include <assert.h>
 #include <ctype.h>
@@ -36,12 +37,13 @@
 #define BOSSKGK ("konstantinos")
 #define BOSSTONY ("tony")
 
+/*
 char *strptr(const char *in) {
   char *out = malloc(sizeof(char) * (strlen(in) + 1));
   checkPtr(out);
   strcpy(out, in);
   return out;
-}
+} */
 
 // converts a string to lowercase
 void lowercase(char *in) {
@@ -60,13 +62,14 @@ void checkPtr(const void *ptr) {
   }
 }
 
+/*
 int validatePtr(const void *ptr, char *message) {
   if (ptr == NULL) {
     printf("Error: %s", message);
     return -1;
   }
   return 0;
-}
+} */
 
 /* loadGameState takes in a filename, a pointer to an uninitialised state,
    and an array of pointers to every room in the game.
@@ -188,7 +191,7 @@ const item_t *itemLookup(const item_t table[], const int size,
   }
   return LOOKUP_FAILURE;
 }
-
+/*
 // general lookup
 int lookup(const pair_t table[], const int size, const char *key) {
   for (int i = 0; i < size; i++) {
@@ -197,7 +200,7 @@ int lookup(const pair_t table[], const int size, const char *key) {
     }
   }
   return -1;
-}
+} */
 
 // Checks if an item has a certain property
 bool hasProperty(Property property, const item_t *item) {

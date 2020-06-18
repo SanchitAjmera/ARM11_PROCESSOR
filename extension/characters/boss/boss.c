@@ -1,5 +1,7 @@
 #include "boss.h"
+#include "../../../src/common/util.h"
 #include "../../battle/battle.h"
+#include "../../emulateARM/emulateARM.h"
 #include "../player/player.h"
 #include "boss_constants.h"
 #include <assert.h>
@@ -105,8 +107,34 @@ void initBattle(boss_t *boss, player_t *player) {
 // takes in the user's input for the answer
 static char *getAnswer(void) {
   // TODO: get answer from user as input
+  bool takeInput = true;
+  resizable_string *code = newString();
+
+  char *input = malloc(sizeof(char) * 50);
+  while (takeInput) {
+    printf("                     >> ");
+    fgets(input, sizeof(char) * 50, stdin);
+
+    // Check if "END" was typed in
+    char *inputCopy = strptr(input);
+    char *token = strtok(inputCopy, " \n");
+    if (!strcmp(token, "END")) {
+      takeInput = false;
+      free(inputCopy);
+      break;
+    }
+    free(inputCopy);
+
+    appendToString(code, input);
+  }
+  // printf("%s\n", code->value);
+  char *output = runCode(code->value);
+  printf("%s", output);
+
+  freeString(code);
+  free(input);
   printf(">");
-  return "";
+  return output;
 }
 
 void processResult(boss_t *boss, player_t *player, int correct) {
