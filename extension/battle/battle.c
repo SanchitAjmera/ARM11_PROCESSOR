@@ -1,6 +1,7 @@
 #include "battle.h"
 #include "../../src/common/util.h"
 #include "../characters/boss/boss.h"
+#include "../characters/boss/boss_constants.h"
 #include "../characters/player/player.h"
 #include "battle_constants.h"
 #include <stdbool.h>
