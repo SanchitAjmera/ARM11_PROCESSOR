@@ -23,16 +23,10 @@ typedef struct {
   const int maxHealth;
 } aggressive_t;
 
-typedef struct {
-  passive_t *teaching;
-  aggressive_t *fighting;
-} state_t;
-
 struct boss_t {
   const char *name;
-  // default: true
-  bool isPassive;
-  state_t *state;
+  passive_t *teaching;
+  aggressive_t *fighting;
 };
 
 typedef struct {
