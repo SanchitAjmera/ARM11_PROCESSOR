@@ -7,6 +7,8 @@
 #include <string.h>
 
 #define LOAD_FACTOR (0.75)
+#define PRIME_INIT (7)
+#define PRIME_FACTOR (31)
 
 symbol *newSymbol(void) {
   symbol *s = malloc(sizeof(symbol));
@@ -55,9 +57,9 @@ void freeTable(symbol_table *s) {
 }
 
 static int hash(const symbol_table *s, const char *key) {
-  int index = 7;
+  int index = PRIME_INIT;
   for (int i = 0; i < strlen(key); i++) {
-    index = (index * 31) + key[i];
+    index = (index * PRIME_FACTOR) + key[i];
   }
   return index % s->size;
 }
@@ -123,6 +125,8 @@ void addSymbol(symbol_table *s, symbol *entry) {
   s->symbols[index1][0].collisions++;
   rehash(s);
 }
+
+// TODO: delete functions
 
 // dummy functions for compilation
 
