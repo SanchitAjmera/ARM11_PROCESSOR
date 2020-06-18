@@ -17,34 +17,43 @@ static lookupBoss_t lookupBoss(const char *name) {
   return {NULL, NULL, NULL};
 }
 
-static passive_t *createPassive(const char **questions, const char **answers,
-                                int num) {
-  passive_t *passive = malloc(sizeof(*passive));
-  checkPtr(passive);
+static aggressive_t *createAggressive(const char *name) {
+  aggressive_t *aggressive = malloc(sizeof(*aggressive));
+  checkPtr(aggressive);
   checkPtr(questions);
   checkPtr(answers);
-  passive->questions = questions;
-  passive->answers = answers;
+  if (strcmp(name, "Tony")) {
+    aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
+                               TONY_ATTACK_NAME, TONY_SPECIAL_NAME,
+                               TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
+    boss->fighting = &tonyBattle;
+  } else {
+    aggressive_t kgkBattle = {KGK_ATTACK,       KGK_SPECIAL,    KGK_ATTACK_NAME,
+                              KGK_SPECIAL_NAME, KGK_MAX_HEALTH, KGK_MAX_HEALTH};
+    boss->fighting = &kgkBattle;
+  }
+  return aggressive;
+}
+
+static passive_t *createPassive(const char **questions, const char **answers) {
+  passive_t *passive = malloc(sizeof(*passive));
+  checkPtr(passive);
+  checkPtr(table.questions);
+  checkPtr(answers);
+  passive->questions = table.questions;
+  passive->answers = table.answers;
   passive->num = MAX_QUESTIONS;
   return passive;
 }
 
 // function to create and initialise a pointer to boss_t on the heap
-static boss_t *initBoss(const char *name) {
-  boss_t *boss = malloc(sizeof(*boss));
-  checkPtr(boss);
-  checkPtr(name);
-  boss->name = name;
-  boss->teaching = NULL;
-  boss->fighting = NULL;
-  return boss;
-}
-
 boss_t *createBoss(const char *name) {
   // PRE: name is one of the pre-defined bosses
-  lookupBoss_t table = lookupBoss(name);
-  boss_t *boss = initBoss(table.key);
-  boss->teaching = createPassive(table.questions, table.answers, MAX_QUESTIONS);
+  boss_t *boss = malloc(sizeof(*boss));
+  checkPtr(boss);
+  boss->name = table.key;
+  boss->teaching = createPassive(table.questions, table.answers);
+  boss->fighting = createAggressive(name);
   return boss;
 }
 
@@ -125,7 +134,6 @@ static void processResult(boss_t *boss, player_t *player, bool correct) {
   // boss attacks player if incorrect
   else {
     printf("%s gets aggravated due to your incorrect answer...\n", boss->name);
-    // printf("%s says: mitigations won't save you this time!\n", boss->name);
   }
   battle(boss, player);
 }
@@ -134,7 +142,6 @@ static void processResult(boss_t *boss, player_t *player, bool correct) {
 static void quiz(boss_t *boss, player_t *player) {
   // PRE: boss->teaching has been initialised
   bool correct = false;
-  initBattle(boss, player, correct);
   printf("Wild %s appeared!\n%s starts asking you assembly questions!\n",
          boss->name, boss->name);
   srand(time(NULL));
