@@ -19,10 +19,10 @@ static bool playerWon(boss_t *boss, player_t *player) {
 }
 
 static void printAttack(const char *name, int damage, const char *attackName) {
-  usleep(100000);
+  usleep(1000000);
   fflush(stdout);
-  printf("%s used '%s'...\n...and dealt %d damage!\n", name, attackName,
-         damage);
+  printf("        %s used '%s'...\n        ...and dealt %d damage!\n", name,
+         attackName, damage);
 }
 
 // deals damage to the player
@@ -60,7 +60,7 @@ static void bossTurn(boss_t *boss, player_t *player) {
   int damage;
   const char *name;
   if (FIGHT(boss)->health < BOSS_LOW_HEALTH(boss)) {
-    printf("%s is enraged...\n", boss->name);
+    printf("            %s is enraged...\n", boss->name);
     damage = FIGHT(boss)->special;
     name = FIGHT(boss)->specialName;
   } else {
@@ -71,8 +71,24 @@ static void bossTurn(boss_t *boss, player_t *player) {
 }
 
 // function to start the battle with the boss
-void battle(boss_t *boss, player_t *player) {
+void battle(boss_t *boss, player_t *player, bool correct) {
   // PRE: boss->fighting has been initialised
+  if (correct) {
+    if (!battleOver(boss, player)) {
+      playerTurn(boss, player);
+    }
+    if (playerWon(boss, player)) {
+      printf("            you defeated %s \n", boss->name);
+    }
+  } else {
+    if (!battleOver(boss, player)) {
+      bossTurn(boss, player);
+    }
+    if (player->health <= 0) {
+      printf("          you were killed by %s\n", boss->name);
+    }
+  }
+  /*
   while (!battleOver(boss, player)) {
     playerTurn(boss, player);
     bossTurn(boss, player);
@@ -82,4 +98,5 @@ void battle(boss_t *boss, player_t *player) {
   } else {
     // TODO: game over message
   }
+  */
 }
