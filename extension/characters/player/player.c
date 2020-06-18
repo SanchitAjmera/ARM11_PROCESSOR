@@ -1,4 +1,4 @@
-#include "../../game_util.h"
+#include "../../game_utils/game_util.h"
 
 int roomItemTraversal(room_t *room, const item_t *item) {
   if (IS_NULL(item)) {
@@ -71,6 +71,8 @@ bool pickUpItem(state *currentState, char *itemName) {
     printf("%s has been picked up\n", itemName);
   }
   return true;
+  currentState->currentRoom->itemCount -= 1;
+  currentState->player->itemCount += 1;
 }
 
 bool dropItem(state *currentState, char *itemName) {
@@ -84,6 +86,8 @@ bool dropItem(state *currentState, char *itemName) {
       currentState->player->inventory[item->name];
   currentState->player->inventory[item->name] = REMOVED;
   printf("%s has been dropped!\n", itemName);
+  currentState->currentRoom->itemCount += 1;
+  currentState->player->itemCount -= 1;
 
   return true;
 }
@@ -111,6 +115,8 @@ bool buyItem(state *currentState, char *itemName) {
   currentState->player->inventory[item->name] =
       currentState->currentRoom->items[index];
   currentState->currentRoom->items[index] = REMOVED;
+  currentState->currentRoom->itemCount -= 1;
+  currentState->player->itemCount += 1;
   return true;
 }
 
@@ -153,7 +159,7 @@ bool consume(state *currentState, char *itemName) {
     printf("You don't have '%s' to eat\n", itemName);
     return false;
   }
-  if (IS_NULL(hasProperty(EDIBLE, item))) {
+  if (!hasProperty(EDIBLE, item)) {
     printf("You can't eat that!\n");
     return false;
   }

@@ -1,3 +1,6 @@
+#include "item_util.h"
+#include "../../src/common/util.h"
+#include "game_util.h"
 
 /* Returns respective int value; -1 for failure */
 const item_t *itemLookup(const item_t table[], const int size,

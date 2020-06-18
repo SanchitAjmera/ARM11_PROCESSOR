@@ -1,7 +1,7 @@
 #ifndef PRINT_UTIL_H
 #define PRINT_UTIL_H
 
-#include "game_util.h"
+#include "../game_utils/game_util.h"
 
 extern void printRoomName(room_t *room1);
 extern void printAdjacentRooms(room_t *room1);
@@ -20,5 +20,8 @@ extern void view(state *currentState, char *argument);
 extern void printPreparingGame(void);
 extern void printInvalid(void);
 extern void printMap(state *currentState);
-
+extern char *getPropertyStr(Property property);
+extern void printCash(state *currentState);
+extern void printHealth(state *currentState);
+extern void printRoomPosition(room_t *room);
 #endif

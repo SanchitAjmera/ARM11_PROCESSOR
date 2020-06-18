@@ -1,5 +1,5 @@
-#include "game_util.h"
-#include "print_util.h"
+#include "game_utils/game_util.h"
+#include "print_utils/print_util.h"
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -83,10 +83,12 @@ void playGame(state *currentState) {
 }
 
 int main(void) {
+  // giveRoomDescriptions(worldMap, descriptionTable);
   // pointer to a location on heap storing an array of room pointers
   room_t **worldMap = malloc(sizeof(room_t *) * 25);
   building_t *huxley = initialiseBuilding(worldMap);
   state *playerState = initialiseState(huxley->startRoom);
+
   // state *playerState = malloc(sizeof(state));
   saveGameState("sanchizzle", playerState, worldMap);
   // loadGameState("sanchizzle", playerState, worldMap);
