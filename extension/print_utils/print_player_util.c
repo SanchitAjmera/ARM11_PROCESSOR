@@ -19,10 +19,6 @@ void printHealth(state *currentState) {
   printf("  %d", currentState->player->health);
 }
 
-void printCash(state *currentState) {
-  printf("HuxCoins: $%d", currentState->player->cash);
-}
-
 void printInventory(state *currentState) {
   printf("                        ");
   int printed = 0;
@@ -39,15 +35,6 @@ void printInventory(state *currentState) {
     printf("EMPTY INVENTORY");
   }
   printf("\n");
-}
-
-char *getPropertyStr(Property property) {
-  for (int i = 1; i < PROPERTY_NUM; i++) {
-    if (propertyTable[i].value == property) {
-      return propertyTable[i].key;
-    }
-  }
-  return LOOKUP_FAILURE;
 }
 
 void printProperties(state *currentState, char *itemName) {
