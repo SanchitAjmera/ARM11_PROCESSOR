@@ -83,11 +83,12 @@ void playGame(state *currentState) {
 }
 
 int main(void) {
+  // giveRoomDescriptions(worldMap, descriptionTable);
   // pointer to a location on heap storing an array of room pointers
   room_t **worldMap = malloc(sizeof(room_t *) * 25);
   building_t *huxley = initialiseBuilding(worldMap);
   state *playerState = initialiseState(huxley->startRoom);
-  //  giveRoomDescriptions(worldMap, descriptionTable);
+
   // state *playerState = malloc(sizeof(state));
   saveGameState("sanchizzle", playerState, worldMap);
   // loadGameState("sanchizzle", playerState, worldMap);

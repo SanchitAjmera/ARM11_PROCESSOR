@@ -1,3 +1,4 @@
+#include "room_util.h"
 #include "../../src/common/util.h"
 #include "game_util.h"
 #include "item_util.h"
