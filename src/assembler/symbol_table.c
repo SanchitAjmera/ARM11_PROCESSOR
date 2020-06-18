@@ -112,11 +112,9 @@ static void rehash(symbol_table *s) {
 
 void addSymbol(symbol_table *s, symbol *entry) {
   symbol *check = getSymbol(s, entry->name);
-  if (check->name != NULL) {
-    if (!strcmp(check->name, entry->name)) {
-      // label already defined
-      return;
-    }
+  if (check->name != NULL && (strcmp(check->name, entry->name) == 0)) {
+    // label already defined
+    return;
   }
   int index1 = hash(s, entry->name);
   int size = s->symbols[index1][0].collisions;
