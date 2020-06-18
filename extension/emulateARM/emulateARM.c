@@ -127,8 +127,10 @@ char *runCode(const char *code) {
         parseLine(symbolTable, codeLines->lines[i], i * WORD_SIZE_BYTES);
     // Load the word lineParsed into memory byte by byte
     if (lineParsed == 0) {
-      printf("not a valid input");
+      printf("            not a valid input");
+      break;
     }
+
     for (int j = 0; j < WORD_SIZE_BYTES; j++) {
       armState->memory[i * WORD_SIZE_BYTES + j] = lineParsed >> BYTE * j;
     }
