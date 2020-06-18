@@ -37,7 +37,7 @@ static void attackPlayer(boss_t *boss, player_t *player, int damage,
 static void attackBoss(boss_t *boss, player_t *player, int damage,
                        const char *attackName) {
   if (IS_CRIT(rand())) {
-    prinf("        You start typing faster and get a damage buff!");
+    prinf(PLAYER_CRIT_MSG);
     damage *= CRIT_FACTOR;
   }
   FIGHT(boss) -= damage;
@@ -50,10 +50,19 @@ void playerTurn(boss_t *boss, player_t *player) {
   char *arg = malloc(sizeof(char) * 30);
   getCommand(com, arg);
   if (strcmp("attack", com) == 0) {
-    // TODO: change magic number
-    attackBoss(boss, player, player->attack, "buffer overflow attack");
+    int damage;
+    const char *name;
+    if (player->health < PLAYER_LOW_HEALTH(player)) {
+      printf(PLAYER_SPECIAL_ATTACK_MSG);
+      damage = player->attack * 1.5;
+      name = PLAYER_SPECIAL_NAME;
+    } else {
+      damage = player->attack;
+      name = PLAYER_ATTACK_NAME;
+    }
+    attackBoss(boss, player, damage, name);
   } else {
-    printf("invalid attack");
+    printf(INVALID_ATTACK_MSG);
     return;
   }
 }
@@ -63,7 +72,7 @@ static void bossTurn(boss_t *boss, player_t *player) {
   int damage;
   const char *name;
   if (FIGHT(boss)->health < BOSS_LOW_HEALTH(boss)) {
-    printf("            %s is enraged...\n", boss->name);
+    printf(BOSS_SPECIAL_ATTACK_MSG, boss->name);
     damage = FIGHT(boss)->special;
     name = FIGHT(boss)->specialName;
   } else {
@@ -73,17 +82,21 @@ static void bossTurn(boss_t *boss, player_t *player) {
   attackPlayer(boss, player, damage, name);
 }
 
+static void playerDefeated(boss_t *boss) {
+  printf("          you were killed by %s\n", boss->name);
+  printf("          %s laughs and says 'mitigations couldn't save you this "
+         "time!'\n",
+         boss->name);
+}
+
 // function to start the battle with the boss
 void battle(boss_t *boss, player_t *player, bool correct) {
   // PRE: boss->fighting has been initialised
   if (battleOver(boss, player)) {
     if (playerWon(boss, player)) {
-      printf("            you defeated %s \n", boss->name);
+      printf(BOSS_DEFEATED_MSG, boss->name);
     } else {
-      printf("          you were killed by %s\n", boss->name);
-      printf("          %s laughs and says 'mitigations couldn't save you this "
-             "time!'\n",
-             boss->name);
+      playerDefeated(boss);
     }
   } else if (correct) {
     // player attacks boss
