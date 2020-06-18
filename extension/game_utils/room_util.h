@@ -7,8 +7,8 @@ static const char *descriptionTable[] = {
     "Every game needs a spawn point right?",
     "There's a DOCSOC notice board but that should be the least of your "
     "worries ",
-    "This leads to the empty LAB.",
     "This stairway leads to the LECTURE HALL.",
+    "This leads to the empty LAB.",
     "The begginning of the end...",
     "The screens are red... prepare yourself for a LEXIS test ",
     "Just some dusty computers.",
