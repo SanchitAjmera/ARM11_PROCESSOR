@@ -3,6 +3,7 @@
 #include "../../src/assembler/assemble_util.h"
 #include "../../src/assembler/symbol_table.h"
 #include "../../src/common/constants.h"
+#include "../../src/common/util.h"
 #include "../../src/emulator/decode/emulate_decode.h"
 #include "../../src/emulator/emulate_util.h"
 #include "../../src/emulator/execute/emulate_execute.h"
@@ -109,7 +110,7 @@ static void firstPass(const char *code, symbol_table *symbolTable,
 /* Returns the register values as a result of running the user's code,
     line by line. Takes in the entirety of the code, with each line
     separated by a newline \n */
-char **runCode(const char *code) {
+char *runCode(const char *code) {
   arm_t *armState = malloc(sizeof(arm_t));
   initialiseArm(armState);
 
@@ -140,27 +141,31 @@ char **runCode(const char *code) {
   }
 
   // Construct the output strings
-  char **output = malloc(sizeof(char *) * NUM_REGISTERS);
+  resizable_string *output = newString();
   for (int i = 0; i < NUM_REGISTERS; i++) {
-    output[i] = malloc(sizeof(char) * 32);
+    char printLine[32];
     if (i == PC) {
-      sprintf(output[i], "PC  : %10s (0x%s)\n", "??", "????????");
+      sprintf(printLine, "PC  : %10s (0x%s)\n", "N/A", "????????");
     } else if (i == CPSR) {
-      sprintf(output[i], "CPSR: %10i (0x%08x)\n", armState->registers[i],
+      sprintf(printLine, "CPSR: %10i (0x%08x)\n", armState->registers[i],
               armState->registers[i]);
     } else {
-      sprintf(output[i], "R%-3i: %10i (0x%08x)\n", i, armState->registers[i],
+      sprintf(printLine, "R%-3i: %10i (0x%08x)\n", i, armState->registers[i],
               armState->registers[i]);
     }
+    appendToString(output, printLine);
   }
+
+  char *outputValue = strptr(output->value);
 
   free(armState->memory);
   free(armState->registers);
   free(armState);
   free(decoded);
+  freeString(output);
   freeTable(symbolTable);
   freeFileLines(codeLines);
-  return output;
+  return outputValue;
 }
 
 void freeOutput(char **output) {

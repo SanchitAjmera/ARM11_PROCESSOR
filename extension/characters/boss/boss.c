@@ -128,14 +128,13 @@ static char *getAnswer(void) {
     appendToString(code, input);
   }
   // printf("%s\n", code->value);
-  char **output = runCode(code->value);
-  printOutput(output);
+  char *output = runCode(code->value);
+  printf("%s", output);
 
-  freeOutput(output);
   freeString(code);
   free(input);
   printf(">");
-  return "";
+  return output;
 }
 
 void processResult(boss_t *boss, player_t *player, int correct) {
@@ -165,4 +164,17 @@ void quiz(boss_t *boss, player_t *player) {
     }
   }
   processResult(boss, player, correct);
+}
+
+void fight(state *currentState, char *boss) {
+
+  if (!currentState->currentRoom->boss) {
+    printf("          No Boss in da house, go to Central Lab...\n");
+    return;
+  }
+  if (strcmp(boss, currentState->currentRoom->boss->name)) {
+    printf("there is no boss by that name ");
+    return;
+  }
+  quiz(currentState->currentRoom->boss, currentState->player);
 }

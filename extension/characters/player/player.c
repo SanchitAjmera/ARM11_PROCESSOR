@@ -103,13 +103,31 @@ bool buyItem(state *currentState, char *itemName) {
   return false;
 }
 
+bool hasItem(state *currentState, Item index) {
+  return currentState->player->inventory[index] != NULL;
+}
+
+// TODO assigne macros
+bool validateAccess(state *currentState, int index) {
+  if (!currentState->currentRoom->adjacent_rooms[index]) {
+    return false;
+  }
+  if (currentState->currentRoom->current_room == LOBBY &&
+      currentState->currentRoom->adjacent_rooms[index]->current_room == LAB &&
+      currentState->currentRoom->adjacent_rooms[index]->position == EAST) {
+    return hasItem(currentState, PASS);
+  }
+  // valid
+  return true;
+}
+
 bool moveRoom(state *currentState, char *dirName) {
   int direction = lookup(directionTable, DIR_NUM, dirName);
   if (direction == -1) {
     printf("'%s' is not a valid direction!\n", dirName);
     return false;
   }
-  if (currentState->currentRoom->adjacent_rooms[direction]) {
+  if (validateAccess(currentState, direction)) {
     currentState->currentRoom =
         currentState->currentRoom->adjacent_rooms[direction];
     return true;
@@ -139,8 +157,4 @@ bool consume(state *currentState, char *itemName) {
   }
   currentState->player->inventory[item->name] = REMOVED;
   return true;
-}
-
-bool hasItem(state *currentState, Item index) {
-  return currentState->player->inventory[index] != NULL;
 }

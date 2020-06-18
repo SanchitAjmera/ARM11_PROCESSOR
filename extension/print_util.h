@@ -19,4 +19,5 @@ void printInventory(state *currentState);
 void view(state *currentState, char *argument);
 void printPreparingGame(void);
 void printInvalid(void);
+void printMap(state *currentState);
 #endif

@@ -182,6 +182,15 @@ void printBuildingDetails(building_t *huxley) {
 
 //--------------------------Start of Player-----------------------------------
 
+void printCommmands(state *currentState) {
+  system(CLEAR);
+  printf("                    view map      ");
+  for (int i = 0; i < ITEM_NUM; i++) {
+    if (currentState->currentRoom->items[i]) {
+    }
+  }
+}
+
 void printHealth(state *currentState) {
   for (int i = 0; i < currentState->player->health / 5; i++) {
     printf("#");
@@ -271,7 +280,11 @@ void printStateDetails(state *state1) {
   printAdjacentRooms(state1->currentRoom);
   printf("\n");
   printItemDetails(state1->currentRoom->items);
-  printf("\n\n\n\n\n");
+  int totalLines =
+      state1->currentRoom->adjacent_room_count + state1->currentRoom->itemCount;
+  for (int i = 0; i < (8 - totalLines); i++) {
+    printf("\n");
+  }
   printInventory(state1);
   printf("\n\n");
 }
@@ -739,5 +752,76 @@ void view(state *currentState, char *argument) {
     printRoomDetails(currentState->currentRoom);
   } else if (strcmp(argument, "inventory") == 0) {
     printInventory(currentState);
+  } else if (strcmp(argument, "map") == 0) {
+    printMap(currentState);
   }
+}
+
+void checkRoom(state *currentState, RoomName roomName, RoomPosition pos) {
+  if (currentState->currentRoom->current_room == roomName &&
+      currentState->currentRoom->position == pos) {
+    printf("X");
+  } else {
+    printf(" ");
+  }
+}
+
+void printMap(state *currentState) {
+  system(CLEAR);
+  printf("\n\n\n\n");
+  printf("                                 @@@@@@@@@                         "
+         "     \n");
+  printf("                                 @       @                         "
+         "     \n");
+  printf("                                 @   ");
+  checkRoom(currentState, LECTURE_HALL, NORTH);
+  printf("   @            \n");
+  printf("                                 @       @                         "
+         "   \n");
+  printf("                         @@@@@@@@@@@@@@@@@@@@@@@@@      \n");
+  printf("                         @       @       @       @              \n");
+  printf("                         @   ");
+  checkRoom(currentState, LECTURE_HALL, WEST);
+  printf("   @   ");
+  checkRoom(currentState, LECTURE_HALL, CENTRE);
+  printf("   @   ");
+  checkRoom(currentState, LECTURE_HALL, EAST);
+  printf("   @        \n");
+  printf("                         @       @       @       @                 "
+         "     \n");
+  printf("                         @@@@@@@@@@@@@@@@@@@@@@@@@                 "
+         "   \n");
+  printf("                                 @       @                         "
+         "     \n");
+  printf("                                 @   ");
+  checkRoom(currentState, LECTURE_HALL, SOUTH);
+  printf("   @                        \n");
+  printf("                                 @       @                         "
+         "     \n");
+  printf("               @@@@@@@@@         @@@@@@@@@       @@@@@@@@@       \n");
+  printf("               @       @         @       @       @       @    \n");
+  printf("               @   ");
+  checkRoom(currentState, LAB, NORTH);
+  printf("   @         @   ");
+  checkRoom(currentState, LOBBY, NORTH);
+  printf("   @       @   ");
+  checkRoom(currentState, FUSION, NORTH);
+  printf("   @       \n");
+  printf("               @       @         @       @       @       @   \n");
+  printf(" "
+         "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+         "@@@@\n");
+  printf(" @       @       @       @       @       @       @       @       @ "
+         "      @ \n");
+  printf(" @       @       @       @       @   X   @       @       @       @ "
+         "      @ \n");
+  printf(" @       @       @       @       @       @       @       @       @ "
+         "      @ \n");
+  printf(" "
+         "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+         "@@@@\n");
+  printf("                                 @       @                 \n");
+  printf("                                 @   X   @                 \n");
+  printf("                                 @       @                   \n");
+  printf("                                 @@@@@@@@@               \n");
 }
