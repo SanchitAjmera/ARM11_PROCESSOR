@@ -103,27 +103,26 @@ void initBattle(boss_t *boss, player_t *player) {
 static char *getAnswer(void) {
   bool takeInput = true;
   resizable_string *code = newString();
+  char *input;
   int size = sizeof(*input) * MAX_LINE_CHARACTERS;
-  char *input = malloc(size);
+  *input = malloc(size);
   checkPtr(input);
   while (takeInput) {
     printf("                     >> ");
-    fgets(input, size, stdin);
+    fgets(input, size - 1, stdin);
     // Check if "END" was typed in
-    char *inputCopy = strptr(input);
-    char *token = strtok(inputCopy, " \n");
+    char *copy = strptr(input);
+    char *token = strtok(copy, " \n");
+    free(copy);
     if (strcmp(token, "END") == 0) {
       takeInput = false;
-      free(inputCopy);
-      break;
+    } else {
+      appendToString(code, input);
     }
-    free(inputCopy);
-    appendToString(code, input);
   }
   // printf("%s\n", code->value);
   char *output = runCode(code->value);
   printf("%s\n", output);
-
   freeString(code);
   free(input);
   return output;
