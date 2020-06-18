@@ -91,7 +91,9 @@ void randomiseArray(int randArray[], int length, int randMax) {
 // randomly places Items in room
 void randomlyPlaceItems(item_t *items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
+  checkPtr(randomCashLocations);
   int *randomPearLocations = malloc(sizeof(int) * TOTAL_PEAR_COUNT);
+  checkPtr(randomPearLocations);
   checkPtr(randomCashLocations);
   checkPtr(randomPearLocations);
   // array for random locations of apples and cash
@@ -153,12 +155,12 @@ state *initialiseState(room_t *initialRoom) {
   initialState->player = initialisePlayer();
   initialState->currentRoom = initialRoom;
   char *username = malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
+  malloc(username);
   strcpy(username, "sanchit");
   // scanf("%s\n", username);
   initialState->profile.username = username;
   initialState->profile.character = UTA;
   initialState->profile.score = 0;
-
   return initialState;
 }
 

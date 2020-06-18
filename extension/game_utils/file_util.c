@@ -27,12 +27,14 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
       /* Load player's username */
       playerState->profile.username =
           malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
+      checkPtr(playerState->profile.username);
       fread(playerState->profile.username, sizeof(char), USERNAME_CHAR_LIMIT,
             file);
 
       /* Load inventory */
       int itemCount = playerState->player->itemCount;
       playerState->player->inventory = calloc(ITEM_NUM, sizeof(item_t));
+      checkPtr(playerState->player->inventory);
       for (int i = 0; i < itemCount; i++) {
         ItemIndex gameItemID;
         fread(&gameItemID, sizeof(ItemIndex), 1, file);

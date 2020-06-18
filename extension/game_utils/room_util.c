@@ -43,10 +43,8 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   // allocates memory to room and adjacent room array
   room_t *room = malloc(sizeof(*room));
   checkPtr(room);
-
   room->current_room = current_room;
   room->position = initial_position;
-
   room->adjacent_room_count = 0;
   room->adjacent_rooms = malloc(sizeof(room_t) * 10);
   checkPtr(room->adjacent_rooms);
