@@ -21,7 +21,7 @@ static bool playerWon(boss_t *boss, player_t *player) {
 
 static void printAttack(const char *name, int damage, const char *attackName) {
   usleep(1000000);
-  fflush(stdout);
+  FLUSH;
   printf("        %s used '%s'...\n        ...and dealt %d damage!\n", name,
          attackName, damage);
 }
@@ -49,6 +49,7 @@ void playerTurn(boss_t *boss, player_t *player) {
   char *arg = malloc(sizeof(char) * 30);
   getCommand(com, arg);
   if (strcmp("attack", com) == 0) {
+    // TODO: change magic number
     attackBoss(boss, player, 10, "your ICL computing powers");
   } else {
     printf("invalid attack");
@@ -74,30 +75,21 @@ static void bossTurn(boss_t *boss, player_t *player) {
 // function to start the battle with the boss
 void battle(boss_t *boss, player_t *player, bool correct) {
   // PRE: boss->fighting has been initialised
-  if (correct) {
-    if (!battleOver(boss, player)) {
-      playerTurn(boss, player);
-    }
+  if (battleOver(boss, player)) {
     if (playerWon(boss, player)) {
       printf("            you defeated %s \n", boss->name);
-    }
-  } else {
-    if (!battleOver(boss, player)) {
-      bossTurn(boss, player);
-    }
-    if (player->health <= 0) {
+    } else {
       printf("          you were killed by %s\n", boss->name);
+      printf("          %s laughs and says 'mitigations couldn't save you this "
+             "time!'\n",
+             boss->name);
     }
   }
-  /*
-  while (!battleOver(boss, player)) {
+  if (correct) {
+    // player attacks boss
     playerTurn(boss, player);
+  } else {
+    // boss attacks player
     bossTurn(boss, player);
   }
-  if (playerWon(boss, player)) {
-    // TODO: game over message
-  } else {
-    // TODO: game over message
-  }
-  */
 }
