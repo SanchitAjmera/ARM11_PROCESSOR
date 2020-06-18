@@ -51,5 +51,6 @@
 #define TOTAL_ROOM_COUNT (25)
 #define COMMAND_NUM (12)
 #define DIR_NUM (4)
+#define DESCRIPTION_SIZE (200)
 
 #endif

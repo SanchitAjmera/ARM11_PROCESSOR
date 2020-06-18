@@ -51,49 +51,7 @@ typedef enum { NONE, EDIBLE, VALUABLE = 2, BUYABLE = 4 } Property;
 // enum for room
 typedef enum { LOBBY, LAB, LECTURE_HALL, FUSION, HARRODS } RoomName;
 
-/* LOBBY -> {"The begginning of the end...",
-             "This leads to the empty LAB."
-             "This stairway leads to the LECTURE HALL."
-              "Just a plain wall.",
-              "There's a DOCSOC notice board but that should be the least of
-               your worries."
-              (Centre) "Every game needs a spawn point right?"}
-LAB -> {"The screens are red... prepare yourself for a LEXIS
-        test!",
-        "Just some dusty computers.",
-        "You see a computer running Windows and the sight nearly blinds you with
-        disgust!",
-        "You see printers, shame they never work.",
-        "A DOCSOC social event poster... you choose to ignore it.",
-        "Just more computer screens..."}
-LECTURE HALL -> {"Huxley 308 is quiet... a bit too quiet.",
-                 "Just empty seats...",
-                 "There's crisp packets underneath the seats.",
-                 "You see the bars on the windows... reminds you why no one
-                 likes Huxley.",
-                 "You see board pens that aren't feint... a truely rare item in
-                 Huxley!",
-                 "The stairway to the back of the lecture hall."}
-
-FUSION -> {"Pot noodles... a life support for any student. Replenish your
-           health here!".
-           "You see the sofas in the JCR. It reminds you to rest (save)".
-           "There's a broken vending machine - wait for part II to use.",
-           "The food on display looks wonderful... shame you can't eat it all.",
-           "You see the imperial gift shop. Maybe you should buy an Imperial
-            hoodie? ... On second thought, maybe not.",
-           ""}
-
-HARRODS -> {"Cosmetic DLC coming soon!",
-            "Gucci belt on sale!",
-            "You see Fredo through a window, eating pasta.",
-            "You see a Supreme coat to battle the coldness.",
-            "You see the ugliest top but its stat buffs are amazing! Come back
-            when the devs have implemented a gear system.",
-            "Just some more over priced clothing..."}
-
-
-*/
+// SOUTH EAST WEST NORTH CENTRE
 
 // enum for character type
 typedef enum { BATMAN, UTA } Character;
@@ -190,8 +148,8 @@ static const item_t gameItems[] = {
     {"cash", CASH, 4, VALUABLE,
      "Cash. I wonder what I could buy around here..."},
     {"pass", PASS, 5, VALUABLE, "You shall not pass"},
-    {"apple", FOOD, 6, (BUYABLE | EDIBLE),
-     "Pay 5 HuxCoins to get an apple! (Health += 5)", 5},
+    {"Pot Noodles", FOOD, 6, (BUYABLE | EDIBLE),
+     "Pay 5 HuxCoins to get some Pot Noodles! (Health += 5)", 5},
     {"tesco meal deal", FOOD, 7, (BUYABLE | EDIBLE),
      "Pay 20 HuxCoins for a Tesco meal deal! (Health += 20)", 20},
     {"coffee", FOOD, 8, (BUYABLE | EDIBLE),
@@ -208,6 +166,8 @@ static const item_t gameItems[] = {
      "Support da movement with a free BLM badge!", 0}};
 
 extern building_t *initialiseBuilding(room_t **out);
+// extern void giveRoomDescriptions(room_t *rooms[], const char
+// *descriptions[]);
 extern void freeBuilding(building_t *huxley);
 extern state *initialiseState(room_t *initialRoom);
 extern void freeState(state *state1);
@@ -223,8 +183,8 @@ extern int loadGameState(const char *fname, state *playerState,
                          room_t **worldMap);
 extern int saveGameState(const char *fname, state *playerState,
                          room_t **worldMap);
-extern void randomiseArray(int randArray[], int length, int randMax);
-extern void getCommand(char *command, char *argument);
-extern char *reduceCommand(char *argument);
-
+extern void randomlyPlaceItems(item_t *items[], room_t *rooms[]);
+extern void placeBuyableItems(item_t *items[], room_t *rooms[]);
+extern void getCommand(char *com, char *arg);
+extern char *reduceCommand(char *arg);
 #endif

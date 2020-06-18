@@ -24,5 +24,4 @@ extern char *getPropertyStr(Property property);
 extern void printCash(state *currentState);
 extern void printHealth(state *currentState);
 extern void printRoomPosition(room_t *room);
-
 #endif

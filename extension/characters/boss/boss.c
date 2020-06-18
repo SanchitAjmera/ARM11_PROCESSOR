@@ -104,7 +104,7 @@ static char *getAnswer(void) {
   resizable_string *code = newString();
   char *input;
   int size = sizeof(*input) * MAX_LINE_CHARACTERS;
-  *input = malloc(size);
+  input = malloc(size);
   checkPtr(input);
   while (takeInput) {
     printf("                     >> ");

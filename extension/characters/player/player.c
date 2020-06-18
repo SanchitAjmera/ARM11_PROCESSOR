@@ -71,6 +71,8 @@ bool pickUpItem(state *currentState, char *itemName) {
     printf("%s has been picked up\n", itemName);
   }
   return true;
+  currentState->currentRoom->itemCount -= 1;
+  currentState->player->itemCount += 1;
 }
 
 bool dropItem(state *currentState, char *itemName) {
@@ -84,6 +86,8 @@ bool dropItem(state *currentState, char *itemName) {
       currentState->player->inventory[item->name];
   currentState->player->inventory[item->name] = REMOVED;
   printf("%s has been dropped!\n", itemName);
+  currentState->currentRoom->itemCount += 1;
+  currentState->player->itemCount -= 1;
 
   return true;
 }
@@ -111,6 +115,8 @@ bool buyItem(state *currentState, char *itemName) {
   currentState->player->inventory[item->name] =
       currentState->currentRoom->items[index];
   currentState->currentRoom->items[index] = REMOVED;
+  currentState->currentRoom->itemCount -= 1;
+  currentState->player->itemCount += 1;
   return true;
 }
 
