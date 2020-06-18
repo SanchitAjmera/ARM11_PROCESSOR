@@ -16,6 +16,14 @@ void current_room() {}
 // possibly a map (like the lego land map)
 void display_rooms() {}
 
+// generates array of random numbers
+void randomiseArray(int randArray[], int length, int randMax) {
+  srand(time(NULL));
+  for (int i = 0; i < length; i++) {
+    randArray[i] = rand() % randMax;
+  }
+}
+
 // randomly places Items in room
 void randomlyPlaceItems(item_t *items[], room_t *rooms[]) {
   int *randomCashLocations = malloc(sizeof(int) * TOTAL_CASH_COUNT);
