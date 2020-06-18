@@ -4,6 +4,10 @@
 #define FLUSH (fflush(stdout))
 #define IS_NULL(pointer) (pointer == NULL)
 
+// from game.c
+#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
+#define IS_EMPTY(string) (!strcmp(string, ""))
+
 // from game_util.c
 #define ROOM_POSITION_NUMBER (5)
 #define TOTAL_ITEM_COUNT (38)
