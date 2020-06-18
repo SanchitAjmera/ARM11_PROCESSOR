@@ -89,18 +89,21 @@ static void rehash(symbol_table *s) {
   }
   symbol **symbols = createSymbols(s->symbolCount, sizeof(*symbols));
   int index = 0;
-  symbol temp = {NULL, LABEL, 0, .body.assembleFunc = NULL};
+  // overwrites the hash table make it 'empty'
+  symbol reset = {NULL, LABEL, 0, .body.assembleFunc = NULL};
   for (int i = 0; i < s->size; i++) {
     for (int j = 0; j < s->symbols[i][0].collisions; j++) {
       symbols[index++][0] = s->symbols[i][j];
-      s->symbols[i][j] = temp;
+      s->symbols[i][j] = reset;
     }
+    // re sizing the collision list back to 1
+    s->symbols[i] = realloc(s->symbols[i], sizeof(*s->symbols));
+    validatePtr(s->symbols[i]);
   }
-  // freeSymbols(s->symbols, s->size);
   s->size *= 2;
   s->symbols = realloc(s->symbols, sizeof(*s->symbols) * s->size);
+  validatePtr(s->symbols);
   addSymbols(s, symbols, s->symbolCount);
-  // freeSymbols(symbols, s->symbolCount);
   free(symbols);
 }
 
@@ -112,7 +115,6 @@ void addSymbol(symbol_table *s, symbol *entry) {
       return;
     }
   }
-
   int index1 = hash(s, entry->name);
   int size = s->symbols[index1][0].collisions;
   if (size >= 1) {
