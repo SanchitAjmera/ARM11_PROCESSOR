@@ -7,52 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SINGLE(type) (type == SKIP || type == HELP || type == EXIT)
-#define IS_EMPTY(string) (!strcmp(string, ""))
-
-char *reduceCommand(char *argument) {
-  if (IS_EMPTY(argument)) {
-    return argument;
-  }
-  char *reduced = malloc(sizeof(argument));
-  strcpy(reduced, argument);
-  reduced = strtok(reduced, " ");
-  return reduced;
-}
-
-void getCommand(char *command, char *argument) {
-  char input[30];
-  printf("         >> ");
-  fgets(input, sizeof(input), stdin);
-
-  // obtain user input
-  char *comm = strtok(input, " ");
-  char *args = strtok(NULL, "\n");
-
-  // remove trailing new line characters
-  comm = strtok(comm, "\n");
-
-  // Make both into lowercase
-  lowercase(comm);
-  lowercase(args);
-
-  // Copy results into given pointers
-  if (!comm) {
-    strcpy(command, "skip");
-    return;
-  }
-  strcpy(command, comm);
-
-  if (!args) {
-    strcpy(argument, "");
-    return;
-  }
-  while (isspace(*args)) {
-    args++;
-  }
-  strcpy(argument, args);
-}
-
 void playGame(state *currentState) {
   printStateDetails(currentState);
   bool play = true;
