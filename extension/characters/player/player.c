@@ -23,7 +23,7 @@ int findSpace(room_t *room, const item_t *item) {
   return -1;
 }
 
-player_t *initialisePlayer() {
+player_t *initialisePlayer(void) {
   player_t *newPlayer = malloc(sizeof(*newPlayer));
   checkPtr(newPlayer);
   newPlayer->inventory = calloc(ITEM_NUM, sizeof(item_t));
@@ -32,6 +32,17 @@ player_t *initialisePlayer() {
   newPlayer->cash = INITIAL_CASH;
   newPlayer->itemCount = 0;
   return newPlayer;
+}
+
+void freePlayer(player_t *player) {
+  // TODO: add a freeItem function
+  if (player->inventory != NULL) {
+    for (int i = 0; i < player->itemCount; i++) {
+      free(player->inventory[i]);
+    }
+    free(player->inventory);
+  }
+  free(player);
 }
 
 bool pickUpItem(state *currentState, char *itemName) {
