@@ -1,15 +1,19 @@
+#include "../src/common/util.h"
+#include "characters/boss/boss.h"
+#include "game_util.h"
+
 /* loadGameState takes in a filename, a pointer to an uninitialised state,
    and an array of pointers to every room in the game.
    If such file does not exist or cannot be opened, return -1.
    Otherwise, it writes the file's contents to the state. */
 int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
-  assert(playerState);
+  // PRE: playerState is not NULL
   if (access(fname, F_OK) == -1) { // File does not exist
     printf("File does not exist.\n");
     return -1;
   } else {
     FILE *file = fopen(fname, "rb");
-    if (!file) {
+    if (file == NULL) {
       return -1;
     } else {
       // TODO: add error checking to each fread to ensure that the end of the
@@ -71,8 +75,8 @@ int loadGameState(const char *fname, state *playerState, room_t **worldMap) {
    the player's state to the file. */
 int saveGameState(const char *fname, state *playerState, room_t **worldMap) {
   FILE *fileOut = fopen(fname, "wb");
-  if (!fileOut) {
-    printf("Something went wrong with the save g, idk wagwaan.");
+  if (fileOut == NULL) {
+    printf("Something went wrong with the save file.");
     return -1;
   } else {
     // Save state
