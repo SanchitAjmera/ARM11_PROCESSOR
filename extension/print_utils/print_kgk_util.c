@@ -16,11 +16,7 @@ void printRemaining(void) {
 
 void printKonstantinos(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -93,14 +89,7 @@ void printKonstantinos(void) {
   printf("                              _/_/_/                                 "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n\n\n");
 
   // fflush(stdout);
   // sleep(3);
@@ -108,11 +97,7 @@ void printKonstantinos(void) {
 
 void printKonstantinosMouthOpen(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -191,21 +176,12 @@ void printKonstantinosMouthOpen(void) {
   printf("                              _/_/_/                                 "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n");
 }
 
 void printKonstantinosIndent(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -301,14 +277,7 @@ void printKonstantinosIndent(void) {
          "                                "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n\n\n");
 
   // fflush(stdout);
   // sleep(3);
@@ -316,11 +285,7 @@ void printKonstantinosIndent(void) {
 
 void printKonstantinosMouthOpenIndent(void) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n");
   printf("                                                               \n");
   printf("                                                               \n");
   printf("                                                               \n");
@@ -424,15 +389,9 @@ void printKonstantinosMouthOpenIndent(void) {
          "                                "
          "            "
          "_/_/_/  \n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n");
 }
 
-// function for testing sleep() functions
 void printKonstantinosTalking(void) {
   for (int i = 0; i < 18; i++) {
     if (i % 6 == 0 || i % 6 == 1 || i % 6 == 2) {
