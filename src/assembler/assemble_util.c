@@ -81,7 +81,9 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
 
 word assemble(symbol_table *symbolTable, instruction input) {
   symbol *instrSymbol = getSymbol(symbolTable, input.opcode);
-  assert(instrSymbol != NULL);
+  if (!instrSymbol) {
+    return 0;
+  }
   word binLine;
   if (instrSymbol->type == INSTR) {
     binLine = instrSymbol->body.assembleFunc(symbolTable, input);

@@ -17,6 +17,7 @@ libs:
 	cd characters; make
 	cd battle; make
 
+
 test:
 	./testme | grep ^T:
 

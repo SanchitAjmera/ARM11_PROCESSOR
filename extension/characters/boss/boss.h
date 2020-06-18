@@ -37,8 +37,12 @@ typedef struct {
 } lookupBoss_t;
 
 // variables for KGK boss
-static const char *kgkQuestions[MAX_QUESTIONS] = {"", "", "", "", ""};
-static const char *kgkAnswers[MAX_QUESTIONS] = {"", "", "", "", ""};
+static const char *kgkQuestions[MAX_QUESTIONS] = {
+    "move 69 into register 1", "move 69 into register 1",
+    "move 69 into register 1", "move 69 into register 1",
+    "move 69 into register 1"};
+static const char *kgkAnswers[MAX_QUESTIONS] = {
+    "mov r1, #69", "mov r1, #69", "mov r1, #69", "mov r1, #69", "mov r1, #69"};
 // static aggressive_t kgkBattle = {KGK_ATTACK,      KGK_SPECIAL,
 //                                        KGK_ATTACK_NAME, KGK_SPECIAL_NAME,
 //                                        KGK_MAX_HEALTH,  KGK_MAX_HEALTH};

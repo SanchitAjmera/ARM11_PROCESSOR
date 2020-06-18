@@ -13,8 +13,6 @@ typedef struct state state;
 #include <time.h>
 #include <unistd.h>
 
-// enum for position in rooms
-
 // enum for
 typedef enum {
   PEAR_INDEX = 0,

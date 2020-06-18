@@ -105,4 +105,5 @@ void battle(boss_t *boss, player_t *player, bool correct) {
     // boss attacks player
     bossTurn(boss, player);
   }
+  */
 }

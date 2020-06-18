@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 static lookupBoss_t lookupBoss(const char *name) {
   for (int i = 0; i < BOSSES; i++) {
@@ -157,6 +158,7 @@ static void quiz(boss_t *boss, player_t *player) {
   if (strcmp(input, correctInput) == 0) {
     correct = true;
   }
+
   processResult(boss, player, correct);
 }
 
