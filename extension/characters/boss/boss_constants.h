@@ -3,6 +3,7 @@
 
 #define MIN_QUESTIONS_CORRECT (3)
 #define MAX_QUESTIONS (5)
+#define MAX_LINE_CHARACTERS (50)
 #define BOSSES (2)
 #define KGK_ATTACK (15)
 #define KGK_SPECIAL (25)

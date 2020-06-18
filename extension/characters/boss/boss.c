@@ -101,25 +101,23 @@ void initBattle(boss_t *boss, player_t *player) {
 
 // takes in the user's input for the answer
 static char *getAnswer(void) {
-  // TODO: get answer from user as input
   bool takeInput = true;
   resizable_string *code = newString();
-
-  char *input = malloc(sizeof(char) * 50);
+  int size = sizeof(*input) * MAX_LINE_CHARACTERS;
+  char *input = malloc(size);
+  checkPtr(input);
   while (takeInput) {
     printf("                     >> ");
-    fgets(input, sizeof(char) * 50, stdin);
-
+    fgets(input, size, stdin);
     // Check if "END" was typed in
     char *inputCopy = strptr(input);
     char *token = strtok(inputCopy, " \n");
-    if (!strcmp(token, "END")) {
+    if (strcmp(token, "END") == 0) {
       takeInput = false;
       free(inputCopy);
       break;
     }
     free(inputCopy);
-
     appendToString(code, input);
   }
   // printf("%s\n", code->value);
@@ -180,7 +178,6 @@ void quiz(boss_t *boss, player_t *player) {
 }
 
 void fight(state *currentState, char *boss) {
-
   if (!currentState->currentRoom->boss) {
     printf("          No Boss in da house, go to Central Lab...\n");
     return;
