@@ -29,6 +29,7 @@ passive_t *createPassive(const char **questions, const char **answers,
   NULL_POINTER(answers);
   passive->questions = questions;
   passive->answers = answers;
+  passive->num = MAX_QUESTIONS;
   return passive;
 }
 
