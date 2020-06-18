@@ -1,6 +1,7 @@
 #include "battle.h"
 #include "../../src/common/util.h"
 #include "../characters/boss/boss.h"
+#include "../characters/boss/boss_constants.h"
 #include "../characters/player/player.h"
 #include "battle_constants.h"
 #include <stdbool.h>
@@ -19,8 +20,10 @@ static bool playerWon(boss_t *boss, player_t *player) {
 }
 
 static void printAttack(const char *name, int damage, const char *attackName) {
-  printf("%s used '%s'...\n...and dealt %d damage!\n", name, attackName,
-         damage);
+  usleep(1000000);
+  FLUSH;
+  printf("        %s used '%s'...\n        ...and dealt %d damage!\n", name,
+         attackName, damage);
 }
 
 // deals damage to the player
@@ -34,6 +37,7 @@ static void attackPlayer(boss_t *boss, player_t *player, int damage,
 static void attackBoss(boss_t *boss, player_t *player, int damage,
                        const char *attackName) {
   if (IS_CRIT(rand())) {
+    prinf(PLAYER_CRIT_MSG);
     damage *= CRIT_FACTOR;
   }
   FIGHT(boss) -= damage;
@@ -42,7 +46,25 @@ static void attackBoss(boss_t *boss, player_t *player, int damage,
 
 // player's turn in battle
 void playerTurn(boss_t *boss, player_t *player) {
-  attackBoss(boss, player, 1, "sanchizzle");
+  char *com = malloc(sizeof(char) * 30);
+  char *arg = malloc(sizeof(char) * 30);
+  getCommand(com, arg);
+  if (strcmp("attack", com) == 0) {
+    int damage;
+    const char *name;
+    if (player->health < PLAYER_LOW_HEALTH(player)) {
+      printf(PLAYER_SPECIAL_ATTACK_MSG);
+      damage = player->attack * 1.5;
+      name = PLAYER_SPECIAL_NAME;
+    } else {
+      damage = player->attack;
+      name = PLAYER_ATTACK_NAME;
+    }
+    attackBoss(boss, player, damage, name);
+  } else {
+    printf(INVALID_ATTACK_MSG);
+    return;
+  }
 }
 
 // boss's turn in battle
@@ -50,7 +72,7 @@ static void bossTurn(boss_t *boss, player_t *player) {
   int damage;
   const char *name;
   if (FIGHT(boss)->health < BOSS_LOW_HEALTH(boss)) {
-    printf("%s is enraged...\n", boss->name);
+    printf(BOSS_SPECIAL_ATTACK_MSG, boss->name);
     damage = FIGHT(boss)->special;
     name = FIGHT(boss)->specialName;
   } else {
@@ -60,16 +82,27 @@ static void bossTurn(boss_t *boss, player_t *player) {
   attackPlayer(boss, player, damage, name);
 }
 
+static void playerDefeated(boss_t *boss) {
+  printf("          you were killed by %s\n", boss->name);
+  printf("          %s laughs and says 'mitigations couldn't save you this "
+         "time!'\n",
+         boss->name);
+}
+
 // function to start the battle with the boss
-void battle(boss_t *boss, player_t *player) {
+void battle(boss_t *boss, player_t *player, bool correct) {
   // PRE: boss->fighting has been initialised
-  while (!battleOver(boss, player)) {
+  if (battleOver(boss, player)) {
+    if (playerWon(boss, player)) {
+      printf(BOSS_DEFEATED_MSG, boss->name);
+    } else {
+      playerDefeated(boss);
+    }
+  } else if (correct) {
+    // player attacks boss
     playerTurn(boss, player);
-    bossTurn(boss, player);
-  }
-  if (playerWon(boss, player)) {
-    // TODO: game over message
   } else {
-    // TODO: game over message
+    // boss attacks player
+    bossTurn(boss, player);
   }
 }

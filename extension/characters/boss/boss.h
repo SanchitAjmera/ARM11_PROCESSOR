@@ -23,16 +23,10 @@ typedef struct {
   const int maxHealth;
 } aggressive_t;
 
-typedef union {
-  passive_t *teaching;
-  aggressive_t *fighting;
-} state_t;
-
 struct boss_t {
   const char *name;
-  // default: true
-  bool isPassive;
-  state_t *state;
+  passive_t *teaching;
+  aggressive_t *fighting;
 };
 
 typedef struct {
@@ -60,16 +54,17 @@ static const lookupBoss_t bossTable[] = {
     {"tony", tonyQuestions, tonyAnswers}};
 
 extern boss_t *createBoss(const char *name);
-// for testing
-extern passive_t *createPassive(const char **questions, const char **answers,
-                                int num);
-extern boss_t *initBoss(const char *name);
-extern void freeBossFighting(aggressive_t *aggressive);
-extern void freeBossTeaching(passive_t *passive);
 extern void freeBoss(boss_t *boss);
-extern void initBattle(boss_t *boss, player_t *player);
-extern void processResult(boss_t *boss, player_t *player, int correct);
-extern void quiz(boss_t *boss, player_t *player);
 extern void fight(state *currentState, char *boss);
+
+// FOR boss_test.c
+// extern passive_t *createPassive(const char **questions, const char **answers,
+//                                 int num);
+// extern boss_t *initBoss(const char *name);
+// extern void freeBossFighting(aggressive_t *aggressive);
+// extern void freeBossTeaching(passive_t *passive);
+// extern void initBattle(boss_t *boss, player_t *player);
+// extern void processResult(boss_t *boss, player_t *player, int correct);
+// extern void quiz(boss_t *boss, player_t *player);
 
 #endif
