@@ -1,5 +1,5 @@
 #include "print_util.h"
-#include "game_util.h"
+#include "../game_utils/game_util.h"
 #include <stdio.h>
 
 void printPreparingGame(void) {
@@ -82,9 +82,10 @@ void printStateDetails(state *state1) {
   printItemDetails(state1->currentRoom->items);
   int totalLines =
       state1->currentRoom->adjacent_room_count + state1->currentRoom->itemCount;
-  for (int i = 0; i < (8 - totalLines); i++) {
+  for (int i = 0; i < (10 - totalLines); i++) {
     printf("\n");
   }
+  printf("%s\n", state1->currentRoom->description);
   printInventory(state1);
   printf("\n\n");
 }

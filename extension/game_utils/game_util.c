@@ -1,6 +1,6 @@
 #include "game_util.h"
-#include "../src/common/util.h"
-#include "characters/boss/boss.h"
+#include "../../src/common/util.h"
+#include "../characters/boss/boss.h"
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
@@ -192,7 +192,7 @@ state *initialiseState(room_t *initialRoom) {
   initialState->player = initialisePlayer();
   initialState->currentRoom = initialRoom;
   char *username = malloc(sizeof(char) * USERNAME_CHAR_LIMIT);
-  malloc(username);
+  // malloc(username);
   strcpy(username, "sanchit");
   // scanf("%s\n", username);
   initialState->profile.username = username;

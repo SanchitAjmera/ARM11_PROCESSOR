@@ -2,7 +2,7 @@
 #define BOSS_H
 typedef struct boss_t boss_t;
 
-#include "../../game_util.h"
+#include "../../game_utils/game_util.h"
 #include "../player/player.h"
 #include "boss_constants.h"
 #include <stdbool.h>
@@ -67,8 +67,8 @@ extern boss_t *initBoss(const char *name);
 extern void freeBossFighting(aggressive_t *aggressive);
 extern void freeBossTeaching(passive_t *passive);
 extern void freeBoss(boss_t *boss);
-extern void initBattle(boss_t *boss, player_t *player);
-extern void processResult(boss_t *boss, player_t *player, int correct);
+extern void initBattle(boss_t *boss, player_t *player, bool correct);
+extern void processResult(boss_t *boss, player_t *player, bool correct);
 extern void quiz(boss_t *boss, player_t *player);
 extern void fight(state *currentState, char *boss);
 

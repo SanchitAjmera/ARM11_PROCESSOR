@@ -1,7 +1,8 @@
 #include "boss.h"
 #include "../../../src/common/util.h"
 #include "../../battle/battle.h"
-#include "../../emulateARM/emulateARM.h"
+#include "../../emulate_ARM/emulate_ARM.h"
+#include "../../game_utils/game_util.h"
 #include "../player/player.h"
 #include "boss_constants.h"
 #include <assert.h>
@@ -79,7 +80,7 @@ void freeBoss(boss_t *boss) {
   free(boss);
 }
 
-void initBattle(boss_t *boss, player_t *player) {
+void initBattle(boss_t *boss, player_t *player, bool correct) {
   freeBossTeaching(boss->state->teaching);
   boss->isPassive = false;
   boss->state->fighting = malloc(sizeof(*boss->state->fighting));
@@ -96,7 +97,7 @@ void initBattle(boss_t *boss, player_t *player) {
                               KGK_SPECIAL_NAME, KGK_MAX_HEALTH, KGK_MAX_HEALTH};
     (boss->state->fighting) = &kgkBattle;
   }
-  battle(boss, player);
+  battle(boss, player, correct);
 }
 
 // takes in the user's input for the answer
@@ -105,7 +106,7 @@ static char *getAnswer(void) {
   resizable_string *code = newString();
   char *input;
   int size = sizeof(*input) * MAX_LINE_CHARACTERS;
-  *input = malloc(size);
+  input = malloc(size);
   checkPtr(input);
   while (takeInput) {
     printf("                     >> ");

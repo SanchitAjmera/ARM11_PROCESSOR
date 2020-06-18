@@ -5,7 +5,7 @@ CFLAGS	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 all: player.o
 
-player.o: player.h ../../game_util.h
+player.o: player.h ../../game_utils/game_util.h
 
 clean:
 		rm -f $(wildcard *.o)

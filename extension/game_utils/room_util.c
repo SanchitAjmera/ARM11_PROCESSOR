@@ -1,3 +1,6 @@
+#include "../../src/common/util.h"
+#include "game_util.h"
+#include "item_util.h"
 
 // shows player their inventory of items
 void view_inventory() {}
@@ -52,7 +55,14 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   room->items = malloc(sizeof(item_t) * 20);
   checkPtr(room->items);
   room->boss = NULL;
+  room->description = malloc(sizeof(char) * DESCRIPTION_SIZE);
   return room;
+}
+
+void giveRoomDescriptions(room_t *rooms[]) {
+  for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
+    rooms[i]->description = strptr(descriptionTable[i]);
+  }
 }
 
 /* Initialises all rooms in building.
@@ -158,6 +168,8 @@ building_t *initialiseBuilding(room_t **out) {
   for (int i = 0; i < TOTAL_ROOM_COUNT; i++) {
     out[i] = roomArray[i];
   }
+  // assigning DESCRIPTIONs
+  giveRoomDescriptions(roomArray);
 
   item_t *itemArray[TOTAL_ITEM_COUNT - TOTAL_BUYABLE_ITEM_COUNT] = {
       cash1, cash2, cash3, cash4,    cash5, pear1,   pear2,
@@ -192,6 +204,7 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     free(room1->items);
   }
 
+  free(room1->description);
   free(room1);
 }
 
