@@ -1,7 +1,6 @@
 #include "print_util.h"
+#include "game_util.h"
 #include <stdio.h>
-
-#define CLEAR ("clear")
 
 void printPreparingGame(void) {
   for (int i = 0; i < 32; i++) {

@@ -1,3 +1,6 @@
+#include "game_util.h"
+#include "print_util.h"
+#include <stdio.h>
 
 void printCommmands(state *currentState) {
   system(CLEAR);

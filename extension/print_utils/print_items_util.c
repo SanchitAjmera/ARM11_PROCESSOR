@@ -1,4 +1,6 @@
-
+#include "game_util.h"
+#include "print_util.h"
+#include <stdio.h>
 
 char *getPropertyStr(Property property) {
   for (int i = 1; i < PROPERTY_NUM; i++) {
