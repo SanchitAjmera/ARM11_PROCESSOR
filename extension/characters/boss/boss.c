@@ -29,6 +29,7 @@ passive_t *createPassive(const char **questions, const char **answers,
   NULL_POINTER(answers);
   passive->questions = questions;
   passive->answers = answers;
+  passive->num = MAX_QUESTIONS;
   return passive;
 }
 
@@ -68,12 +69,6 @@ void freeBossTeaching(passive_t *passive) {
   if (passive == NULL) {
     return;
   }
-  for (int i = 0; i < passive->num; i++) {
-    free((void *)passive->questions[i]);
-    free((void *)passive->answers[i]);
-  }
-  free(passive->questions);
-  free(passive->answers);
   free(passive);
 }
 
@@ -129,40 +124,58 @@ static char *getAnswer(void) {
   }
   // printf("%s\n", code->value);
   char *output = runCode(code->value);
-  printf("%s", output);
+  printf("%s\n", output);
 
   freeString(code);
   free(input);
-  printf(">");
   return output;
 }
 
-void processResult(boss_t *boss, player_t *player, int correct) {
+void processResult(boss_t *boss, player_t *player, bool correct) {
   // TODO: special KGK case
+  /*
   printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
   if (correct > MIN_QUESTIONS_CORRECT) {
     printf("%s is happy you scored well!\n", boss->name);
     return;
   }
+  */
+
+  // the case where the answer is correct
+  if (correct) {
+    printf("                           Well done you answered correctly\n");
+    printf("                           You can attack %s\n", boss->name);
+  }
+  // case when the answer is incorrect
+  else {
+    printf("%s gets aggravated due to your low score...\n", boss->name);
+    printf("%s says: mitigations won't save you this time!\n", boss->name);
+  }
   // if small number of questions correct start turn-based comabat
-  printf("%s gets aggravated due to your low score...\n", boss->name);
-  printf("%s says: mitigations won't save you this time!\n", boss->name);
-  initBattle(boss, player);
+  initBattle(boss, player, correct);
 }
 
 // function to start the quiz on assembly code
 void quiz(boss_t *boss, player_t *player) {
   // PRE: boss->teaching has been initialised
-  int correct = 0;
-  printf("Wild %s appeared!\n%s starts asking you assembly questions!",
+  bool correct = false;
+  printf("Wild %s appeared!\n%s starts asking you assembly questions!\n",
          boss->name, boss->name);
-  for (int i = 0; i < boss->state->teaching->num; i++) {
-    printf("Question %d: %s\n", i + 1, boss->state->teaching->questions[i]);
-    const char *input = getAnswer();
-    if (strcmp(input, boss->state->teaching->answers[i]) == 0) {
-      correct++;
-    }
+  srand(time(NULL));
+  int randomQuestion = rand() % MAX_QUESTIONS;
+
+  printf("                        Question %d: %s\n", randomQuestion + 1,
+         boss->state->teaching->questions[randomQuestion]);
+  printf("                        enter 'END' on a separate line to submit "
+         "your answer\n");
+  const char *input = getAnswer();
+  const char *correctInput =
+      runCode(boss->state->teaching->answers[randomQuestion]);
+  printf("%s", correctInput);
+  if (strcmp(input, correctInput) == 0) {
+    correct = true;
   }
+
   processResult(boss, player, correct);
 }
 
