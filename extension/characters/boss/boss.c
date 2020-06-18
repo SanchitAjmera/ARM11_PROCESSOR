@@ -5,68 +5,69 @@
 #include "../../game_utils/game_util.h"
 #include "../player/player.h"
 #include "boss_constants.h"
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// dummy pre-processor function
-#define NULL_POINTER(pointer) (checkPtr(pointer))
-// dummy function
-lookupBoss_t lookupBoss(const char *name) {
+static lookupBoss_t lookupBoss(const char *name) {
   for (int i = 0; i < BOSSES; i++) {
     if (strcmp(bossTable[i].key, name) == 0) {
       return bossTable[i];
     }
   }
-  assert(false);
+  return {NULL, NULL, NULL};
 }
 
-passive_t *createPassive(const char **questions, const char **answers,
-                         int num) {
+static aggressive_t *createAggressive(const char *name) {
+  aggressive_t *aggressive = malloc(sizeof(*aggressive));
+  checkPtr(aggressive);
+  checkPtr(questions);
+  checkPtr(answers);
+  if (strcmp(name, "Tony")) {
+    aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
+                               TONY_ATTACK_NAME, TONY_SPECIAL_NAME,
+                               TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
+    boss->fighting = &tonyBattle;
+  } else {
+    aggressive_t kgkBattle = {KGK_ATTACK,       KGK_SPECIAL,    KGK_ATTACK_NAME,
+                              KGK_SPECIAL_NAME, KGK_MAX_HEALTH, KGK_MAX_HEALTH};
+    boss->fighting = &kgkBattle;
+  }
+  return aggressive;
+}
+
+static passive_t *createPassive(const char **questions, const char **answers) {
   passive_t *passive = malloc(sizeof(*passive));
-  NULL_POINTER(passive);
-  NULL_POINTER(questions);
-  NULL_POINTER(answers);
-  passive->questions = questions;
-  passive->answers = answers;
+  checkPtr(passive);
+  checkPtr(table.questions);
+  checkPtr(answers);
+  passive->questions = table.questions;
+  passive->answers = table.answers;
   passive->num = MAX_QUESTIONS;
   return passive;
 }
 
 // function to create and initialise a pointer to boss_t on the heap
-boss_t *initBoss(const char *name) {
-  boss_t *boss = malloc(sizeof(*boss));
-  NULL_POINTER(boss);
-  NULL_POINTER(name);
-  boss->name = name;
-  // defaults to true
-  boss->isPassive = true;
-  boss->state = malloc(sizeof(*boss->state));
-  NULL_POINTER(boss->state);
-  boss->state->teaching = NULL;
-  return boss;
-}
-
 boss_t *createBoss(const char *name) {
   // PRE: name is one of the pre-defined bosses
-  lookupBoss_t table = lookupBoss(name);
-  boss_t *boss = initBoss(table.key);
-  boss->state->teaching =
-      createPassive(table.questions, table.answers, MAX_QUESTIONS);
+  boss_t *boss = malloc(sizeof(*boss));
+  checkPtr(boss);
+  boss->name = table.key;
+  boss->teaching = createPassive(table.questions, table.answers);
+  boss->fighting = createAggressive(name);
   return boss;
 }
 
-void freeBossFighting(aggressive_t *aggressive) {
+static void freeBossFighting(aggressive_t *aggressive) {
   if (aggressive == NULL) {
     return;
   }
-  free((void *)aggressive->attackName);
-  free((void *)aggressive->specialName);
+  free((char *)aggressive->attackName);
+  free((char *)aggressive->specialName);
   free(aggressive);
 }
 
-void freeBossTeaching(passive_t *passive) {
+static void freeBossTeaching(passive_t *passive) {
   if (passive == NULL) {
     return;
   }
@@ -74,30 +75,27 @@ void freeBossTeaching(passive_t *passive) {
 }
 
 void freeBoss(boss_t *boss) {
-  freeBossTeaching(boss->state->teaching);
-  freeBossFighting(boss->state->fighting);
-  free((void *)boss->name);
+  freeBossTeaching(boss->teaching);
+  freeBossFighting(boss->fighting);
+  free((char *)boss->name);
   free(boss);
 }
 
-void initBattle(boss_t *boss, player_t *player, bool correct) {
-  freeBossTeaching(boss->state->teaching);
-  boss->isPassive = false;
-  boss->state->fighting = malloc(sizeof(*boss->state->fighting));
-  NULL_POINTER(boss->state->fighting);
-  boss->state->fighting = malloc(sizeof(*boss->state->fighting));
-  NULL_POINTER(boss->state->fighting);
+static void initBattle(boss_t *boss, player_t *player) {
+  boss->fighting = malloc(sizeof(*boss->fighting));
+  NULL_POINTER(boss->fighting);
+  boss->fighting = malloc(sizeof(*boss->fighting));
+  NULL_POINTER(boss->fighting);
   if (strcmp(boss->name, "Tony")) {
     aggressive_t tonyBattle = {TONY_ATTACK,      TONY_SPECIAL,
                                TONY_ATTACK_NAME, TONY_SPECIAL_NAME,
                                TONY_MAX_HEALTH,  TONY_MAX_HEALTH};
-    (boss->state->fighting) = &tonyBattle;
+    (boss->fighting) = &tonyBattle;
   } else {
     aggressive_t kgkBattle = {KGK_ATTACK,       KGK_SPECIAL,    KGK_ATTACK_NAME,
                               KGK_SPECIAL_NAME, KGK_MAX_HEALTH, KGK_MAX_HEALTH};
-    (boss->state->fighting) = &kgkBattle;
+    (boss->fighting) = &kgkBattle;
   }
-  battle(boss, player, correct);
 }
 
 // takes in the user's input for the answer
@@ -121,7 +119,6 @@ static char *getAnswer(void) {
       appendToString(code, input);
     }
   }
-  // printf("%s\n", code->value);
   char *output = runCode(code->value);
   printf("%s\n", output);
   freeString(code);
@@ -129,60 +126,46 @@ static char *getAnswer(void) {
   return output;
 }
 
-void processResult(boss_t *boss, player_t *player, bool correct) {
-  // TODO: special KGK case
-  /*
-  printf("You scored %d correct out of %d.\n", correct, MAX_QUESTIONS);
-  if (correct > MIN_QUESTIONS_CORRECT) {
-    printf("%s is happy you scored well!\n", boss->name);
-    return;
-  }
-  */
-
-  // the case where the answer is correct
+static void processResult(boss_t *boss, player_t *player, bool correct) {
+  // player can attack boss if correct
   if (correct) {
     printf("                           Well done you answered correctly\n");
     printf("                           You can attack %s\n", boss->name);
   }
-  // case when the answer is incorrect
+  // boss attacks player if incorrect
   else {
-    printf("%s gets aggravated due to your low score...\n", boss->name);
-    printf("%s says: mitigations won't save you this time!\n", boss->name);
+    printf("%s gets aggravated due to your incorrect answer...\n", boss->name);
   }
-  // if small number of questions correct start turn-based comabat
-  initBattle(boss, player, correct);
+  battle(boss, player);
 }
 
 // function to start the quiz on assembly code
-void quiz(boss_t *boss, player_t *player) {
+static void quiz(boss_t *boss, player_t *player) {
   // PRE: boss->teaching has been initialised
   bool correct = false;
   printf("Wild %s appeared!\n%s starts asking you assembly questions!\n",
          boss->name, boss->name);
   srand(time(NULL));
   int randomQuestion = rand() % MAX_QUESTIONS;
-
-  printf("                        Question %d: %s\n", randomQuestion + 1,
-         boss->state->teaching->questions[randomQuestion]);
+  printf("                        %s asks: %s\n", boss->name,
+         boss->teaching->questions[randomQuestion]);
   printf("                        enter 'END' on a separate line to submit "
          "your answer\n");
   const char *input = getAnswer();
-  const char *correctInput =
-      runCode(boss->state->teaching->answers[randomQuestion]);
+  const char *correctInput = runCode(boss->teaching->answers[randomQuestion]);
   printf("%s", correctInput);
   if (strcmp(input, correctInput) == 0) {
     correct = true;
   }
-
   processResult(boss, player, correct);
 }
 
 void fight(state *currentState, char *boss) {
-  if (!currentState->currentRoom->boss) {
+  if (IS_NULL(currentState->currentRoom->boss)) {
     printf("          No Boss in da house, go to Central Lab...\n");
     return;
   }
-  if (strcmp(boss, currentState->currentRoom->boss->name)) {
+  if (strcmp(boss, currentState->currentRoom->boss->name) != 0) {
     printf("there is no boss by that name ");
     return;
   }

@@ -1,6 +1,8 @@
 #ifndef BOSS_CONSTANTS_H
 #define BOSS_CONSTANTS_H
 
+#define FIGHT(boss) (boss->fighting)
+#define TEACH(boss) (boss->teaching)
 #define MIN_QUESTIONS_CORRECT (3)
 #define MAX_QUESTIONS (5)
 #define MAX_LINE_CHARACTERS (50)

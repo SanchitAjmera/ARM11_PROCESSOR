@@ -159,7 +159,7 @@ bool consume(state *currentState, char *itemName) {
     printf("You don't have '%s' to eat\n", itemName);
     return false;
   }
-  if (!(hasProperty(EDIBLE, item))) {
+  if (!hasProperty(EDIBLE, item)) {
     printf("You can't eat that!\n");
     return false;
   }
