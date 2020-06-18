@@ -6,19 +6,9 @@
 void printPreparingGame(void) {
   for (int i = 0; i < 32; i++) {
     system(CLEAR);
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
+    printf("\n\n\n\n\n\n\n\n");
     printf("                       Prepare for a new adventure...");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("                       ");
+    printf("\n\n\n                       ");
     for (int j = 0; j < i; j++) {
       printf("#");
     }
@@ -29,18 +19,12 @@ void printPreparingGame(void) {
     fflush(stdout);
     usleep(70000);
   }
-  printf("\n");
-  printf("\n");
+  printf("\n\n");
 }
 
 void printMenu(bool isInvalid) {
   system(CLEAR);
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("\n\n\n\n\n\n");
   printf("                          Welcome to the ICL Text Adventure!\n\n");
   printf("                          What would you like to do?\n\n");
   if (!isInvalid) {
@@ -49,34 +33,16 @@ void printMenu(bool isInvalid) {
   fflush(stdout);
   printf("                              [1] NEW GAME\n");
   printf("                              [2] LOAD GAME\n");
-  printf("                              [3] QUIT\n");
-  printf("\n");
+  printf("                              [3] QUIT\n\n");
   if (isInvalid) {
-    printf("                          You have entered an invalid choice\n");
-  } else {
-    printf("\n");
+    printf("                          You have entered an invalid choice");
   }
-  printf("\n");
-  printf("                          >> ");
-  return;
+  printf("\n\n                          >> ");
 }
 
 void printInvalid(void) {
   printf("\n                            Invalid choice entered!\n");
   usleep(800000);
-}
-
-void printItemDetails(item_t **items) {
-  printf("                                                             ROOM "
-         "ITEMS\n");
-  printf("                                                             ");
-  for (int i = 0; i < ITEM_NUM; i++) {
-    if (items[i]) {
-      printf("%s ", items[i]->key);
-      printf("\n");
-      printf("                                                             ");
-    }
-  }
 }
 
 // prints map of current and adjancent room on top right of terminal
@@ -122,16 +88,6 @@ void printStateDetails(state *state1) {
   }
   printInventory(state1);
   printf("\n\n");
-}
-
-void view(state *currentState, char *argument) {
-  if (strcmp(argument, "room") == 0) {
-    printRoomDetails(currentState->currentRoom);
-  } else if (strcmp(argument, "inventory") == 0) {
-    printInventory(currentState);
-  } else if (strcmp(argument, "map") == 0) {
-    printMap(currentState);
-  }
 }
 
 // printing the map -------------------------------------------------------
@@ -203,4 +159,16 @@ void printMap(state *currentState) {
   printf("                                 @   X   @                 \n");
   printf("                                 @       @                   \n");
   printf("                                 @@@@@@@@@               \n");
+}
+
+// --------------------------------------------------------------------------
+
+void view(state *currentState, char *argument) {
+  if (strcmp(argument, "room") == 0) {
+    printRoomDetails(currentState->currentRoom);
+  } else if (strcmp(argument, "inventory") == 0) {
+    printInventory(currentState);
+  } else if (strcmp(argument, "map") == 0) {
+    printMap(currentState);
+  }
 }
