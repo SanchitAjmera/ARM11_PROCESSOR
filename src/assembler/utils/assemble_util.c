@@ -93,7 +93,7 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines_t *output) {
 
 word assemble(symbol_table *symbolTable, instruction input) {
   symbol *instrSymbol = getSymbol(symbolTable, input.opcode);
-  if (!instrSymbol) {
+  if (instrSymbol == NULL) {
     return 0;
   }
   word binLine;
