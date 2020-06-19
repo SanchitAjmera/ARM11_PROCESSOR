@@ -1,0 +1,81 @@
+Extension specification
+
+name: computing bizzare
+
+Aim:
+	- create a text-based game
+	- prints prompts to players
+	- description of the rooms
+	- inventory
+	- store
+
+		- these are problems for player to solve
+		- also prints players score and rooms
+
+	- takes inputs from player
+
+		- inputs in the form of arm assembly code
+
+	- correctly checks inputs
+	- assigns some sort of point system
+
+		- point system relays to the next level
+		- problems get increasing difficult
+
+	- prints konstantinos
+
+
+functions:
+
+	GAME:
+		- music
+
+	cheatcode
+
+	PLAYER:
+
+		- dropItem()
+		- pickUpItem()
+		- move(north, south, east, west)
+		- playArm()
+		- buy()
+		- eat()
+		- viewProfile/Inventory/healthPoint()
+		- changeUsername()
+		- changeCharacter()
+		- updateSkins()
+		Optional(ONLINE DATABASE)
+
+	BOSSES:
+
+		- initialiseBoss()
+		-
+
+	ROOM:
+
+		- desciptions
+		- examineRoom()
+		- items/ objects
+		- bosses
+		- visits
+
+	CODING:
+
+		- giveQuestion()
+		- takeAnswer()
+		-
+
+	printState()
+	load game or new game
+	chooseRoom()
+	showMap()
+	randomlocation()
+	connectRoom()
+	intialiseRoom()
+	initialiseGame()
+	saveGame() - MORKUS
+
+		- writes to some file
+		- state
+	loadGame()
+		-
