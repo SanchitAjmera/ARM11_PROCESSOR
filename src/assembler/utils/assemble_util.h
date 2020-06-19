@@ -39,7 +39,8 @@ extern word assembleMultiply(symbol_table *symbolTable, instruction input);
 extern word assembleBranch(symbol_table *symbolTable, instruction input);
 extern uint parseImmediate(char *op2);
 extern void scanFile(FILE *armFile, symbol_table *symbolTable,
-                     file_lines *output);
-extern void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out);
+                     fileLines_t *output);
+extern void parseLines(fileLines_t *in, symbol_table *symbolTable, FILE *out);
+extern int lookup(const pair_t table[], const int size, const char *key);
 
 #endif

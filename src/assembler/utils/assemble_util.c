@@ -4,6 +4,7 @@
 #include "../assemble_constants.h"
 #include "../file_lines.h"
 #include "../symbol_table.h"
+#include "assemble_dpi.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,10 +38,10 @@ uint parseImmediate(char *op2) {
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
     and stores expressions in their string form at the end of the array. */
-void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines *output) {
+void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines_t *output) {
   // PRE: armFile, symbolTable, output are not NULL
   // Will be used to store expressions found during the scan
-  fileLines *expressions = newFileLines();
+  fileLines_t *expressions = newFileLines();
   /* Scan file for labels and expressions */
   char *line = malloc(LINE_CHAR_LIM * sizeof(*line));
   validatePtr(line, MEM_ASSIGN);
@@ -49,12 +50,12 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines *output) {
     bool isLabel = false;
     char *lineCopy = strptr(line);
     for (int i = 0; i < strlen(line); i++) {
-      if (lineCopy[i] == ':') { // Line is a label
-        char *label = strtok(lineCopy, ":");
-        symbol labelSymbol = {strptr(label), LABEL,
+      if (line[i] == ':') { // Line is a label
+        char *label = strtok(line, ":");
+        symbol labelSymbol = {strptr(label), LABEL, 0,
                               .body.address =
                                   output->lineCount * WORD_SIZE_BYTES};
-        addSymbol(symbolTable, labelSymbol);
+        addSymbol(symbolTable, &labelSymbol);
         isLabel = true;
         break;                         // Line contains only one label
       } else if (lineCopy[i] == '=') { // Line contains an =0x expression
@@ -81,8 +82,8 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines *output) {
   for (int i = 0; i < expressions->lineCount; i++) {
     char *expr = expressions->lines[i];
     word address = (output->lineCount + i) * WORD_SIZE_BYTES;
-    symbol exprSymbol = {strptr(expr), LABEL, .body.address = address};
-    addSymbol(symbolTable, exprSymbol);
+    symbol exprSymbol = {strptr(expr), LABEL, 0, .body.address = address};
+    addSymbol(symbolTable, &exprSymbol);
   }
 
   // Add expressions to the end of the file
@@ -90,8 +91,8 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines *output) {
   freeFileLines(expressions);
 }
 
-/* Performs the second pass on fileLines */
-void parseLines(fileLines *in, symbol_table *symbolTable, FILE *out) {
+/* Performs the second pass on fileLines_t */
+void parseLines(fileLines_t *in, symbol_table *symbolTable, FILE *out) {
   // PRE: in, symbolTable, out are not NULL
   for (int i = 0; i < in->lineCount; i++) {
     char *line = in->lines[i];

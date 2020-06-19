@@ -129,6 +129,7 @@ static bool checkCond(arm_t *state, word instruction) {
     // no other instruction
     // should never happen
     errorExit(UNEXPECTED_CASE);
+    return false;
   }
 }
 

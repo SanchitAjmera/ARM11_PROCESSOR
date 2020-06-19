@@ -1,7 +1,7 @@
 CC      	= gcc
 CFLAGS 		= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 EMULATE 	= emulator/fetch/emulate_fetch.o emulator/decode/emulate_decode.o emulator/execute/emulate_execute.o emulator/execute/emulate_execute_dpi.o
-ASSEMBLE 	= assembler/assemble_util.o assembler/file_lines.o assembler/symbol_table.o
+ASSEMBLE 	= assembler/utils/assemble_util.o assembler/file_lines.o assembler/symbol_table.o assembler/utils/assemble_dpi.o
 
 .SUFFIXES: .c .o
 
@@ -20,7 +20,7 @@ libs:
 
 test:
 	./emulate ~/arm11_testsuite/test_cases/add01
-	./assemble ~/arm11_testsuite/test_cases/b01.s
+	./assemble ~/arm11_testsuite/test_cases/b01.s b01
 	./testme | grep ^T
 
 clean:

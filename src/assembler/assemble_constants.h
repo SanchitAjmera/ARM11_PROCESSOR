@@ -1,6 +1,8 @@
 #ifndef ASSEMBLE_CONSTANTS_H
 #define ASSEMBLE_CONSTANTS_H
 
+#include <stdlib.h>
+
 // Universal constants & pre-processor functions
 #define MAX_NUM (4294967295)
 #define MAX_BYTE (0xFF)
@@ -19,6 +21,9 @@
 
 // Constants for Symbol Table
 #define INIT_S_TABLE_SIZE (32)
+#define LOAD_FACTOR (0.75)
+#define PRIME_INIT (7)
+#define PRIME_FACTOR (31)
 
 // Constants for Data Processing Instructions
 #define HEX_BASE (16)

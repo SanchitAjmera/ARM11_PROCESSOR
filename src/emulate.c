@@ -40,7 +40,7 @@ void printArmState(arm_t *state) {
 
 int main(int argc, char **argv) {
   if (argc == 1) {
-    errorExit(UNEXPECTED_ARG);
+    errorExit(UNEXPECTED_ARGS);
     // fprintf(stderr, "Please specify an ARM binary object code file.\n");
     // exit(EXIT_FAILURE);
   }

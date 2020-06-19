@@ -44,7 +44,7 @@ typedef enum { EQ, NE, GE = 10, LT, GT, LE, AL } Cond;
 typedef enum { LSL, LSR, ASR, ROR } Shift;
 
 extern char *strptr(const char *in);
-extern Error validatePtr(const void *ptr, Error error);
+extern void validatePtr(const void *ptr, Error error);
 extern void errorExit(Error error);
 
 #endif
