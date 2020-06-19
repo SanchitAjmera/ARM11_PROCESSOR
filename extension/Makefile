@@ -6,7 +6,7 @@ CFLAGS	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 all: libs game testme
 
-game: emulate_ARM/emulate_ARM.o ../src/emulator/libemulator.a ../src/assembler/libassembler.a ../src/common/util.o print_utils/libprint_utils.a game_utils/libgame_util.a characters/player/player.o battle/battle.o characters/boss/boss.o
+game: emulate_ARM/emulate_ARM.o print_utils/print_kgk_util.o ../src/emulator/libemulator.a ../src/assembler/libassembler.a ../src/common/util.o print_utils/libprint_utils.a game_utils/libgame_util.a characters/player/player.o battle/battle.o characters/boss/boss.o
 testme: testme.o game_utils/libgame_util.a characters/player/player.o battle/battle.o characters/boss/boss.o emulate_ARM/emulate_ARM.o print_utils/libprint_utils.a ../src/emulator/libemulator.a ../src/assembler/libassembler.a ../src/common/util.o
 testme.o:
 libs:
