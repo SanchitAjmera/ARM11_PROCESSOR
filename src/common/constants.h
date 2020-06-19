@@ -12,7 +12,7 @@
 
 // Common constants for data structures
 #define INITIAL_STRING_SIZE (16)
-#define STRING_SIZE_FACTOR (2)
+#define RESIZE_FACTOR (2)
 
 // Constants for Data Processing Instructions
 #define ROTATION_FACTOR (2)
