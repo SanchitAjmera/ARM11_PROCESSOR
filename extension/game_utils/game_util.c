@@ -114,17 +114,6 @@ void quit(void) {
   exit(EXIT_SUCCESS);
 }
 
-// displays introduction to player
-void introduction() {}
-
-// generates array of random numbers of length n
-void randomiseArray(int randArray[], int length, int randMax) {
-  srand(time(NULL));
-  for (int i = 0; i < length; i++) {
-    randArray[i] = rand() % randMax;
-  }
-}
-
 state *initialiseState(room_t *initialRoom) {
   state *initialState = malloc(sizeof(*initialState));
   checkPtr(initialState);
