@@ -2,8 +2,8 @@
 #include "../../common/constants.h"
 #include "../../common/util.h"
 #include "../assemble_constants.h"
-#include "../file_lines.h"
-#include "../symbol_table.h"
+#include "../file_lines/file_lines.h"
+#include "../symbol_table/symbol_table.h"
 #include "assemble_dpi.h"
 #include <stdbool.h>
 #include <stdio.h>
