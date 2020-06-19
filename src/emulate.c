@@ -1,4 +1,10 @@
 #include "common/constants.h"
+<<<<<<< HEAD
+=======
+#include "common/util.h"
+#include "emulator/decode/emulate_decode.h"
+#include "emulator/emulate_constants.h"
+>>>>>>> code-cleanup
 #include "emulator/emulate_util.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +14,7 @@ void printArmState(arm_t *state) {
   printf("Registers:\n");
   char registerName[5];
   for (int i = 0; i < NUM_REGISTERS; i++) {
-    if (i == 13 || i == 14) {
+    if (i == SP || i == LR) {
       // Not used in this exercise
       continue;
     }
@@ -35,13 +41,16 @@ void printArmState(arm_t *state) {
 
 int main(int argc, char **argv) {
   if (argc == 1) {
-    fprintf(stderr, "Please specify an ARM binary object code file.\n");
-    exit(EXIT_FAILURE);
+    errorExit(UNEXPECTED_ARGS);
+    // fprintf(stderr, "Please specify an ARM binary object code file.\n");
+    // exit(EXIT_FAILURE);
   }
 
-  arm_t *state = malloc(sizeof(arm_t));
+  arm_t *state = malloc(sizeof(*state));
+  validatePtr(state, MEM_ASSIGN);
   initArm(state, argv[1]);
-  decoded_t *decoded = malloc(sizeof(decoded_t));
+  decoded_t *decoded = malloc(sizeof(*decoded));
+  validatePtr(decoded, MEM_ASSIGN);
 
   // PIPELINE
   while ((state->decoded.isSet && state->decoded.instruction) ||

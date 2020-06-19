@@ -1,18 +1,47 @@
 #include "assemble_util.h"
-#include "../common/constants.h"
-#include "../common/util.h"
-#include "assemble_constants.h"
-#include "file_lines.h"
-#include <assert.h>
+#include "../../common/constants.h"
+#include "../../common/util.h"
+#include "../assemble_constants.h"
+#include "../file_lines.h"
+#include "../symbol_table.h"
+#include "assemble_dpi.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+<<<<<<< HEAD:src/assembler/assemble_util.c
+=======
+/* Returns respective int value; -1 for failure */
+int lookup(const pair_t table[], const int size, const char *key) {
+  for (int i = 0; i < size; i++) {
+    if (!strcmp(table[i].key, key)) {
+      return table[i].value;
+    }
+  }
+  return LOOKUP_FAILURE;
+}
+
+/* Converts string to integer for both denary and hex constants */
+uint parseImmediate(char *op2) {
+  // PRE: # has been removed from <#expression> (op2)
+  if (op2[0] == '-') {
+    REMOVE_FIRST_CHAR(op2);
+  }
+  if (strlen(op2) > 2) {
+    if (op2[0] == '0' && op2[1] == 'x') {
+      return (uint)strtol(op2, NULL, HEX_BASE);
+    }
+  }
+  return (uint)atoi(op2);
+}
+
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
 /* Performs the first scan on a file adding labels to the symbol table,
     as well as expressions. Returns an array of strings that
     represent each line, stripped of the newline \n,
     and stores expressions in their string form at the end of the array. */
+<<<<<<< HEAD:src/assembler/assemble_util.c
 void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
   assert(armFile != NULL && symbolTable != NULL && output != NULL);
 
@@ -21,16 +50,29 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
 
   /* Scan file for labels and expressions */
   char line[LINE_CHAR_LIM];
+=======
+void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines_t *output) {
+  // PRE: armFile, symbolTable, output are not NULL
+  // Will be used to store expressions found during the scan
+  fileLines_t *expressions = newFileLines();
+  /* Scan file for labels and expressions */
+  char *line = malloc(LINE_CHAR_LIM * sizeof(*line));
+  validatePtr(line, MEM_ASSIGN);
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   while (fgets(line, LINE_CHAR_LIM, armFile) != NULL) {
     /* iterate through chars in line */
     bool isLabel = false;
     for (int i = 0; i < strlen(line); i++) {
       if (line[i] == ':') { // Line is a label
         char *label = strtok(line, ":");
+<<<<<<< HEAD:src/assembler/assemble_util.c
         symbol labelSymbol = {strptr(label), LABEL,
+=======
+        symbol labelSymbol = {strptr(label), LABEL, 0,
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
                               .body.address =
                                   output->lineCount * WORD_SIZE_BYTES};
-        addSymbol(symbolTable, labelSymbol);
+        addSymbol(symbolTable, &labelSymbol);
         isLabel = true;
         break;                     // Line contains only one label
       } else if (line[i] == '=') { // Line contains an =0x expression
@@ -49,28 +91,36 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, file_lines *output) {
       }
     }
   }
+<<<<<<< HEAD:src/assembler/assemble_util.c
 
+=======
+  free(line);
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   /* Now that we have added all lines to output, we can add all expressions
      to the symbol table and calculate their address using lineCount */
   for (int i = 0; i < expressions->lineCount; i++) {
     char *expr = expressions->lines[i];
     word address = (output->lineCount + i) * WORD_SIZE_BYTES;
-    symbol exprSymbol = {strptr(expr), LABEL, .body.address = address};
-    addSymbol(symbolTable, exprSymbol);
+    symbol exprSymbol = {strptr(expr), LABEL, 0, .body.address = address};
+    addSymbol(symbolTable, &exprSymbol);
   }
 
   addLines(output, expressions->lines, expressions->lineCount);
-
   freeFileLines(expressions);
 }
 
+<<<<<<< HEAD:src/assembler/assemble_util.c
 /*  Performs the second pass on fileLines */
 void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   assert(out);
+=======
+/* Performs the second pass on fileLines_t */
+void parseLines(fileLines_t *in, symbol_table *symbolTable, FILE *out) {
+  // PRE: in, symbolTable, out are not NULL
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   for (int i = 0; i < in->lineCount; i++) {
     char *line = in->lines[i];
     char *rest = NULL;
-
     char *fields[5];
     int fieldCount = 0;
     char *token = strtok_r(line, " ,", &rest);
@@ -79,25 +129,41 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
       if (rest[0] == ' ') {
         rest++;
       }
+<<<<<<< HEAD:src/assembler/assemble_util.c
       if (rest[0] == '[') { // If the next token starts with a [
+=======
+      fields[fieldCount++] = token;
+      if (rest[0] == '[') {
+        // If the next token starts with a [
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
         token = strtok_r(rest, "]", &rest);
       } else {
         token = strtok_r(NULL, " ,", &rest);
       }
     }
+<<<<<<< HEAD:src/assembler/assemble_util.c
 
     instruction instr = {fields[0], fields + 1, fieldCount - 1,
                          i * WORD_SIZE_BYTES};
+=======
+    // Stores the current instruction's information in struct
+    instruction instr = {
+        fields[0], lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]),
+        fields + 1, fieldCount - 1, i * WORD_SIZE_BYTES};
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
     symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
-    assert(instrSymbol != NULL);
+    validatePtr(instrSymbol, MEM_ASSIGN);
     word binLine;
     if (instrSymbol->type == INSTR) {
       binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
     } else {
       binLine = parseImmediate(in->lines[i] + 1);
     }
+<<<<<<< HEAD:src/assembler/assemble_util.c
     printf("output: %x\n", binLine);
 
+=======
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
     fwrite(&binLine, sizeof(word), 1, out);
 
     for (int j = 0; j < fieldCount; j++) {
@@ -107,6 +173,7 @@ void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out) {
   }
 }
 
+<<<<<<< HEAD:src/assembler/assemble_util.c
 // removes first character and returns integer from string
 word rem(const char *string) { return atoi(++string); }
 
@@ -273,6 +340,10 @@ word assembleDPI(symbol_table *symbolTable, instruction input) {
 
 /*Provides assembly function for 'mla' and 'mul' instructions and
 returns the corresponding ARM-binary based on the instruction arguments*/
+=======
+/* Provides assembly function for 'mla' and 'mul' instructions and
+returns the corresponding ARM-binary based on the instruction arguments */
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
 word assembleMultiply(symbol_table *symbolTable, instruction input) {
   // Defining the components of the instruction
   word rd = rem(input.fields[0]) << MULT_RDEST_SHIFT;
@@ -319,6 +390,7 @@ word assembleBranch(symbol_table *symbolTable, instruction input) {
 /* removes bracketing around string
 converts remaining strings into unsigned int values
 returns array containing register address and expression address */
+<<<<<<< HEAD:src/assembler/assemble_util.c
 word *remBracket(char *string) {
   word *addresses = malloc(sizeof(word) * 4);
   int length = strlen(string);
@@ -327,12 +399,26 @@ word *remBracket(char *string) {
   for (int i = 1; i < length; i++) { // TODO ++string
     unbracketed[i - 1] = string[i];
   }
+=======
+static word *remBracket(const char *string) {
+  word *addresses = malloc(sizeof(*addresses) * 4);
+  validatePtr(addresses, MEM_ASSIGN);
+  char *unbracketed = strptr(string + 1);
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   // separator
   char *delim = ", ";
   // gets Rn
   char *token = strtok(unbracketed, delim);
   // gets address of register rn
+<<<<<<< HEAD:src/assembler/assemble_util.c
   addresses[0] = atoi(++token);
+=======
+  if (token[0] == 'r') {
+    // Rn could either be a register or immediate const
+    REMOVE_FIRST_CHAR(token);
+  }
+  addresses[0] = parseImmediate(token);
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   token = strtok(NULL, delim);
   // if expression exists in address
   if (token != NULL) {
@@ -350,30 +436,42 @@ SDTIOperation SDTIparser(char **fields, uint field_count) {
   // returns correct enum corresponding to decoded address
   if (field_count == 3) {
     return POST_RN_EXP;
-  } else if (strstr(fields[1], ",")) {
-    return PRE_RN_EXP;
-  } else if (strstr(fields[1], "r")) {
-    return PRE_RN;
-  } else {
-    return NUMERIC_CONST;
   }
+  if (strstr(fields[1], ",")) {
+    return PRE_RN_EXP;
+  }
+  if (strstr(fields[1], "r")) {
+    return PRE_RN;
+  }
+  return NUMERIC_CONST;
 }
 
 word assembleSDTI(symbol_table *symbolTable, instruction input) {
-  // TODO: (WIP) I refactored your `remBracket` & added var `addresses` - Alex
   word *addresses = remBracket(input.fields[1]);
+<<<<<<< HEAD:src/assembler/assemble_util.c
 
   // decoding address type
+=======
+  // Decoding address type
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   SDTIOperation operation = SDTIparser(input.fields, input.field_count);
   // Load bit
   word l = (!strcmp("ldr", input.opcode)) ? (1 << SDTI_L_SHIFT) : 0;
   // PRE/POST-INDEXING bits
   word p = (operation == POST_RN_EXP) ? 0 : (1 << SDTI_P_SHIFT);
+<<<<<<< HEAD:src/assembler/assemble_util.c
   // base register Rn
   word Rn = addresses[0] << SDTI_RN_SHIFT;
   // source/ dest register Rd
   word Rd = rem(input.fields[0]) << SDTI_RD_SHIFT;
   // offsets
+=======
+  // Base register Rn
+  word rn = addresses[0] << SDTI_RN_SHIFT;
+  // Source/ dest register Rd
+  word rd = REM_INT(input.fields[0]) << SDTI_RD_SHIFT;
+  // Offsets
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   word offset;
   // up bit
   word u = 1 << SDTI_U_SHIFT;
@@ -391,8 +489,12 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     offset = 0;
     break;
   case PRE_RN_EXP:
+<<<<<<< HEAD:src/assembler/assemble_util.c
     // offset
     // TODO: check if this is null? - Alex
+=======
+    // Offset
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
     offset = addresses[1];
     u = addresses[2] << SDTI_U_SHIFT;
     i = addresses[3] << SDTI_I_SHIFT;
@@ -406,6 +508,7 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
       // offset
       offset = getSymbol(symbolTable, input.fields[1])->body.address - 8;
       offset -= input.currentAddress;
+<<<<<<< HEAD:src/assembler/assemble_util.c
       // base register Rn
       Rn = PC << SDTI_RN_SHIFT;
     }
@@ -414,9 +517,23 @@ word assembleSDTI(symbol_table *symbolTable, instruction input) {
     // this should never happen, fields were most likely parsed wrong
     assert(false);
     break;
+=======
+      // Base register Rn
+      rn = PC << SDTI_RN_SHIFT;
+    }
+    break;
+  default:
+    // No other case - if so fields were most likely parsed incorrectly
+    errorExit(UNEXPECTED_CASE);
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
   }
   // freeing memory for the register address and expression address
   free(addresses);
+<<<<<<< HEAD:src/assembler/assemble_util.c
   // returning constructed instruction
   return ALWAYS | SDTI_HARDCODE | i | p | u | l | Rn | Rd | offset;
+=======
+  // Returning constructed instruction
+  return ALWAYS | SDTI_HARDCODE | i | p | u | l | rn | rd | offset;
+>>>>>>> code-cleanup:src/assembler/utils/assemble_util.c
 }

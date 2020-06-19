@@ -1,10 +1,21 @@
+<<<<<<< HEAD:src/emulator/emulate_util.c
 #include "emulate_util.h"
 #include "../common/util.h"
 #include <assert.h>
 #include <stdbool.h>
+=======
+#include "emulate_execute.h"
+#include "../../common/constants.h"
+#include "../../common/util.h"
+#include "../emulate_constants.h"
+#include "../emulate_util.h"
+#include "../fetch/emulate_fetch.h"
+#include "emulate_execute_dpi.h"
+>>>>>>> code-cleanup:src/emulator/execute/emulate_execute.c
 #include <stdio.h>
 #include <stdlib.h>
 
+<<<<<<< HEAD:src/emulator/emulate_util.c
 uint shiftByConstant(uint shiftPart) {
   // integer specified by bits 7-4
   return shiftPart >> GET_SHIFT_CONSTANT_SHIFT;
@@ -199,6 +210,11 @@ void executeDPI(arm_t *state, dp_t *decoded) {
 // function for checking if word is within MEMORY_CAPACITY
 // prints error if memory is out of bounds
 bool checkValidAddress(word address) {
+=======
+/* function for checking if word is within MEMORY_CAPACITY
+   prints error if memory is out of bounds */
+static bool checkValidAddress(word address) {
+>>>>>>> code-cleanup:src/emulator/execute/emulate_execute.c
   if (address > MEMORY_CAPACITY) {
     printf("Error: Out of bounds memory access at address 0x%08x\n", address);
     return false;
@@ -223,15 +239,21 @@ void store(arm_t *state, word sourceReg, word baseReg) {
 // function which loads address inside base register Rn into the memory
 void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
-  if (checkValidAddress(sourceAddr)) {
-    // value inside base register
-    word value = getWord(state->memory + sourceAddr, NOT_BIG_ENDIAN);
-    // laoding value into destination register Rd
-    state->registers[destReg] = value;
+  if (!checkValidAddress(sourceAddr)) {
+    return;
   }
+  // value inside base register
+  word value = getWord(state->memory + sourceAddr, NOT_BIG_ENDIAN);
+  // laoding value into destination register Rd
+  state->registers[destReg] = value;
 }
 
+<<<<<<< HEAD:src/emulator/emulate_util.c
 void executeSDTI(arm_t *state, sdt_t *decoded) {
+=======
+/* Executes all supported Single Data Transfer instructions */
+static void executeSDTI(arm_t *state, sdt_t *decoded) {
+>>>>>>> code-cleanup:src/emulator/execute/emulate_execute.c
   uint l = decoded->l;
   uint rd = decoded->rd;
   word offset = decoded->offset;
@@ -255,7 +277,12 @@ void executeSDTI(arm_t *state, sdt_t *decoded) {
   free(decoded);
 }
 
+<<<<<<< HEAD:src/emulator/emulate_util.c
 void executeMultiply(arm_t *state, multiply_t *decoded) {
+=======
+/* Executes all supported Multiply instructions */
+static void executeMultiply(arm_t *state, multiply_t *decoded) {
+>>>>>>> code-cleanup:src/emulator/execute/emulate_execute.c
   int regS = decoded->regS;
   int regM = decoded->regM;
   // initial execution of instruction
@@ -280,7 +307,12 @@ void flushPipeline(arm_t *state) {
   state->decoded.isSet = false;
 }
 
+<<<<<<< HEAD:src/emulator/emulate_util.c
 void executeBranch(arm_t *state, branch_t *decoded) {
+=======
+/* Execution of a branch instruction */
+static void executeBranch(arm_t *state, branch_t *decoded) {
+>>>>>>> code-cleanup:src/emulator/execute/emulate_execute.c
   flushPipeline(state);
   int offset = decoded->offset;
   // extracting information from instruction
@@ -404,7 +436,7 @@ void decode(arm_t *state, decoded_t *decoded) {
 }
 
 // checks the instruction condition with the CPSR flags
-bool checkCond(arm_t *state, word instruction) {
+static bool checkCond(arm_t *state, word instruction) {
   // CPSR flag bits
   word cpsr = state->registers[CPSR];
   uint n = GET_CPSR_N(cpsr);
@@ -430,7 +462,8 @@ bool checkCond(arm_t *state, word instruction) {
   default:
     // no other instruction
     // should never happen
-    assert(false);
+    errorExit(UNEXPECTED_CASE);
+    return false;
   }
 }
 
@@ -440,7 +473,6 @@ void execute(arm_t *state, decoded_t *decoded) {
     return;
   }
   switch (state->decoded.instructionType) {
-  // TODO: consider removing instruction from the paramter of each execution
   case BR:
     executeBranch(state, decoded->branch);
     break;
@@ -459,6 +491,6 @@ void execute(arm_t *state, decoded_t *decoded) {
   default:
     // no other instructions
     // should never happen
-    assert(false);
+    errorExit(UNEXPECTED_CASE);
   }
 }

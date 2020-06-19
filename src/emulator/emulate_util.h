@@ -86,6 +86,7 @@ typedef struct {
   instructionState_t decoded;
 } arm_t;
 
+<<<<<<< HEAD
 /* Takes in the ARM binary file's name and returns an ARM state pointer with
  * memory and register
  * pointers on heap, where memory is of size MEM_LIMIT bytes */
@@ -96,4 +97,6 @@ extern void fetch(arm_t *state);
 extern void decode(arm_t *state, decoded_t *decoded);
 extern void execute(arm_t *state, decoded_t *decoded);
 
+=======
+>>>>>>> code-cleanup
 #endif
