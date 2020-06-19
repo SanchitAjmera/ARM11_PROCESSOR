@@ -6,10 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define LOAD_FACTOR (0.75)
-#define PRIME_INIT (7)
-#define PRIME_FACTOR (31)
-
 symbol *newSymbol(void) {
   symbol *s = malloc(sizeof(symbol));
   s->name = NULL;
