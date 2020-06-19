@@ -9,16 +9,20 @@
 
 /* function for checking if word is within MEMORY_CAPACITY
    prints error if memory is out of bounds */
-static void checkValidAddress(word address) {
+static bool checkValidAddress(word address) {
   if (address > MEMORY_CAPACITY) {
-    errorExit(MEM_OVERFLOW);
+    printf("Error: Out of bounds memory access at address 0x%08x\n", address);
+    return false;
   }
+  return true;
 }
 
 /* Stores address, found in source register Rd, into the the memory */
 static void store(arm_t *state, word sourceReg, word baseReg) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
-  checkValidAddress(baseReg);
+  if (!checkValidAddress(baseReg)) {
+    return;
+  }
   // value inside source register Rd
   word value = state->registers[sourceReg];
   // storing value within memory located by address inside base register
@@ -30,7 +34,9 @@ static void store(arm_t *state, word sourceReg, word baseReg) {
 /* Function which loads address inside base register Rn into the memory */
 static void load(arm_t *state, word destReg, word sourceAddr) {
   // check for making sure address is within bounds of MEMORY_CAPACITY
-  checkValidAddress(sourceAddr);
+  if (!checkValidAddress(sourceAddr)) {
+    return;
+  }
   // value inside base register
   word value = getWord(state->memory + sourceAddr, NOT_BIG_ENDIAN);
   // laoding value into destination register Rd
