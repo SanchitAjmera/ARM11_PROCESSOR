@@ -1,4 +1,5 @@
 #include "util.h"
+#include "constants.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +28,7 @@ void extendString(resizableString_t *string) {
     return;
   }
   while (string->length >= string->maxLength - 1) {
-    string->maxLength *= STRING_SIZE_FACTOR;
+    string->maxLength *= RESIZE_FACTOR;
   }
   string->value =
       realloc(string->value, sizeof(*string->value) * string->maxLength);
