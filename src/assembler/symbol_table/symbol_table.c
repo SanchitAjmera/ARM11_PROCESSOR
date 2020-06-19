@@ -58,9 +58,6 @@ static int hash(const symbol_table *s, const char *key) {
   for (const char *copy = key; *copy; copy++) {
     index = (index * PRIME_FACTOR) + copy[0];
   }
-  // for (int i = 0; i < strlen(key); i++) {
-  //   index = (index * PRIME_FACTOR) + key[i];
-  // }
   return index % s->size;
 }
 
