@@ -14,10 +14,10 @@ symbol *newSymbol(void) {
 
 symbol **createSymbols(int num, int size) {
   symbol **symbols = malloc(num * size);
-  validatePtr(symbols, "Not enough memory.");
+  validatePtr(symbols, MEM_ASSIGN);
   for (int i = 0; i < num; i++) {
     symbols[i] = newSymbol();
-    validatePtr(symbols[i], "Not enough memory.");
+    validatePtr(symbols[i], MEM_ASSIGN);
     symbols[i][0].collisions = 0;
   }
   return symbols;
@@ -26,7 +26,7 @@ symbol **createSymbols(int num, int size) {
 /* Takes in a pointer to an uninitialised symbol table and initialises it */
 symbol_table *newSymbolTable(void) {
   symbol_table *s = malloc(sizeof(symbol_table));
-  validatePtr(s, "Not enough memory.");
+  validatePtr(s, MEM_ASSIGN);
   s->size = INIT_S_TABLE_SIZE;
   s->symbolCount = 0;
   s->symbols = createSymbols(s->size, sizeof(*s->symbols));
@@ -54,7 +54,7 @@ void freeTable(symbol_table *s) {
 
 static int hash(const symbol_table *s, const char *key) {
   int index = PRIME_INIT;
-  for (char *copy = key; *copy; copy++) {
+  for (const char *copy = key; *copy; copy++) {
     index = (index * PRIME_FACTOR) + copy[0];
   }
   // for (int i = 0; i < strlen(key); i++) {
@@ -97,11 +97,11 @@ static void rehash(symbol_table *s) {
     }
     // re sizing the collision list back to 1
     s->symbols[i] = realloc(s->symbols[i], sizeof(*s->symbols));
-    validatePtr(s->symbols[i]);
+    validatePtr(s->symbols[i], MEM_ASSIGN);
   }
   s->size *= 2;
   s->symbols = realloc(s->symbols, sizeof(*s->symbols) * s->size);
-  validatePtr(s->symbols);
+  validatePtr(s->symbols, MEM_ASSIGN);
   addSymbols(s, symbols, s->symbolCount);
   free(symbols);
 }
@@ -117,7 +117,7 @@ void addSymbol(symbol_table *s, symbol *entry) {
   if (size >= 1) {
     s->symbols[index1] =
         realloc(s->symbols[index1], sizeof(symbol) * (size + 1));
-    validatePtr(s->symbols[index1], "Not enough memory.");
+    validatePtr(s->symbols[index1], MEM_ASSIGN);
   }
   s->symbols[index1][size] = *entry;
   s->symbolCount++;
