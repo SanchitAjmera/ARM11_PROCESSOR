@@ -1,6 +1,6 @@
 #include "symbol_table.h"
-#include "../common/util.h"
-#include "assemble_constants.h"
+#include "../../common/util.h"
+#include "../assemble_constants.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,10 +1,11 @@
 CC			= gcc
 CFLAGS	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
-.PHONY: clean
+.PHONY: all clean
 
-assemble_util.o:
-assemble_dpi.o:
+all: file_lines.o
+
+file_lines.o: file_lines.h
 
 clean:
 		rm -f $(wildcard *.o)

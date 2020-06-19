@@ -1,6 +1,6 @@
 #include "file_lines.h"
-#include "../common/util.h"
-#include "assemble_constants.h"
+#include "../../common/util.h"
+#include "../assemble_constants.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
