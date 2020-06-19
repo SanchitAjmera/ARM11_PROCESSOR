@@ -1,4 +1,5 @@
 #include "symbol_table.h"
+#include "../../common/constants.h"
 #include "../../common/util.h"
 #include "../assemble_constants.h"
 #include <assert.h>
@@ -99,7 +100,7 @@ static void rehash(symbol_table *s) {
     s->symbols[i] = realloc(s->symbols[i], sizeof(*s->symbols));
     validatePtr(s->symbols[i], MEM_ASSIGN);
   }
-  s->size *= 2;
+  s->size *= RESIZE_FACTOR;
   s->symbols = realloc(s->symbols, sizeof(*s->symbols) * s->size);
   validatePtr(s->symbols, MEM_ASSIGN);
   addSymbols(s, symbols, s->symbolCount);
@@ -123,21 +124,4 @@ void addSymbol(symbol_table *s, symbol *entry) {
   s->symbolCount++;
   s->symbols[index1][0].collisions++;
   rehash(s);
-}
-
-// TODO: delete functions
-
-// dummy functions for compilation
-
-void printSymbol(symbol s) {}
-
-void printSymbolTable(symbol_table *s) {
-  for (int i = 0; i < s->size; i++) {
-    if (s->symbols[i] == NULL) {
-      continue;
-    }
-    for (int j = 0; j < s->symbols[i][0].collisions; j++) {
-      printf("key:%s\n", s->symbols[i][j].name);
-    }
-  }
 }
