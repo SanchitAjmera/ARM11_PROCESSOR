@@ -110,7 +110,7 @@ void initBattle(boss_t *boss, player_t *player, bool correct) {
 static char *getAnswer(void) {
   // TODO: get answer from user as input
   bool takeInput = true;
-  resizable_string *code = newString();
+  resizableString_t *code = newString();
 
   char *input = malloc(sizeof(char) * 50);
   while (takeInput) {

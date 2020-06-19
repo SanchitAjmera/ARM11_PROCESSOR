@@ -41,6 +41,8 @@ extern uint parseImmediate(char *op2);
 extern void scanFile(FILE *armFile, symbol_table *symbolTable,
                      fileLines_t *output);
 extern void parseLines(fileLines_t *in, symbol_table *symbolTable, FILE *out);
+extern word parseLine(symbol_table *symbolTable, const char *line,
+                      word address);
 extern int lookup(const pair_t table[], const int size, const char *key);
 
 #endif

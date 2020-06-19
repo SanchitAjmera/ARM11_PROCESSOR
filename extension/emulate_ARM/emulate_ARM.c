@@ -1,7 +1,9 @@
 #include "emulate_ARM.h"
 #include "../../src/assembler/assemble_constants.h"
-#include "../../src/assembler/assemble_util.h"
-#include "../../src/assembler/symbol_table.h"
+#include "../../src/assembler/file_lines/file_lines.h"
+#include "../../src/assembler/symbol_table/symbol_table.h"
+#include "../../src/assembler/utils/assemble_dpi.h"
+#include "../../src/assembler/utils/assemble_util.h"
 #include "../../src/common/constants.h"
 #include "../../src/common/util.h"
 #include "../../src/emulator/decode/emulate_decode.h"
@@ -19,39 +21,60 @@ static void initialiseArm(arm_t *arm) {
   arm->decoded.isSet = false;
 }
 
+symbol *newSymbol(void) {
+  symbol *s = malloc(sizeof(symbol));
+  s->name = NULL;
+  return s;
+}
+
+symbol **createSymbols(int num, int size) {
+  symbol **symbols = malloc(num * size);
+  validatePtr(symbols, MEM_ASSIGN);
+  for (int i = 0; i < num; i++) {
+    symbols[i] = newSymbol();
+    validatePtr(symbols[i], MEM_ASSIGN);
+    symbols[i][0].collisions = 0;
+  }
+  return symbols;
+}
+
 // Initialises the symbol table with predefined symbols
 // TODO: expand this function to take in a set of allowed instructions?
 static void initialiseSymbolTable(symbol_table *s) {
-  symbol predefinedSymbols[23] = {
-      {strptr("add"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("sub"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("rsb"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("and"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("eor"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("orr"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("mov"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("tst"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("teq"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("cmp"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("mul"), INSTR, .body.assembleFunc = assembleMultiply},
-      {strptr("mla"), INSTR, .body.assembleFunc = assembleMultiply},
-      {strptr("ldr"), INSTR, .body.assembleFunc = assembleSDTI},
-      {strptr("str"), INSTR, .body.assembleFunc = assembleSDTI},
-      {strptr("beq"), INSTR, .body.assembleFunc = assembleBranch},
-      {strptr("bne"), INSTR, .body.assembleFunc = assembleBranch},
-      {strptr("bge"), INSTR, .body.assembleFunc = assembleBranch},
-      {strptr("blt"), INSTR, .body.assembleFunc = assembleBranch},
-      {strptr("bgt"), INSTR, .body.assembleFunc = assembleBranch},
-      {strptr("ble"), INSTR, .body.assembleFunc = assembleBranch},
-      {strptr("b"), INSTR, .body.assembleFunc = assembleBranch},
-      {strptr("lsl"), INSTR, .body.assembleFunc = assembleDPI},
-      {strptr("andeq"), INSTR, .body.assembleFunc = assembleDPI}};
-  addSymbols(s, predefinedSymbols, 23);
+  symbol **pre = createSymbols(PREDEFINED_SYMBOLS_COUNT, sizeof(*pre));
+  symbol predefinedSymbols[PREDEFINED_SYMBOLS_COUNT] = {
+      {strptr("add"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("sub"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("rsb"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("and"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("eor"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("orr"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("mov"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("tst"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("teq"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("cmp"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("mul"), INSTR, 0, .body.assembleFunc = assembleMultiply},
+      {strptr("mla"), INSTR, 0, .body.assembleFunc = assembleMultiply},
+      {strptr("ldr"), INSTR, 0, .body.assembleFunc = assembleSDTI},
+      {strptr("str"), INSTR, 0, .body.assembleFunc = assembleSDTI},
+      {strptr("beq"), INSTR, 0, .body.assembleFunc = assembleBranch},
+      {strptr("bne"), INSTR, 0, .body.assembleFunc = assembleBranch},
+      {strptr("bge"), INSTR, 0, .body.assembleFunc = assembleBranch},
+      {strptr("blt"), INSTR, 0, .body.assembleFunc = assembleBranch},
+      {strptr("bgt"), INSTR, 0, .body.assembleFunc = assembleBranch},
+      {strptr("ble"), INSTR, 0, .body.assembleFunc = assembleBranch},
+      {strptr("b"), INSTR, 0, .body.assembleFunc = assembleBranch},
+      {strptr("lsl"), INSTR, 0, .body.assembleFunc = assembleDPI},
+      {strptr("andeq"), INSTR, 0, .body.assembleFunc = assembleDPI}};
+  for (int i = 0; i < PREDEFINED_SYMBOLS_COUNT; i++) {
+    pre[i][0] = predefinedSymbols[i];
+  }
+  addSymbols(s, pre, PREDEFINED_SYMBOLS_COUNT);
 }
 
 static void firstPass(const char *code, symbol_table *symbolTable,
-                      file_lines *output) {
-  file_lines *expressions = newFileLines();
+                      fileLines_t *output) {
+  fileLines_t *expressions = newFileLines();
 
   /* Scan file for labels and expressions */
   char *codeCopy = strptr(code);
@@ -68,7 +91,7 @@ static void firstPass(const char *code, symbol_table *symbolTable,
         symbol labelSymbol = {strptr(label), LABEL,
                               .body.address =
                                   output->lineCount * WORD_SIZE_BYTES};
-        addSymbol(symbolTable, labelSymbol);
+        addSymbol(symbolTable, &labelSymbol);
         isLabel = true;
         break;                         // Line contains only one label
       } else if (lineCopy[i] == '=') { // Line contains an =0x expression
@@ -97,7 +120,7 @@ static void firstPass(const char *code, symbol_table *symbolTable,
     char *expr = expressions->lines[i];
     word address = (output->lineCount + i) * WORD_SIZE_BYTES;
     symbol exprSymbol = {strptr(expr), LABEL, .body.address = address};
-    addSymbol(symbolTable, exprSymbol);
+    addSymbol(symbolTable, &exprSymbol);
   }
 
   // Add expressions to the end of the file
@@ -117,7 +140,7 @@ char *runCode(const char *code) {
   symbol_table *symbolTable = newSymbolTable();
   initialiseSymbolTable(symbolTable);
 
-  file_lines *codeLines = newFileLines();
+  fileLines_t *codeLines = newFileLines();
   // Perform first pass through code
   firstPass(code, symbolTable, codeLines);
 
@@ -146,7 +169,7 @@ char *runCode(const char *code) {
   }
 
   // Construct the output strings
-  resizable_string *output = newString();
+  resizableString_t *output = newString();
   for (int i = 0; i < NUM_REGISTERS; i++) {
     char printLine[32];
     if (i == PC) {
