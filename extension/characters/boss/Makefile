@@ -3,8 +3,8 @@ CFLAGS	= -Wall -g -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 
 .PHONY: clean
 
-assemble_util.o:
-assemble_dpi.o:
+boss.o: boss.h ../../battle/battle.h ../player/player.h boss_constants.h
 
 clean:
 		rm -f $(wildcard *.o)
+		rm -f boss_test

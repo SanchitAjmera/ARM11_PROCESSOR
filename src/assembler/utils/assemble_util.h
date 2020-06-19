@@ -4,8 +4,8 @@
 #include "../../common/constants.h"
 #include "../../common/util.h"
 #include "../assemble_constants.h"
-#include "../file_lines.h"
-#include "../symbol_table.h"
+#include "../file_lines/file_lines.h"
+#include "../symbol_table/symbol_table.h"
 #include "assemble_util.h"
 
 #include <stdio.h>
@@ -41,6 +41,8 @@ extern uint parseImmediate(char *op2);
 extern void scanFile(FILE *armFile, symbol_table *symbolTable,
                      fileLines_t *output);
 extern void parseLines(fileLines_t *in, symbol_table *symbolTable, FILE *out);
+extern word parseLine(symbol_table *symbolTable, const char *line,
+                      word address);
 extern int lookup(const pair_t table[], const int size, const char *key);
 
 #endif

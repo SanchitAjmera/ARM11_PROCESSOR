@@ -15,8 +15,10 @@
 
 #ignore junk files from compiling C code
 *.o
+*.a
 emulate
 assemble
+testme
 
 #ignore junk files from compiling Haskell code
 *.hi
@@ -37,5 +39,3 @@ assemble
 **/.idea
 **/cmake-build-debug
 CMakeLists.txt
-
-

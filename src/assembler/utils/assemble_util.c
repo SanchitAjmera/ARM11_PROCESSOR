@@ -2,8 +2,8 @@
 #include "../../common/constants.h"
 #include "../../common/util.h"
 #include "../assemble_constants.h"
-#include "../file_lines.h"
-#include "../symbol_table.h"
+#include "../file_lines/file_lines.h"
+#include "../symbol_table/symbol_table.h"
 #include "assemble_dpi.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -91,41 +91,55 @@ void scanFile(FILE *armFile, symbol_table *symbolTable, fileLines_t *output) {
   freeFileLines(expressions);
 }
 
-/* Performs the second pass on fileLines_t */
-void parseLines(fileLines_t *in, symbol_table *symbolTable, FILE *out) {
-  // PRE: in, symbolTable, out are not NULL
-  for (int i = 0; i < in->lineCount; i++) {
-    char *line = in->lines[i];
-    char *rest = NULL;
-    char *fields[5];
-    int fieldCount = 0;
-    char *token = strtok_r(line, " ,", &rest);
-    while (token != NULL) {
-      if (rest[0] == ' ') {
-        REMOVE_FIRST_CHAR(rest);
-        continue;
-      }
-      fields[fieldCount++] = token;
-      if (rest[0] == '[') {
-        // If the next token starts with a [
-        token = strtok_r(rest, "]", &rest);
-      } else {
-        token = strtok_r(NULL, " ,", &rest);
-      }
+word assemble(symbol_table *symbolTable, instruction input) {
+  symbol *instrSymbol = getSymbol(symbolTable, input.opcode);
+  if (instrSymbol == NULL) {
+    return 0;
+  }
+  word binLine;
+  if (instrSymbol->type == INSTR) {
+    binLine = instrSymbol->body.assembleFunc(symbolTable, input);
+  } else {
+    // Parse expression
+    binLine = parseImmediate(input.opcode + 1);
+  }
+  return binLine;
+}
+
+word parseLine(symbol_table *symbolTable, const char *line, word address) {
+  char *lineCopy = strptr(line);
+  char *rest = NULL;
+
+  char *fields[MAX_FIELD_COUNT];
+  int fieldCount = 0;
+  char *token = strtok_r(lineCopy, " ,", &rest);
+  while (token != NULL) {
+    if (rest[0] == ' ') {
+      REMOVE_FIRST_CHAR(rest);
+      continue;
     }
-    // Stores the current instruction's information in struct
-    instruction instr = {
-        fields[0], lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]),
-        fields + 1, fieldCount - 1, i * WORD_SIZE_BYTES};
-    symbol *instrSymbol = getSymbol(symbolTable, instr.opcode);
-    validatePtr(instrSymbol, MEM_ASSIGN);
-    word binLine;
-    if (instrSymbol->type == INSTR) {
-      binLine = instrSymbol->body.assembleFunc(symbolTable, instr);
+    fields[fieldCount++] = token;
+    if (rest[0] == '[') { // If the next token starts with a [
+      token = strtok_r(rest, "]", &rest);
     } else {
-      // Parse expression
-      binLine = parseImmediate(in->lines[i] + 1);
+      token = strtok_r(NULL, " ,", &rest);
     }
+  }
+
+  // Stores the current instruction's information in struct
+  instruction instr = {fields[0],
+                       lookup(opcodeTable, PREDEFINED_SYMBOLS_COUNT, fields[0]),
+                       fields + 1, fieldCount - 1, address};
+  word binLine = assemble(symbolTable, instr);
+  free(lineCopy);
+  return binLine;
+}
+
+/* Performs the second pass on fileLines */
+void parseLines(fileLines_t *in, symbol_table *symbolTable, FILE *out) {
+  for (int i = 0; i < in->lineCount; i++) {
+    // char *line = in->lines[i];
+    word binLine = parseLine(symbolTable, in->lines[i], i * WORD_SIZE_BYTES);
     fwrite(&binLine, sizeof(word), 1, out);
   }
 }

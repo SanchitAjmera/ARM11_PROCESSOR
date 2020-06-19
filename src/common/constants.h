@@ -10,6 +10,10 @@
 #define BYTE (8)
 #define COND_SHIFT (28)
 
+// Common constants for data structures
+#define INITIAL_STRING_SIZE (16)
+#define RESIZE_FACTOR (2)
+
 // Constants for Data Processing Instructions
 #define ROTATION_FACTOR (2)
 #define DPI_I_SHIFT (25)

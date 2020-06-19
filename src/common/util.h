@@ -43,8 +43,17 @@ typedef enum { EQ, NE, GE = 10, LT, GT, LE, AL } Cond;
 // Shift types
 typedef enum { LSL, LSR, ASR, ROR } Shift;
 
+typedef struct {
+  char *value;
+  int length, maxLength;
+} resizableString_t;
+
 extern char *strptr(const char *in);
 extern void validatePtr(const void *ptr, Error error);
 extern void errorExit(Error error);
+extern void extendString(resizableString_t *string);
+extern resizableString_t *newString(void);
+extern void appendToString(resizableString_t *string, const char *append);
+extern void freeString(resizableString_t *string);
 
 #endif

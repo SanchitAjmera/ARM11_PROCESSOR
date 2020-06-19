@@ -1,6 +1,6 @@
 #include "assembler/assemble_constants.h"
-#include "assembler/file_lines.h"
-#include "assembler/symbol_table.h"
+#include "assembler/file_lines/file_lines.h"
+#include "assembler/symbol_table/symbol_table.h"
 #include "assembler/utils/assemble_dpi.h"
 #include "assembler/utils/assemble_util.h"
 #include "common/util.h"
