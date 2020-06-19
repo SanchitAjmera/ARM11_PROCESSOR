@@ -25,6 +25,7 @@
 #define DPI_S_SHIFT (20)
 #define SHIFT_BY_REG_HARDCODE (1 << 4)
 #define RS_SHIFT (8)
+#define SHIFT_NUM_SHIFT (7)
 #define SHIFT_TYPE_SHIFT (5)
 #define SHIFT_NO_ARGS (3)
 #define SHIFT_TABLE_SIZE (4)

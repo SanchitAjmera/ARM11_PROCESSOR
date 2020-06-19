@@ -1,9 +1,13 @@
 #ifndef ASSEMBLE_UTIL_H
 #define ASSEMBLE_UTIL_H
 
-#include "../common/util.h"
-#include "file_lines.h"
-#include "symbol_table.h"
+#include "../../common/constants.h"
+#include "../../common/util.h"
+#include "../assemble_constants.h"
+#include "../file_lines.h"
+#include "../symbol_table.h"
+#include "assemble_util.h"
+
 #include <stdio.h>
 
 // Generic (string, enum) struct for lookups
@@ -30,12 +34,10 @@ static const pair_t opcodeTable[] = {
     {"bgt", BGT}, {"ble", BLE}, {"b", B}};
 
 // Assemble functions for all instruction types
-extern word assembleDPI(symbol_table *symbolTable, instruction input);
 extern word assembleSDTI(symbol_table *symbolTable, instruction input);
 extern word assembleMultiply(symbol_table *symbolTable, instruction input);
 extern word assembleBranch(symbol_table *symbolTable, instruction input);
 extern uint parseImmediate(char *op2);
-
 extern void scanFile(FILE *armFile, symbol_table *symbolTable,
                      file_lines *output);
 extern void parseLines(file_lines *in, symbol_table *symbolTable, FILE *out);
