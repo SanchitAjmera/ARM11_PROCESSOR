@@ -45,9 +45,6 @@ int main(int argc, char **argv) {
   scanFile(armFile, symbolTable, fileLines);
   fclose(armFile);
 
-  printFileLines(fileLines);
-  printSymbolTable(symbolTable);
-
   FILE *binOutFile = fopen(argv[2], "wb");
   parseLines(fileLines, symbolTable, binOutFile);
   fclose(binOutFile);

@@ -6,7 +6,7 @@
 #include <string.h>
 
 void testBool(bool cond, char *test_name) {
-  printf("T: %s : %s\n", test_name, cond ? "OK" : "FAIL");
+  printf("T: %-55s : %s\n", test_name, cond ? "OK" : "FAIL");
 }
 
 /* Loads a binary file fname into state memory and returns strcmp() between
