@@ -1,6 +1,8 @@
 #ifndef ASSEMBLE_CONSTANTS_H
 #define ASSEMBLE_CONSTANTS_H
 
+#include <stdlib.h>
+
 // Universal constants & pre-processor functions
 #define MAX_NUM (4294967295)
 #define MAX_BYTE (0xFF)

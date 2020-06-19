@@ -1,7 +1,8 @@
 #include "assembler/assemble_constants.h"
-#include "assembler/assemble_util.h"
 #include "assembler/file_lines.h"
 #include "assembler/symbol_table.h"
+#include "assembler/utils/assemble_dpi.h"
+#include "assembler/utils/assemble_util.h"
 #include "common/util.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,7 +39,7 @@ int main(int argc, char **argv) {
     pre[i][0] = predefinedSymbols[i];
   }
   addSymbols(symbolTable, pre, PREDEFINED_SYMBOLS_COUNT);
-  file_lines *fileLines = newFileLines();
+  fileLines_t *fileLines = newFileLines();
 
   FILE *armFile = fopen(argv[1], "r");
   scanFile(armFile, symbolTable, fileLines);

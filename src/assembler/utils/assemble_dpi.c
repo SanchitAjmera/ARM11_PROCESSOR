@@ -15,7 +15,7 @@ static word rotateLeft(word value, uint rotateNum) {
 }
 
 /* Exits program if num exceeds the highest representable value */
-extern void exitOverflow(uint num, const uint max) {
+void exitOverflow(uint num, const uint max) {
   if (num > max) {
     // fprintf(stderr, "Number cannot be represented.\n");
     errorExit(MEM_OVERFLOW);
@@ -23,7 +23,7 @@ extern void exitOverflow(uint num, const uint max) {
 }
 
 /* Calculates the rotation amount to fit an immediate constant in 8 bits */
-extern static word calcRotatedImm(word imm) {
+static word calcRotatedImm(word imm) {
   // PRE: imm can be represented by WORD_SIZE bits
   uint mask = 1;
   uint rotation = 0;
@@ -46,7 +46,7 @@ extern static word calcRotatedImm(word imm) {
 
 /* Calculates immediate value, including any rotation required to
 fit number into 8 bits */
-extern static word parseOperand2Imm(char **op2) {
+static word parseOperand2Imm(char **op2) {
   word imm = (word)parseImmediate(REMOVE_FIRST_CHAR(op2[0]));
   exitOverflow(imm, MAX_NUM);
   if (imm > MAX_BYTE) {
@@ -57,7 +57,7 @@ extern static word parseOperand2Imm(char **op2) {
 
 /* Calculates binary representation of a register operand2
 including registers with shifts attached */
-extern static word parseOperand2Reg(char **op2, uint args) {
+static word parseOperand2Reg(char **op2, uint args) {
   uint rm = REM_INT(op2[0]);
   if (args < SHIFT_NO_ARGS) {
     // No shift type (shift of 0)
@@ -78,7 +78,7 @@ extern static word parseOperand2Reg(char **op2, uint args) {
 }
 
 /* Checks type of operand 2 (imm/reg) and calls corresponding parser */
-extern static word parseOperand2(char **op2, uint args) {
+static word parseOperand2(char **op2, uint args) {
   // 8 bit immediate value - <#expression>
   // Decimal or hexadecimal ("#n" or “#0x...”)
   if (IS_IMMEDIATE(op2[0])) {
