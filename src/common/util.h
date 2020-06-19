@@ -3,16 +3,9 @@
 
 #include <stdint.h>
 
-typedef enum { ERR_PASS = 0, ERR_FAIL = 1 } Error;
-
 typedef uint32_t word;
 typedef uint8_t byte;
 typedef unsigned int uint;
-<<<<<<< HEAD
-
-extern char *strptr(char *in);
-extern Error validatePtr(const void *ptr, const char *error_msg);
-=======
 // Enums for checked errors within program
 typedef enum {
   ERR_FAIL,
@@ -52,7 +45,6 @@ typedef enum { LSL, LSR, ASR, ROR } Shift;
 
 extern char *strptr(const char *in);
 extern void validatePtr(const void *ptr, Error error);
->>>>>>> code-cleanup
 extern void errorExit(Error error);
 
 #endif

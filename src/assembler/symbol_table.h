@@ -1,7 +1,6 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#include "../common/constants.h"
 #include "../common/util.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -10,10 +9,11 @@ typedef struct instruction instruction;
 typedef struct symbol_table symbol_table;
 typedef struct symbol symbol;
 
-enum SymbolType { LABEL, INSTR };
+typedef enum { LABEL, INSTR } SymbolType;
 
 struct instruction {
-  char *opcode;  // String representing the instruction INCLUDING cond suffix
+  char *opcode; // String representing the instruction INCLUDING cond suffix
+  int mnemonic;
   char **fields; // Array of string fields.
   uint field_count;
   word currentAddress; // The current address of the instruction being called
@@ -27,12 +27,8 @@ struct symbol_table {
 
 struct symbol {
   char *name;
-<<<<<<< HEAD
-  enum SymbolType type;
-=======
   SymbolType type;
   int collisions;
->>>>>>> code-cleanup
   union {
     word address;                                      // LABEL
     word (*assembleFunc)(symbol_table *, instruction); // INSTR

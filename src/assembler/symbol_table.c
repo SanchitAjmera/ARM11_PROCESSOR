@@ -1,12 +1,11 @@
 #include "symbol_table.h"
+#include "../common/util.h"
+#include "assemble_constants.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-<<<<<<< HEAD
-#define INIT_S_TABLE_SIZE 32
-=======
 symbol *newSymbol(void) {
   symbol *s = malloc(sizeof(symbol));
   s->name = NULL;
@@ -23,21 +22,12 @@ symbol **createSymbols(int num, int size) {
   }
   return symbols;
 }
->>>>>>> code-cleanup
 
 /* Takes in a pointer to an uninitialised symbol table and initialises it */
 symbol_table *newSymbolTable(void) {
   symbol_table *s = malloc(sizeof(symbol_table));
-<<<<<<< HEAD
-  assert(s != NULL);
-  symbol *symbols = malloc(INIT_S_TABLE_SIZE * sizeof(symbol));
-  assert(symbols != NULL);
-  s->symbols = symbols;
-  s->maxSymbols = INIT_S_TABLE_SIZE;
-=======
   validatePtr(s, MEM_ASSIGN);
   s->size = INIT_S_TABLE_SIZE;
->>>>>>> code-cleanup
   s->symbolCount = 0;
   s->symbols = createSymbols(s->size, sizeof(*s->symbols));
   return s;
@@ -74,18 +64,6 @@ static int hash(const symbol_table *s, const char *key) {
 }
 
 symbol *getSymbol(const symbol_table *s, const char *name) {
-<<<<<<< HEAD
-  assert(s != NULL);
-
-  /* simple linear search by name */
-  for (int i = 0; i < s->symbolCount; i++) {
-    if (strcmp(s->symbols[i].name, name) == 0) {
-      return s->symbols + i;
-    }
-  }
-
-  return NULL;
-=======
   int index1 = hash(s, name);
   int size = s->symbols[index1][0].collisions;
   if (size >= 1) {
@@ -96,7 +74,6 @@ symbol *getSymbol(const symbol_table *s, const char *name) {
     }
   }
   return s->symbols[index1];
->>>>>>> code-cleanup
 }
 
 void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
