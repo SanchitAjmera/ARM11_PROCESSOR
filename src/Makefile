@@ -19,8 +19,6 @@ libs:
 	cd common; make;
 
 test:
-	./emulate ~/arm11_testsuite/test_cases/add01
-	./assemble ~/arm11_testsuite/test_cases/b01.s
 	./testme | grep ^T
 
 clean:
