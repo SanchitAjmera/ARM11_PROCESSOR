@@ -77,6 +77,7 @@ void playGame(state *currentState) {
     default:
       printf("I'm not sure how to '%s'?\n", command);
     }
+    free(reduced);
   }
   free(command);
   free(argument);
