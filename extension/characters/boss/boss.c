@@ -167,18 +167,28 @@ void processResult(boss_t *boss, player_t *player, bool correct) {
 void quiz(boss_t *boss, player_t *player) {
   // PRE: boss->teaching has been initialised
   bool correct = false;
-  printf("Wild %s appeared!\n%s starts asking you assembly questions!\n",
+  system(CLEAR);
+  printf("\n\n\n\n\n\n\n");
+  printf("                  Wild %s appeared!\n\n                  %s "
+         "starts asking "
+         "you assembly questions!\n\n",
          boss->name, boss->name);
   srand(time(NULL));
   int randomQuestion = rand() % 5;
 
-  printf("                        Question %d: %s\n", randomQuestion + 1,
+  printf("                  Question: %s\n\n",
          boss->state->teaching->questions[randomQuestion]);
-  printf("                        enter 'END' on a separate line to submit "
-         "your answer\n");
+  printf("                  enter 'END' on a separate line to submit "
+         "your answer\n\n");
+
   const char *input = getAnswer();
+  system(CLEAR);
   char *expectedOutput =
       runCode(boss->state->teaching->answers[randomQuestion]);
+  printf("\n\n\n");
+  printf("Your Output:\n\n");
+  printf("%s\n\n", input);
+  printf("Correct Output:\n\n");
   printf("%50s", expectedOutput);
   if (strcmp(input, expectedOutput) == 0) {
     correct = true;
