@@ -114,7 +114,7 @@ static char *getAnswer(void) {
 
   char *input = malloc(sizeof(char) * 50);
   while (takeInput) {
-    printf("                     >> ");
+    printf("                  >> ");
     fgets(input, sizeof(char) * 50, stdin);
 
     // Check if "END" was typed in

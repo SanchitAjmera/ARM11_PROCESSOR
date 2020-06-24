@@ -15,7 +15,7 @@ static const char *descriptionTable[] = {
     "You see a computer running Windows and the sight nearly blinds you with"
     "disgust ",
     "You see printers, shame they never work.",
-    "I spot a wild konstantinos, enter attack konstantinos...",
+    "     I spot a wild konstantinos, enter fight konstantinos...",
     "The stairway to the back of the lobby.",
     "Huxley 308 is quiet... a bit too quiet.",
     "Just empty seats...",
