@@ -9,7 +9,7 @@ static const char *descriptionTable[] = {
     "worries ",
     "This stairway leads to the LECTURE HALL.",
     "This leads to the empty LAB.",
-    "The begginning of the end...",
+    "The beginning of the end...",
     "The screens are red... prepare yourself for a LEXIS test ",
     "Just some dusty computers.",
     "You see a computer running Windows and the sight nearly blinds you with"
