@@ -66,12 +66,12 @@ symbol *getSymbol(const symbol_table *s, const char *name) {
   int size = s->symbols[index1][0].collisions;
   if (size >= 1) {
     for (int i = 0; i < size; i++) {
-      if (!strcmp(s->symbols[index1][i].name, name)) {
+      if (strcmp(s->symbols[index1][i].name, name) == 0) {
         return s->symbols[index1] + i;
       }
     }
   }
-  return s->symbols[index1];
+  return NULL; // s->symbols[index1];
 }
 
 void addSymbols(symbol_table *s, symbol **symbols, int symbolCount) {
