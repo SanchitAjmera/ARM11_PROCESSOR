@@ -30,6 +30,11 @@ static void attackPlayer(boss_t *boss, player_t *player, int damage,
                          const char *attackName) {
   player->health -= damage;
   printAttack(boss->name, damage, attackName);
+  FLUSH;
+  usleep(8000000);
+  printKonstantinosTalking();
+  FLUSH;
+  system(CLEAR);
 }
 
 // deals damage to the boss
