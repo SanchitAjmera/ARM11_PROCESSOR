@@ -30,8 +30,7 @@ void extendString(resizableString_t *string) {
   while (string->length >= string->maxLength - 1) {
     string->maxLength *= RESIZE_FACTOR;
   }
-  string->value =
-      realloc(string->value, sizeof(*string->value) * string->maxLength);
+  string->value = realloc(string->value, sizeof(char) * string->maxLength);
   validatePtr(string->value, MEM_ASSIGN);
 }
 
