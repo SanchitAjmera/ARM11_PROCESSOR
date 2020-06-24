@@ -2,6 +2,7 @@
 #include "../../src/common/util.h"
 #include "../characters/boss/boss.h"
 #include "../characters/player/player.h"
+#include "../print_utils/print_util.h"
 #include "battle_constants.h"
 #include <stdbool.h>
 #include <stdio.h>
