@@ -76,7 +76,7 @@ void freeBossTeaching(passive_t *passive) {
   // }
   // free((char **)passive->questions);
   // free((char **)passive->answers);
-  free(passive);
+  // free(passive);
 }
 
 void freeBoss(boss_t *boss) {
