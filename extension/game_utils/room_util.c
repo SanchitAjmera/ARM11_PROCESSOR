@@ -125,7 +125,7 @@ room_t *initialiseRoom(RoomName current_room, RoomPosition initial_position) {
   room->items = malloc(sizeof(item_t) * 20);
   checkPtr(room->items);
   room->boss = NULL;
-  room->description = malloc(sizeof(char) * DESCRIPTION_SIZE);
+  room->description = NULL;
   return room;
 }
 
@@ -142,10 +142,10 @@ building_t *initialiseBuilding(room_t **out) {
 
   building_t *huxley = malloc(sizeof(*huxley));
   checkPtr(huxley);
-
-  huxley->startRoom = malloc(sizeof(room_t));
-  checkPtr(huxley->startRoom);
-
+  /*
+    huxley->startRoom = malloc(sizeof(room_t));
+    checkPtr(huxley->startRoom);
+  */
   // initialise Items to put in rooms
   // initilaising 5 game apples
   item_t *pear1 = initialiseItem(PEAR_INDEX);
@@ -274,7 +274,9 @@ void freeRoom(room_t *entranceRoom, room_t *room1) {
     free(room1->items);
   }
 
-  free(room1->description);
+  if (room1->description != NULL) {
+    free(room1->description);
+  }
   free(room1);
 }
 
